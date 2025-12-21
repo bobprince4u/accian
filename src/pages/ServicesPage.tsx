@@ -13,17 +13,38 @@ export default function ServicesPage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative gradient-hero text-white">
-        <div className="container-custom py-20">
+      <section className="relative text-white overflow-hidden">
+        {/* Motion background */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          aria-hidden="true"
+        >
+          <source src="/videos/hero.mp4" type="video/mp4" />
+        </video>
+
+        {/* Gradient overlay */}
+        <div
+          className="absolute inset-0 gradient-hero opacity-80"
+          aria-hidden="true"
+        />
+
+        {/* Content */}
+        <div className="relative container-custom py-20">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="mb-6 text-white">
               Comprehensive IT Solutions for Modern Businesses
             </h1>
+
             <p className="text-xl text-white/90 leading-relaxed">
               From cybersecurity and forensics to data science and business
               intelligence, we deliver end-to-end technology solutions across
-              the UK, Nigeria, and worldwide that drive growth, enhance
-              security, and optimize operations.
+              the UK and worldwide that drive growth, enhance security, and
+              optimize operations.
             </p>
           </div>
         </div>
@@ -319,17 +340,17 @@ export default function ServicesPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="/portfolio#contact"
+                href="/contact"
                 className="bg-white text-[#1E40AF] px-7 py-3 rounded-md font-semibold uppercase text-sm tracking-wider transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 inline-block"
               >
                 Request Free Consultation
               </a>
-              <a
+              {/* <a
                 href="/portfolio"
                 className="bg-transparent border-2 border-white text-white px-7 py-3 rounded-md font-semibold uppercase text-sm tracking-wider transition-all duration-300 hover:bg-white hover:text-[#1E40AF] hover:-translate-y-0.5 inline-block"
               >
                 View Our Portfolio
-              </a>
+              </a> */}
             </div>
           </div>
         </div>

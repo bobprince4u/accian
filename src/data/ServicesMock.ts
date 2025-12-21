@@ -240,25 +240,25 @@ export const comparisonData = [
     service: "IT Consulting & Advisory",
     bestFor: "Organizations seeking strategic technology guidance and planning",
     timeline: "2-12 weeks",
-    investment: "£5,000 - £50,000",
+    investment: "-",
   },
   {
     service: "Software Development",
     bestFor: "Businesses needing custom applications or system automation",
     timeline: "2-6 months",
-    investment: "£10,000 - £100,000+",
+    investment: "-",
   },
   {
     service: "Education & Training",
     bestFor: "Teams and individuals seeking skills development",
     timeline: "1 day - 12 weeks",
-    investment: "£500 - £10,000",
+    investment: "-",
   },
   {
     service: "Social Care Support",
     bestFor: "Individuals and families requiring care services",
     timeline: "Ongoing",
-    investment: "£15 - £40/hour",
+    investment: "-",
   },
 ];
 

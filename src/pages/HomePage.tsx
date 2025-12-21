@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { LazyImage } from "../components/LazyImage";
+//import { LazyImage } from "../components/LazyImage";
 import ServiceCard from "../components/ServiceCard";
 
 import { trustIndicators, stats } from "../data/HomPageData";
-import { Globe, Network, Clock, Star } from "lucide-react";
+import { Globe, Clock, Star } from "lucide-react";
 
 interface Service {
   id?: string;
@@ -95,28 +95,39 @@ export default function HomePage() {
     <div>
       {/* Hero Section */}
       <section
-        className="relative gradient-hero text-white overflow-hidden"
+        className="relative text-white overflow-hidden"
         aria-labelledby="hero-heading"
       >
-        <div className="absolute inset-0 opacity-10" aria-hidden="true">
-          <LazyImage
-            src="https://images.unsplash.com/photo-1764053430604-d585d1f1dad6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB0ZWNobm9sb2d5JTIwbmV0d29ya3xlbnwxfHx8fDE3NjQ0NDAzNjZ8MA&ixlib=rb-4.1.0&q=80&w=1080"
-            alt="Technology Background"
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {/* Motion background video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+          aria-hidden="true"
+        >
+          <source src="/videos/hero.mp4" type="video/mp4" />
+        </video>
+
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
+
+        {/* Content */}
         <div className="relative container-custom section-spacing">
           <div className="max-w-4xl">
             <h1 id="hero-heading" className="mb-6 text-white">
               Global IT, Cybersecurity & Digital Innovation for Modern
               Businesses
             </h1>
+
             <p className="text-xl mb-8 text-white/90 leading-relaxed">
-              ACCIAN is a multinational technology and cybersecurity company
-              serving clients across the United Kingdom, Nigeria, and worldwide.
-              We deliver secure, scalable, and intelligent digital solutions
+              ACCIAN is a UK-registered technology and cybersecurity company
+              delivering secure, scalable, and intelligent digital solutions
               that help businesses grow, automate, and stay protected.
             </p>
+
             <div
               className="flex flex-col sm:flex-row gap-4"
               role="group"
@@ -129,6 +140,7 @@ export default function HomePage() {
               >
                 Request a Consultation
               </a>
+
               <a
                 href="/services"
                 className="btn-secondary inline-block text-center"
@@ -153,47 +165,55 @@ export default function HomePage() {
                 Our Global Presence
               </h2>
               <p className="text-lg text-[#64748B] leading-relaxed max-w-3xl mx-auto">
-                ACCIAN operates as a unified global brand with two legally
-                registered entities providing world-class services with
-                consistent quality, security, and innovation.
+                ACCIAN operates as a UK-registered company, delivering
+                high-quality digital solutions that meet international
+                standards, while remaining agile, innovative, and focused on
+                creating measurable value for clients.
               </p>
             </div>
 
             <div
-              className="grid grid-cols-1 lg:grid-cols-2 gap-12"
-              role="list"
-              aria-label="Global office locations"
+            //className="grid grid-cols-1 lg:grid-cols-2 gap-12"
+            //role="list"
+            //aria-label="Global office locations"
             >
               {/* UK Entity */}
-              <article className="flex gap-6" role="listitem">
-                <div className="shrink-0" aria-hidden="true">
-                  <div className="w-16 h-16 rounded-full bg-[#1E40AF]/10 flex items-center justify-center">
+              <article
+                className="flex flex-col items-center text-center m-auto"
+                role="listitem"
+              >
+                {/* Globe */}
+                <div className="mb-4" aria-hidden="true">
+                  <div className="w-16 h-16 rounded-full bg-[#1E40AF]/10 flex items-center justify-center mx-auto">
                     <Globe className="text-[#1E40AF]" size={32} />
                   </div>
                 </div>
-                <div className="flex-1">
-                  <div className="mb-2">
+
+                {/* Content */}
+                <div>
+                  <div className="mb-4">
                     <h3 className="text-2xl mb-1">ACCIAN</h3>
                     <p className="text-[#64748B]">United (UK)</p>
                   </div>
+
                   <ul
-                    className="space-y-3 text-[#64748B]"
+                    className="space-y-3 text-[#64748B] flex flex-col items-center"
                     aria-label="UK operations highlights"
                   >
                     <li className="flex items-start gap-2">
-                      <span className="text-[#14B8A6] mt-1" aria-hidden="true">
+                      <span className="text-[#14B8A6]" aria-hidden="true">
                         •
                       </span>
                       <span>International operations</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-[#14B8A6] mt-1" aria-hidden="true">
+                      <span className="text-[#14B8A6]" aria-hidden="true">
                         •
                       </span>
                       <span>Enterprise delivery</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <span className="text-[#14B8A6] mt-1" aria-hidden="true">
+                      <span className="text-[#14B8A6]" aria-hidden="true">
                         •
                       </span>
                       <span>EU & Americas client services</span>
@@ -202,7 +222,7 @@ export default function HomePage() {
                 </div>
               </article>
 
-              {/* Nigeria Entity */}
+              {/* Nigeria Entity 
               <article className="flex gap-6" role="listitem">
                 <div className="shrink-0" aria-hidden="true">
                   <div className="w-16 h-16 rounded-full bg-[#14B8A6]/10 flex items-center justify-center">
@@ -238,14 +258,14 @@ export default function HomePage() {
                     </li>
                   </ul>
                 </div>
-              </article>
+              </article> */}
             </div>
 
             <div className="text-center mt-12 pt-12 border-t border-gray-200">
               <p className="text-lg text-[#1E293B]">
-                Together, we combine technical excellence with strategic
-                thinking to provide comprehensive digital solutions that drive
-                measurable business outcomes. Our approach is mission-driven,
+                We combine technical excellence with strategic thinking to
+                provide comprehensive digital solutions that drive measurable
+                business outcomes. Our approach is mission-driven,
                 results-focused, and security-conscious.
               </p>
             </div>
@@ -400,7 +420,7 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <a href="/portfolio#contact" className="btn-primary inline-block">
+              <a href="/contact" className="btn-primary inline-block">
                 Schedule a Consultation
               </a>
               <a href="/services" className="btn-secondary inline-block">
@@ -437,7 +457,7 @@ export default function HomePage() {
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-semibold text-[#1E293B]">Phone</p>
-                  <p className="text-sm text-[#64748B]">+234 810 066 2390</p>
+                  <p className="text-sm text-[#64748B]">+44 7749 101623</p>
                 </div>
               </div>
 

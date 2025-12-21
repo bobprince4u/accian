@@ -382,7 +382,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h5 className="mb-1 text-[#1E293B]">Phone</h5>
-                      <p className="text-[#64748B] mb-1">+234 810 066 2390</p>
+                      <p className="text-[#64748B] mb-1"> +44 7749 101623</p>
                       <p className="text-sm text-[#64748B]">
                         Available: Monday - Friday, 9:00 AM - 5:00 PM WAT
                       </p>
@@ -426,9 +426,9 @@ export default function ContactPage() {
                       <MapPin className="text-[#1E40AF]" size={24} />
                     </div>
                     <div>
-                      <h5 className="mb-1 text-[#1E293B]">Global Offices</h5>
+                      <h5 className="mb-1 text-[#1E293B]">Our Office</h5>
                       <p className="text-[#64748B] mb-1">🇬🇧 United Kingdom</p>
-                      <p className="text-[#64748B]">🇳🇬 Nigeria</p>
+                      {/* <p className="text-[#64748B]">🇳🇬 Nigeria</p> */}
                       <p className="text-sm text-[#64748B] mt-2">
                         Serving clients worldwide
                       </p>

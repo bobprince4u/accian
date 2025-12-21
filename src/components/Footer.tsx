@@ -28,8 +28,8 @@ export default function Footer() {
             </p>
             <p className="text-sm text-white/70 leading-relaxed mb-6">
               A multinational technology company with operations in the United
-              Kingdom and Nigeria, delivering secure, innovative, and scalable
-              digital systems that empower businesses worldwide.
+              Kingdom, delivering secure, innovative, and scalable digital
+              systems that empower businesses worldwide.
             </p>
 
             {/* Global Entities */}
@@ -52,7 +52,7 @@ export default function Footer() {
                   <p className="text-xs text-white/60">United Kingdom</p>
                 </div>
               </div>
-              <div className="flex items-start gap-2">
+              {/* <div className="flex items-start gap-2">
                 <span className="text-xl" role="img" aria-label="Nigeria flag">
                   🇳🇬
                 </span>
@@ -61,8 +61,8 @@ export default function Footer() {
                     ACCIAN Nigeria Limited
                   </p>
                   <p className="text-xs text-white/60">Nigeria</p>
-                </div>
-              </div>
+                </div>*
+              </div>*/}
             </div>
           </div>
 
@@ -194,7 +194,7 @@ export default function Footer() {
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="Call us at +234 810 066 2390"
                 >
-                  +234 810 066 2390
+                  +44 7749 101623
                 </a>
               </li>
               <li className="flex items-start gap-2">
