@@ -479,9 +479,7 @@ export default function HomePage() {
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-semibold text-[#1E293B]">Email</p>
-                  <p className="text-sm text-[#64748B]">
-                    admin@acciannginfo.com
-                  </p>
+                  <p className="text-sm text-[#64748B]"></p>
                 </div>
               </div>
             </div>
