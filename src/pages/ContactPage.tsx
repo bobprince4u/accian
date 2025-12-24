@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Download,
+  //Download,
   Phone,
   Mail,
   Clock,
@@ -8,6 +8,7 @@ import {
   Send,
   CheckCircle2,
 } from "lucide-react";
+import { API_URL } from "../config/api";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -41,8 +42,7 @@ export default function ContactPage() {
     setSubmitting(true);
 
     try {
-      const response = await fetch("http://localhost:2025/api/contact", {
-        method: "POST",
+      const response = await fetch(`${API_URL}/api/contact`, {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
@@ -393,15 +393,15 @@ export default function ContactPage() {
                     <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/10 flex items-center justify-center shrink-0">
                       <Mail className="text-[#1E40AF]" size={24} />
                     </div>
-                    <div>
+                    {/* <div>
                       <h5 className="mb-1 text-[#1E293B]">Email</h5>
                       <p className="text-[#64748B] mb-1">
-                        admin@acciannginfo.com
+                      
                       </p>
                       <p className="text-sm text-[#64748B]">
                         Response Time: Within 24 business hours
                       </p>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="flex items-start gap-4">
@@ -448,7 +448,7 @@ export default function ContactPage() {
                 </button>
               </div>
 
-              <div className="card">
+              {/* <div className="card">
                 <h4 className="mb-4">Download Company Profile</h4>
                 <p className="text-[#64748B] mb-4">
                   Get our comprehensive company brochure with detailed
@@ -458,7 +458,7 @@ export default function ContactPage() {
                   <Download size={18} />
                   Download PDF
                 </button>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

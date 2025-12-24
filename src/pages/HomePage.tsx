@@ -5,6 +5,7 @@ import ServiceCard from "../components/ServiceCard";
 
 import { trustIndicators, stats } from "../data/HomPageData";
 import { Globe, Clock, Star } from "lucide-react";
+import { API_URL } from "../config/api";
 
 interface Service {
   id?: string;
@@ -44,7 +45,7 @@ export default function HomePage() {
   //fetch services data from API
   const fetchServices = async () => {
     try {
-      const res = await axios.get("http://localhost:2025/api/services");
+      const res = await axios.get(`${API_URL}/api/services`);
       const data = res.data.data || res.data;
       setServices(Array.isArray(data) ? data : []); // Adjust based on API response structure
     } catch {
@@ -57,7 +58,7 @@ export default function HomePage() {
   //fetch testimonials data from API
   const fetchTestimonials = async () => {
     try {
-      const res = await axios.get("http://localhost:2025/api/testimonials");
+      const res = await axios.get(`${API_URL}/api/testimonials`);
       const data = res.data.data || res.data;
 
       // Map backend keys to frontend keys

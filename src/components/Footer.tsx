@@ -207,9 +207,7 @@ export default function Footer() {
                   href="mailto:admin@acciannginfo.com"
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="Email us at admin@acciannginfo.com"
-                >
-                  admin@acciannginfo.com
-                </a>
+                ></a>
               </li>
               <li className="flex items-start gap-2">
                 <Clock
