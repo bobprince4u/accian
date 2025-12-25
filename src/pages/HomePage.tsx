@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 //import { LazyImage } from "../components/LazyImage";
 import ServiceCard from "../components/ServiceCard";
 
@@ -134,13 +135,13 @@ export default function HomePage() {
               role="group"
               aria-label="Call to action buttons"
             >
-              <a
-                href="#contact"
-                className="btn-primary inline-block text-center"
-                aria-label="Request a consultation"
+              <Link
+                to="/contact"
+                className="btn-primary"
+                aria-label="Request consultation"
               >
-                Request a Consultation
-              </a>
+                Request Consultation
+              </Link>
 
               <a
                 href="/services"
@@ -421,9 +422,13 @@ export default function HomePage() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <a href="/contact" className="btn-primary inline-block">
-                Schedule a Consultation
-              </a>
+              <Link
+                to="/contact"
+                className="btn-primary"
+                aria-label="Request consultation"
+              >
+                Request Consultation
+              </Link>
               <a href="/services" className="btn-secondary inline-block">
                 View Our Services
               </a>

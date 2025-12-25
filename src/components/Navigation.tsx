@@ -57,13 +57,13 @@ export default function Navigation() {
                 {link.name}
               </Link>
             ))}
-            <a
-              href="/contact"
+            <Link
+              to="/contact"
               className="btn-primary"
               aria-label="Request consultation"
             >
               Request Consultation
-            </a>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}

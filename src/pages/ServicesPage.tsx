@@ -1,6 +1,7 @@
 import React from "react";
 import { LazyImage } from "../components/LazyImage";
 import { CheckCircle2, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   detailedServices,
   industries,
@@ -96,13 +97,13 @@ export default function ServicesPage() {
                   </div>
                 </div>
 
-                <a
-                  href="/portfolio#contact"
+                <Link
+                  to="/portfolio#contact"
                   className="btn-primary inline-flex items-center gap-2"
                 >
                   Discuss Your Project
                   <ArrowRight size={18} />
-                </a>
+                </Link>
               </div>
 
               <div
@@ -339,12 +340,12 @@ export default function ServicesPage() {
               consultation to explore how we can drive your digital success.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/contact"
+              <Link
+                to="/contact"
                 className="bg-white text-[#1E40AF] px-7 py-3 rounded-md font-semibold uppercase text-sm tracking-wider transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 inline-block"
               >
                 Request Free Consultation
-              </a>
+              </Link>
               {/* <a
                 href="/portfolio"
                 className="bg-transparent border-2 border-white text-white px-7 py-3 rounded-md font-semibold uppercase text-sm tracking-wider transition-all duration-300 hover:bg-white hover:text-[#1E40AF] hover:-translate-y-0.5 inline-block"
