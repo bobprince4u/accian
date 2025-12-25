@@ -98,7 +98,7 @@ export default function ServicesPage() {
                 </div>
 
                 <Link
-                  to="/portfolio#contact"
+                  to="/contact"
                   className="btn-primary inline-flex items-center gap-2"
                 >
                   Discuss Your Project
