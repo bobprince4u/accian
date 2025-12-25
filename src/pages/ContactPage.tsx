@@ -9,7 +9,6 @@ import {
   MapPin,
   Send,
   CheckCircle2,
-  AlertCircle,
 } from "lucide-react";
 import { API_URL } from "../config/api";
 
@@ -28,7 +27,6 @@ export default function ContactPage() {
 
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -44,7 +42,6 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
 
     try {
       const response = await fetch(`${API_URL}/api/contact`, {
@@ -57,7 +54,6 @@ export default function ContactPage() {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to submit form");
       }
-      throw new Error(`Error: ${response.statusText}`);
 
       // Show success toast
       toast.success("Message sent successfully! We'll get back to you soon.", {
@@ -81,14 +77,13 @@ export default function ContactPage() {
           howHeard: "",
         });
         setSubmitting(false);
-      }, 5000);
+      }, 3000);
     } catch (error) {
       console.error("Failed to submit form:", error);
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong. Please try again.";
-      setError(errorMessage);
+      toast.error("Oops! Something went wrong. Please try again later.", {
+        duration: 5000,
+        position: "top-center",
+      });
       setSubmitting(false);
     }
   };
@@ -143,16 +138,6 @@ export default function ContactPage() {
                     className="space-y-6"
                     aria-label="Contact form"
                   >
-                    {error && (
-                      <div className="p-4 bg-red-50 border border-red-200 rounded-md flex items-start gap-3">
-                        <AlertCircle
-                          className="text-red-600 shrink-0 mt-0.5"
-                          size={20}
-                        />
-                        <p className="text-red-600 text-sm">{error}</p>
-                      </div>
-                    )}
-
                     <div>
                       <label
                         htmlFor="fullName"
