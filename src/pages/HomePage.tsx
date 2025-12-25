@@ -143,13 +143,13 @@ export default function HomePage() {
                 Request Consultation
               </Link>
 
-              <a
-                href="/services"
+              <Link
+                to="/services"
                 className="btn-secondary inline-block text-center"
                 aria-label="Explore our services"
               >
                 Explore Our Services
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -429,9 +429,9 @@ export default function HomePage() {
               >
                 Request Consultation
               </Link>
-              <a href="/services" className="btn-secondary inline-block">
+              <Link to="/services" className="btn-secondary inline-block">
                 View Our Services
-              </a>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
