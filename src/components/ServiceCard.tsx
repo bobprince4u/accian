@@ -1,10 +1,9 @@
 import { ArrowRight } from "lucide-react";
-//import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import { serviceIconBySlug } from "../lib/ServiceIcons";
 import { Link } from "react-router-dom";
 
 interface ServiceCardProps {
-  icon?: ReactNode;
+  slug: string;
   title: string;
   description: string;
   features: string[];
@@ -12,11 +11,13 @@ interface ServiceCardProps {
 }
 
 export default function ServiceCard({
-  icon,
+  slug,
   title,
   description,
   features,
 }: ServiceCardProps) {
+  const Icon = serviceIconBySlug[slug]; // component type
+
   return (
     <article
       className="card group"
@@ -26,7 +27,7 @@ export default function ServiceCard({
         className="w-14 h-14 rounded-lg bg-linear-to-br from-[#1E40AF] to-[#14B8A6] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
         aria-hidden="true"
       >
-        {icon}
+        {Icon && <Icon className="w-6 h-6 text-white" />}
       </div>
 
       <h3
@@ -43,7 +44,7 @@ export default function ServiceCard({
           Key Offerings:
         </p>
         <ul className="space-y-2" aria-label={`Key offerings for ${title}`}>
-          {(features || []).map((features, index) => (
+          {(features || []).map((feature, index) => (
             <li
               key={index}
               className="text-sm text-[#64748B] flex items-start gap-2"
@@ -51,7 +52,7 @@ export default function ServiceCard({
               <span className="text-[#14B8A6] mt-1" aria-hidden="true">
                 •
               </span>
-              <span>{features}</span>
+              <span>{feature}</span>
             </li>
           ))}
         </ul>

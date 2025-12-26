@@ -11,6 +11,10 @@ import {
   Target,
   Zap,
   Users,
+  Brain,
+  Cpu,
+  TrendingDown,
+  LineChart,
 } from "lucide-react";
 
 export const detailedServices = [
@@ -196,6 +200,47 @@ export const detailedServices = [
       "Promoting dignity, independence, and wellbeing",
     ],
   },
+  {
+    id: "data-science-ai",
+    icon: Brain,
+    title: "Data Science, AI & Predictive Analytics",
+    overview:
+      "Advanced data-driven solutions that turn raw data into actionable intelligence. We help organisations leverage machine learning, AI, and analytics to improve decision-making, reduce risk, and unlock new opportunities.",
+    image:
+      "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80",
+    deliverables: [
+      {
+        icon: Cpu,
+        name: "Machine learning modelling",
+        description:
+          "Design and deployment of machine learning models tailored to classification, forecasting, and optimisation problems",
+      },
+      {
+        icon: TrendingDown,
+        name: "Financial risk modelling",
+        description:
+          "Quantitative models to assess, monitor, and mitigate financial risks using statistical and AI-driven techniques",
+      },
+      {
+        icon: LineChart,
+        name: "Predictive analytics",
+        description:
+          "Data-driven forecasting solutions that anticipate trends, behaviors, and outcomes to support proactive decision-making",
+      },
+      {
+        icon: Database,
+        name: "Big data analytics",
+        description:
+          "Processing and analysis of large-scale datasets to uncover insights, patterns, and performance indicators",
+      },
+    ],
+    keyBenefits: [
+      "Make smarter, data-backed business decisions",
+      "Identify risks and opportunities early",
+      "Improve forecasting accuracy and operational planning",
+      "Extract real value from large and complex datasets",
+    ],
+  },
 ];
 
 export const industries = [
@@ -258,6 +303,13 @@ export const comparisonData = [
     service: "Social Care Support",
     bestFor: "Individuals and families requiring care services",
     timeline: "Ongoing",
+    investment: "-",
+  },
+  {
+    service: "Data Science, AI & Predictive Analytics",
+    bestFor:
+      "Organizations looking to leverage data, AI, and predictive insights for smarter decision-making",
+    timeline: "4–16 weeks",
     investment: "-",
   },
 ];

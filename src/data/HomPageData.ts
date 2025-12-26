@@ -6,7 +6,7 @@ export const trustIndicators = [
     icon: CheckCircle2,
     title: "Multinational Operations",
     description:
-      "Registered entities in the United Kingdom and Nigeria, providing global reach with local expertise and accountability.",
+      "Registered entities in the United Kingdom providing global reach with local expertise and accountability.",
   },
   {
     icon: Shield,
@@ -42,7 +42,7 @@ export const trustIndicators = [
 
 export const stats = [
   {
-    number: "50+",
+    number: "10+",
     label: "Projects Delivered",
     description: "Successful implementations across diverse industries",
   },
@@ -52,9 +52,9 @@ export const stats = [
     description: "Consistent delivery of quality solutions",
   },
   {
-    number: "2",
-    label: "Global Offices",
-    description: "United Kingdom and Nigeria operations",
+    number: "1",
+    label: "Global Office",
+    description: "United Kingdom operations",
   },
   {
     number: "24/7",

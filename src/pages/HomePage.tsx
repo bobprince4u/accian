@@ -10,6 +10,7 @@ import { API_URL } from "../config/api";
 
 interface Service {
   id?: string;
+  slug: string;
   title: string;
   description: string;
   icon?: React.ReactNode;
@@ -195,7 +196,7 @@ export default function HomePage() {
                 <div>
                   <div className="mb-4">
                     <h3 className="text-2xl mb-1">ACCIAN</h3>
-                    <p className="text-[#64748B]">United (UK)</p>
+                    <p className="text-[#64748B]">Limited (UK)</p>
                   </div>
 
                   <ul
@@ -218,7 +219,7 @@ export default function HomePage() {
                       <span className="text-[#14B8A6]" aria-hidden="true">
                         •
                       </span>
-                      <span>EU & Americas client services</span>
+                      <span>World wide client services</span>
                     </li>
                   </ul>
                 </div>
@@ -287,10 +288,11 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.slice(0, 3).map((service, index) => (
+            {services.slice(0, 3).map((service) => (
               <ServiceCard
-                key={index}
+                key={service.id}
                 {...service}
+                // slug={service.slug}
                 features={service.features || []}
                 link={service.link || "#"}
               />
@@ -298,10 +300,11 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 max-w-4xl mx-auto">
-            {services.slice(3).map((service, index) => (
+            {services.slice(3).map((service) => (
               <ServiceCard
-                key={index}
+                key={service.id}
                 {...service}
+                //slug={service.slug}
                 features={service.features || []}
                 link={service.link || "#"}
               />
@@ -443,7 +446,9 @@ export default function HomePage() {
                   <p className="text-sm font-semibold text-[#1E293B]">
                     Business Hours
                   </p>
-                  <p className="text-sm text-[#64748B]">Mon-Fri, 9AM-5PM WAT</p>
+                  <p className="text-sm text-[#64748B]">
+                    Mon-Fri, 9AM-17PM GMT
+                  </p>
                 </div>
               </div>
 

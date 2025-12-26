@@ -241,19 +241,19 @@ export default function ContactPage() {
                       >
                         <option value="">Select a service</option>
                         <option value="software-development">
-                          Software Development
+                          IT Consulting & Advisory
                         </option>
                         <option value="cybersecurity">
-                          Cybersecurity & Compliance
+                          Business & Domestic Software Development
                         </option>
                         <option value="software-testing">
-                          Software Testing & QA
+                          Education & Training
                         </option>
                         <option value="ai-automation">
-                          AI Automation & Chatbots
+                          Social Care & Community Support
                         </option>
                         <option value="cloud-solutions">
-                          Cloud Solutions & Infrastructure
+                          Data Science, AI & Predictive Analytics
                         </option>
                         <option value="it-consulting">
                           IT Strategy & Consulting
@@ -278,12 +278,12 @@ export default function ContactPage() {
                         aria-label="Select project budget range"
                         className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
                       >
-                        <option value="">Select budget range</option>
-                        <option value="under-500k">Under ₦500,000</option>
-                        <option value="500k-2m">₦500,000 - ₦2,000,000</option>
-                        <option value="2m-5m">₦2,000,000 - ₦5,000,000</option>
-                        <option value="5m-10m">₦5,000,000 - ₦10,000,000</option>
-                        <option value="above-10m">Above ₦10,000,000</option>
+                        <option value="">Select budget range</option>"
+                        {/*<option value="under-500k"></option>
+                        <option value="500k-2m"></option>
+                        <option value="2m-5m"></option>
+                        <option value="5m-10m"></option>
+                        <option value="above-10m"></option> */}
                         <option value="prefer-discuss">
                           Prefer to Discuss
                         </option>
@@ -400,7 +400,7 @@ export default function ContactPage() {
                       <h5 className="mb-1 text-[#1E293B]">Phone</h5>
                       <p className="text-[#64748B] mb-1"> +44 7749 101623</p>
                       <p className="text-sm text-[#64748B]">
-                        Available: Monday - Friday, 9:00 AM - 5:00 PM WAT
+                        Available: Monday - Friday, 9:00 AM - 17:00 PM GMT
                       </p>
                     </div>
                   </div>
@@ -427,7 +427,7 @@ export default function ContactPage() {
                     <div>
                       <h5 className="mb-1 text-[#1E293B]">Business Hours</h5>
                       <p className="text-[#64748B]">
-                        Monday - Friday: 9:00 AM - 5:00 PM WAT
+                        Monday - Friday: 9:00 AM - 17:00 PM GMT
                       </p>
                       <p className="text-[#64748B]">Saturday: By Appointment</p>
                       <p className="text-[#64748B]">Sunday: Closed</p>
@@ -460,7 +460,7 @@ export default function ContactPage() {
                   requirements and explore how we can help.
                 </p>
                 <button className="bg-white text-[#1E40AF] px-6 py-3 rounded-md font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 w-full">
-                  Schedule a Call
+                  Fill the Form
                 </button>
               </div>
 

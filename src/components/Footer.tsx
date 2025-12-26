@@ -99,7 +99,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  to="/portfolio#contact"
+                  to="/contact"
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="Contact us"
                 >
@@ -137,7 +137,7 @@ export default function Footer() {
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="Learn about Cybersecurity and Forensics services"
                 >
-                  Cybersecurity & Forensics
+                  IT Consulting & Advisory
                 </a>
               </li>
               <li>
@@ -146,7 +146,7 @@ export default function Footer() {
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="Learn about ICT and Digital Solutions"
                 >
-                  ICT & Digital Solutions
+                  Business & Domestic Software Development
                 </a>
               </li>
               <li>
@@ -155,7 +155,7 @@ export default function Footer() {
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="Learn about Software Development"
                 >
-                  Software Development
+                  Education & Training
                 </a>
               </li>
               <li>
@@ -164,7 +164,7 @@ export default function Footer() {
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="Learn about AI Automation and Chatbots"
                 >
-                  AI Automation & Chatbots
+                  Social Care & Community Support
                 </a>
               </li>
               <li>
@@ -173,7 +173,7 @@ export default function Footer() {
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="Learn about Software Testing and QA"
                 >
-                  Software Testing & QA
+                  Data Science, AI & Predictive Analytics
                 </a>
               </li>
             </ul>
@@ -218,7 +218,7 @@ export default function Footer() {
                 <span className="text-white/70">
                   Monday - Friday
                   <br />
-                  9:00 AM - 6:00 PM WAT
+                  9:00 AM - 17:00 PM GMT
                 </span>
               </li>
             </ul>
@@ -276,10 +276,7 @@ export default function Footer() {
         <div className="container-custom py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/60">
             <p>© {currentYear} ACCIAN. All Rights Reserved.</p>
-            <p>
-              Global Technology & Cybersecurity Company | UK & Nigeria
-              Operations
-            </p>
+            <p>Global Technology & Cybersecurity Company | UK Operations</p>
           </div>
         </div>
       </div>
