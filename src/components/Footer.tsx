@@ -258,7 +258,7 @@ export default function Footer() {
                   <Facebook size={16} aria-hidden="true" />
                 </a>
                 <a
-                  href="#"
+                  href="https://www.instagram.com/accianltd/"
                   className="w-8 h-8 rounded-full bg-white/10 hover:bg-[#14B8A6] flex items-center justify-center transition-colors"
                   aria-label="Follow us on Instagram"
                   role="listitem"
