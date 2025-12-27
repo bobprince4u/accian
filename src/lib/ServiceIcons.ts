@@ -4,7 +4,7 @@ import type { LucideIcon } from "lucide-react";
 
 export const serviceIconBySlug: Record<string, LucideIcon> = {
   "it-consulting": Lightbulb,
-  "software-development": Code,
+  "web-development": Code,
   "education-training": GraduationCap,
   "social-care": Heart,
   "data-science-ai": Brain,

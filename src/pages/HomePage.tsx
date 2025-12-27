@@ -292,7 +292,7 @@ export default function HomePage() {
               <ServiceCard
                 key={service.id}
                 {...service}
-                // slug={service.slug}
+                slug={service.slug}
                 features={service.features || []}
                 link={service.link || "#"}
               />
@@ -304,7 +304,7 @@ export default function HomePage() {
               <ServiceCard
                 key={service.id}
                 {...service}
-                //slug={service.slug}
+                slug={service.slug}
                 features={service.features || []}
                 link={service.link || "#"}
               />
