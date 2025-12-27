@@ -261,7 +261,7 @@ Copyright © 2025 ACCIAN Uk Limited. All rights reserved.
 
 ## 📞 Contact
 
-**ACCIAN Nigeria Limited**
+**ACCIAN Limited**
 
 - Website: [https://accian.co.uk](https://accian.co.uk)
 - Email: admin@acciannginfo.com
