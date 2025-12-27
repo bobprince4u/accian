@@ -1,24 +1,27 @@
-import { ArrowRight, Box } from "lucide-react"; // Box as fallback
-import { serviceIconBySlug } from "../lib/ServiceIcons";
+import { ArrowRight, Box } from "lucide-react";
+import * as LucideIcons from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ServiceCardProps {
-  slug: string;
   title: string;
   description: string;
   features: string[];
   link: string;
+  icon?: string; // API-provided icon name
 }
 
 export default function ServiceCard({
-  slug,
   title,
   description,
   features,
   link,
+  icon,
 }: ServiceCardProps) {
-  // Get icon from mapping, fallback to Box if missing
-  const Icon = serviceIconBySlug[slug] || Box;
+  // Ensure the icon is a valid React component
+  const RawIcon = icon
+    ? (LucideIcons[icon as keyof typeof LucideIcons] as React.ElementType)
+    : Box;
+  const Icon: React.ElementType = RawIcon || Box;
 
   return (
     <article
