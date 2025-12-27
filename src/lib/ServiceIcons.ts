@@ -1,8 +1,8 @@
+// lib/ServiceIcons.ts
 import { Lightbulb, Code, GraduationCap, Heart, Brain } from "lucide-react";
-
 import type { LucideIcon } from "lucide-react";
 
-export const serviceIconBySlug: Record<string, LucideIcon> = {
+export const iconMap: Record<string, LucideIcon> = {
   "it-consulting": Lightbulb,
   "web-development": Code,
   "education-training": GraduationCap,

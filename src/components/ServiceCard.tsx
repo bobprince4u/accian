@@ -1,5 +1,5 @@
-import { ArrowRight } from "lucide-react";
-import * as LucideIcons from "lucide-react";
+import { ArrowRight, Code } from "lucide-react";
+import { iconMap } from "../lib/ServiceIcons";
 import { Link } from "react-router-dom";
 
 interface ServiceCardProps {
@@ -8,6 +8,7 @@ interface ServiceCardProps {
   features: string[];
   link: string;
   icon?: string; // API-provided icon name
+  slug: string;
 }
 
 export default function ServiceCard({
@@ -15,12 +16,9 @@ export default function ServiceCard({
   description,
   features,
   link,
-  icon,
+  slug,
 }: ServiceCardProps) {
-  // pick icon component dynamically
-  const Icon =
-    icon &&
-    (LucideIcons[icon as keyof typeof LucideIcons] as React.ElementType);
+  const Icon = iconMap[slug] ?? Code; // fallback if missing
 
   return (
     <article
@@ -31,7 +29,7 @@ export default function ServiceCard({
         className="w-14 h-14 rounded-lg bg-linear-to-br from-[#1E40AF] to-[#14B8A6] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
         aria-hidden="true"
       >
-        {Icon ? <Icon className="w-6 h-6 text-white" /> : null}
+        <Icon className="w-6 h-6 text-white" />
       </div>
 
       <h3
