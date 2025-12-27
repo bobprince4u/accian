@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Box } from "lucide-react"; // Box as fallback
 import { serviceIconBySlug } from "../lib/ServiceIcons";
 import { Link } from "react-router-dom";
 
@@ -15,8 +15,10 @@ export default function ServiceCard({
   title,
   description,
   features,
+  link,
 }: ServiceCardProps) {
-  const Icon = serviceIconBySlug[slug]; // component type
+  // Get icon from mapping, fallback to Box if missing
+  const Icon = serviceIconBySlug[slug] || Box;
 
   return (
     <article
@@ -27,7 +29,7 @@ export default function ServiceCard({
         className="w-14 h-14 rounded-lg bg-linear-to-br from-[#1E40AF] to-[#14B8A6] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
         aria-hidden="true"
       >
-        {Icon && <Icon className="w-6 h-6 text-white" />}
+        <Icon className="w-6 h-6 text-white" />
       </div>
 
       <h3
@@ -59,7 +61,7 @@ export default function ServiceCard({
       </div>
 
       <Link
-        to="/services"
+        to={link}
         className="inline-flex items-center gap-2 text-[#1E40AF] font-semibold text-sm group-hover:gap-3 transition-all duration-300"
         aria-label={`Learn more about ${title}`}
       >
