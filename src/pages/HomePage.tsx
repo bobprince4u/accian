@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-//import { LazyImage } from "../components/LazyImage";
 import ServiceCard from "../components/ServiceCard";
-
 import { trustIndicators, stats } from "../data/HomPageData";
 import { Globe, Clock, Star } from "lucide-react";
 import { API_URL } from "../config/api";
@@ -33,6 +31,42 @@ interface TestimonialResponse {
   rating?: number;
 }
 
+// Loading Skeleton Components
+const ServiceCardSkeleton = () => (
+  <div className="card animate-pulse">
+    <div className="w-12 h-12 bg-gray-200 rounded-lg mb-4"></div>
+    <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
+    <div className="space-y-2 mb-4">
+      <div className="h-4 bg-gray-200 rounded"></div>
+      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+    </div>
+    <div className="space-y-2">
+      <div className="h-3 bg-gray-200 rounded w-4/5"></div>
+      <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+      <div className="h-3 bg-gray-200 rounded w-4/5"></div>
+    </div>
+  </div>
+);
+
+const TestimonialSkeleton = () => (
+  <div className="card animate-pulse">
+    <div className="flex gap-1 mb-4">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
+      ))}
+    </div>
+    <div className="space-y-2 mb-6">
+      <div className="h-4 bg-gray-200 rounded"></div>
+      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+      <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+    </div>
+    <div>
+      <div className="h-5 bg-gray-200 rounded w-1/2 mb-2"></div>
+      <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+    </div>
+  </div>
+);
+
 export default function HomePage() {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,7 +83,7 @@ export default function HomePage() {
     try {
       const res = await axios.get(`${API_URL}/api/services`);
       const data = res.data.data || res.data;
-      setServices(Array.isArray(data) ? data : []); // Adjust based on API response structure
+      setServices(Array.isArray(data) ? data : []);
     } catch {
       setError("Failed to fetch services");
     } finally {
@@ -63,13 +97,12 @@ export default function HomePage() {
       const res = await axios.get(`${API_URL}/api/testimonials`);
       const data = res.data.data || res.data;
 
-      // Map backend keys to frontend keys
       const mappedTestimonials = Array.isArray(data)
         ? data.map((t: TestimonialResponse) => ({
             quote: t.testimonialText,
             author: t.clientName,
             position: t.clientPosition || "",
-            rating: t.rating || 5, // optional default
+            rating: t.rating || 5,
           }))
         : [];
 
@@ -81,18 +114,10 @@ export default function HomePage() {
     }
   };
 
-  // useEffect that calls it
   useEffect(() => {
     fetchServices();
     fetchTestimonials();
   }, []);
-
-  if (loading) {
-    return <p className="text-center">Loading services...</p>;
-  }
-  if (error) {
-    return <p className="text-center text-red-500">{error}</p>;
-  }
 
   return (
     <div>
@@ -101,7 +126,6 @@ export default function HomePage() {
         className="relative text-white overflow-hidden"
         aria-labelledby="hero-heading"
       >
-        {/* Motion background video */}
         <video
           autoPlay
           muted
@@ -114,10 +138,8 @@ export default function HomePage() {
           <source src="/videos/hero.mp4" type="video/mp4" />
         </video>
 
-        {/* Overlay for readability */}
         <div className="absolute inset-0 bg-black/60" aria-hidden="true" />
 
-        {/* Content */}
         <div className="relative container-custom section-spacing">
           <div className="max-w-4xl">
             <h1 id="hero-heading" className="mb-6 text-white">
@@ -175,24 +197,17 @@ export default function HomePage() {
               </p>
             </div>
 
-            <div
-            //className="grid grid-cols-1 lg:grid-cols-2 gap-12"
-            //role="list"
-            //aria-label="Global office locations"
-            >
-              {/* UK Entity */}
+            <div>
               <article
                 className="flex flex-col items-center text-center m-auto"
                 role="listitem"
               >
-                {/* Globe */}
                 <div className="mb-4" aria-hidden="true">
                   <div className="w-16 h-16 rounded-full bg-[#1E40AF]/10 flex items-center justify-center mx-auto">
                     <Globe className="text-[#1E40AF]" size={32} />
                   </div>
                 </div>
 
-                {/* Content */}
                 <div>
                   <div className="mb-4">
                     <h3 className="text-2xl mb-1">ACCIAN</h3>
@@ -224,44 +239,6 @@ export default function HomePage() {
                   </ul>
                 </div>
               </article>
-
-              {/* Nigeria Entity 
-              <article className="flex gap-6" role="listitem">
-                <div className="shrink-0" aria-hidden="true">
-                  <div className="w-16 h-16 rounded-full bg-[#14B8A6]/10 flex items-center justify-center">
-                    <Network className="text-[#14B8A6]" size={32} />
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <div className="mb-2">
-                    <h3 className="text-2xl mb-1">ACCIAN</h3>
-                    <p className="text-[#64748B]">Nigeria Limited</p>
-                  </div>
-                  <ul
-                    className="space-y-3 text-[#64748B]"
-                    aria-label="Nigeria operations highlights"
-                  >
-                    <li className="flex items-start gap-2">
-                      <span className="text-[#14B8A6] mt-1" aria-hidden="true">
-                        •
-                      </span>
-                      <span>Regional operations</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-[#14B8A6] mt-1" aria-hidden="true">
-                        •
-                      </span>
-                      <span>EZ & African client services</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-[#14B8A6] mt-1" aria-hidden="true">
-                        •
-                      </span>
-                      <span>Outsource & services delivery</span>
-                    </li>
-                  </ul>
-                </div>
-              </article> */}
             </div>
 
             <div className="text-center mt-12 pt-12 border-t border-gray-200">
@@ -287,28 +264,54 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.slice(0, 3).map((service) => (
-              <ServiceCard
-                key={service.id}
-                {...service}
-                //slug={service.slug}
-                features={service.features || []}
-                link={service.link || "#"}
-              />
-            ))}
-          </div>
+          {loading ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[...Array(3)].map((_, i) => (
+                  <ServiceCardSkeleton key={i} />
+                ))}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 max-w-4xl mx-auto">
+                {[...Array(2)].map((_, i) => (
+                  <ServiceCardSkeleton key={i} />
+                ))}
+              </div>
+            </>
+          ) : error ? (
+            <div className="text-center py-12">
+              <p className="text-red-500 mb-4">{error}</p>
+              <button
+                onClick={fetchServices}
+                className="btn-primary inline-block"
+              >
+                Retry
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {services.slice(0, 3).map((service) => (
+                  <ServiceCard
+                    key={service.id}
+                    {...service}
+                    features={service.features || []}
+                    link={service.link || "#"}
+                  />
+                ))}
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 max-w-4xl mx-auto">
-            {services.slice(3).map((service) => (
-              <ServiceCard
-                key={service.id}
-                {...service}
-                features={service.features || []}
-                link={service.link || "#"}
-              />
-            ))}
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8 max-w-4xl mx-auto">
+                {services.slice(3).map((service) => (
+                  <ServiceCard
+                    key={service.id}
+                    {...service}
+                    features={service.features || []}
+                    link={service.link || "#"}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </section>
 
@@ -378,9 +381,21 @@ export default function HomePage() {
           </div>
 
           {testimonialsLoading ? (
-            <p className="text-center">Loading testimonials...</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, i) => (
+                <TestimonialSkeleton key={i} />
+              ))}
+            </div>
           ) : testimonialsError ? (
-            <p className="text-center text-red-500">{testimonialsError}</p>
+            <div className="text-center py-12">
+              <p className="text-red-500 mb-4">{testimonialsError}</p>
+              <button
+                onClick={fetchTestimonials}
+                className="btn-primary inline-block"
+              >
+                Retry
+              </button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {testimonials.map((testimonial, index) => (
