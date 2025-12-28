@@ -1,5 +1,4 @@
-import { ArrowRight, Code } from "lucide-react";
-import { iconMap } from "../lib/ServiceIcons";
+import * as LucideIcons from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ServiceCardProps {
@@ -7,8 +6,7 @@ interface ServiceCardProps {
   description: string;
   features: string[];
   link: string;
-  icon?: string; // API-provided icon name
-  slug: string;
+  icon?: string; // this comes from your API
 }
 
 export default function ServiceCard({
@@ -16,9 +14,13 @@ export default function ServiceCard({
   description,
   features,
   link,
-  slug,
+  icon,
 }: ServiceCardProps) {
-  const Icon = iconMap[slug] ?? Code; // fallback if missing
+  // Pick the icon component dynamically
+  const IconComponent =
+    icon && LucideIcons[icon as keyof typeof LucideIcons]
+      ? LucideIcons[icon as keyof typeof LucideIcons]
+      : LucideIcons.Code; // fallback if icon name is missing
 
   return (
     <article
@@ -29,7 +31,7 @@ export default function ServiceCard({
         className="w-14 h-14 rounded-lg bg-linear-to-br from-[#1E40AF] to-[#14B8A6] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
         aria-hidden="true"
       >
-        <Icon className="w-6 h-6 text-white" />
+        {IconComponent && <IconComponent className="w-6 h-6 text-white" />}
       </div>
 
       <h3
@@ -46,9 +48,9 @@ export default function ServiceCard({
           Key Offerings:
         </p>
         <ul className="space-y-2" aria-label={`Key offerings for ${title}`}>
-          {features.map((feature, index) => (
+          {features.map((feature, idx) => (
             <li
-              key={index}
+              key={idx}
               className="text-sm text-[#64748B] flex items-start gap-2"
             >
               <span className="text-[#14B8A6] mt-1" aria-hidden="true">
@@ -66,7 +68,7 @@ export default function ServiceCard({
         aria-label={`Learn more about ${title}`}
       >
         Explore Service
-        <ArrowRight size={16} aria-hidden="true" />
+        <LucideIcons.ArrowRight size={16} aria-hidden="true" />
       </Link>
     </article>
   );
