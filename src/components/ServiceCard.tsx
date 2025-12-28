@@ -65,6 +65,7 @@ export default function ServiceCard({
 
       <Link
         to={`/services/${slug}`}
+        onClick={() => console.log("Navigating to:", `/services/${slug}`)}
         className="inline-flex items-center gap-2 text-[#1E40AF]
                    font-semibold text-sm group-hover:gap-3
                    transition-all duration-300"
