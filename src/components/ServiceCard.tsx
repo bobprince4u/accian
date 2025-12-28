@@ -1,4 +1,5 @@
-import * as LucideIcons from "lucide-react";
+import { ArrowRight, Code } from "lucide-react";
+import * as Icons from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface ServiceCardProps {
@@ -6,7 +7,7 @@ interface ServiceCardProps {
   description: string;
   features: string[];
   link: string;
-  icon?: string; // this comes from your API
+  icon?: string; // 👈 icon name from API (e.g. "Lightbulb")
 }
 
 export default function ServiceCard({
@@ -16,11 +17,10 @@ export default function ServiceCard({
   link,
   icon,
 }: ServiceCardProps) {
-  // Pick the icon component dynamically
   const IconComponent =
-    icon && LucideIcons[icon as keyof typeof LucideIcons]
-      ? LucideIcons[icon as keyof typeof LucideIcons]
-      : LucideIcons.Code; // fallback if icon name is missing
+    icon && icon in Icons
+      ? (Icons[icon as keyof typeof Icons] as React.ElementType)
+      : Code;
 
   return (
     <article
@@ -28,10 +28,12 @@ export default function ServiceCard({
       aria-labelledby={`service-${title.replace(/\s+/g, "-").toLowerCase()}`}
     >
       <div
-        className="w-14 h-14 rounded-lg bg-linear-to-br from-[#1E40AF] to-[#14B8A6] flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300"
+        className="w-14 h-14 rounded-lg bg-linear-to-br from-[#1E40AF] to-[#14B8A6]
+                   flex items-center justify-center mb-6
+                   group-hover:scale-110 transition-transform duration-300"
         aria-hidden="true"
       >
-        {IconComponent && <IconComponent className="w-6 h-6 text-white" />}
+        <IconComponent className="w-6 h-6 text-white" />
       </div>
 
       <h3
@@ -47,15 +49,13 @@ export default function ServiceCard({
         <p className="text-sm font-semibold text-[#1E293B] mb-3">
           Key Offerings:
         </p>
-        <ul className="space-y-2" aria-label={`Key offerings for ${title}`}>
-          {features.map((feature, idx) => (
+        <ul className="space-y-2">
+          {features.map((feature, index) => (
             <li
-              key={idx}
+              key={index}
               className="text-sm text-[#64748B] flex items-start gap-2"
             >
-              <span className="text-[#14B8A6] mt-1" aria-hidden="true">
-                •
-              </span>
+              <span className="text-[#14B8A6] mt-1">•</span>
               <span>{feature}</span>
             </li>
           ))}
@@ -64,11 +64,12 @@ export default function ServiceCard({
 
       <Link
         to={link}
-        className="inline-flex items-center gap-2 text-[#1E40AF] font-semibold text-sm group-hover:gap-3 transition-all duration-300"
-        aria-label={`Learn more about ${title}`}
+        className="inline-flex items-center gap-2 text-[#1E40AF]
+                   font-semibold text-sm group-hover:gap-3
+                   transition-all duration-300"
       >
         Explore Service
-        <LucideIcons.ArrowRight size={16} aria-hidden="true" />
+        <ArrowRight size={16} />
       </Link>
     </article>
   );
