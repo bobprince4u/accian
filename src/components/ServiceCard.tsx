@@ -7,6 +7,7 @@ interface ServiceCardProps {
   description: string;
   features: string[];
   link: string;
+  slug: string;
   icon?: string; // 👈 icon name from API (e.g. "Lightbulb")
 }
 
@@ -14,7 +15,7 @@ export default function ServiceCard({
   title,
   description,
   features,
-  link,
+  slug,
   icon,
 }: ServiceCardProps) {
   const IconComponent =
@@ -63,7 +64,7 @@ export default function ServiceCard({
       </div>
 
       <Link
-        to={link}
+        to={`/services/${slug}`}
         className="inline-flex items-center gap-2 text-[#1E40AF]
                    font-semibold text-sm group-hover:gap-3
                    transition-all duration-300"
