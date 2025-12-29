@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 import {
@@ -28,6 +28,8 @@ export default function ContactPage() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
+  const recaptchaRef = useRef<HTMLDivElement>(null);
+
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -44,10 +46,25 @@ export default function ContactPage() {
     setSubmitting(true);
 
     try {
+      // Execute reCAPTCHA
+      const token = await new Promise<string>((resolve, reject) => {
+        if (window.grecaptcha && recaptchaRef.current) {
+          window.grecaptcha
+            .execute("6LdLoDosAAAAAJTKq0H28k6zMm35urTQXnNvkEPO", {
+              action: "submit",
+            })
+            .then(resolve)
+            .catch(reject);
+        } else {
+          reject("reCAPTCHA not loaded");
+        }
+      });
+
+      // Send form data + reCAPTCHA token to backend
       const response = await fetch(`${API_URL}/api/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, recaptchaToken: token }),
       });
 
       if (!response.ok) {
@@ -383,6 +400,13 @@ export default function ContactPage() {
                     </button>
                   </form>
                 )}
+                {/* Invisible reCAPTCHA container */}
+                <div
+                  ref={recaptchaRef}
+                  className="g-recaptcha"
+                  data-sitekey="6LdLoDosAAAAAJTKq0H28k6zMm35urTQXnNvkEPO"
+                  data-size="invisible"
+                ></div>
               </div>
             </div>
 
