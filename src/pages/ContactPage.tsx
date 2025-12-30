@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Phone, Mail, Clock, MapPin, Send, CheckCircle2 } from "lucide-react";
-
+import { API_URL } from "../config/api";
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -1022,7 +1022,7 @@ export default function ContactPage() {
         userAgent: navigator.userAgent,
       };
 
-      const response = await fetch(`/api/contact`, {
+      const response = await fetch(`${API_URL}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
