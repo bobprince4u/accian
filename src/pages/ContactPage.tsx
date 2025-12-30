@@ -1,8 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
 import {
-  //Download,
   Phone,
   Mail,
   Clock,
@@ -11,6 +10,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { API_URL } from "../config/api";
+
+
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -28,12 +29,23 @@ export default function ContactPage() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const recaptchaRef = useRef<HTMLDivElement>(null);
+  // Load reCAPTCHA script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://www.google.com/recaptcha/api.js';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+
+     return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
 
   const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     setFormData({
       ...formData,
@@ -46,19 +58,17 @@ export default function ContactPage() {
     setSubmitting(true);
 
     try {
-      // Execute reCAPTCHA
-      const token = await new Promise<string>((resolve, reject) => {
-        if (window.grecaptcha && recaptchaRef.current) {
-          window.grecaptcha
-            .execute("6LdLoDosAAAAAJTKq0H28k6zMm35urTQXnNvkEPO", {
-              action: "submit",
-            })
-            .then(resolve)
-            .catch(reject);
-        } else {
-          reject("reCAPTCHA not loaded");
-        }
-      });
+      // Get reCAPTCHA response
+      const token = window.grecaptcha?.getResponse();
+
+      if (!token) {
+        toast.error("Please verify that you are not a robot", {
+          duration: 4000,
+          position: "top-center",
+        });
+        setSubmitting(false);
+        return;
+      }
 
       // Send form data + reCAPTCHA token to backend
       const response = await fetch(`${API_URL}/api/contact`, {
@@ -80,6 +90,7 @@ export default function ContactPage() {
 
       setFormSubmitted(true);
 
+      // Reset form and reCAPTCHA
       setTimeout(() => {
         setFormSubmitted(false);
         setFormData({
@@ -93,6 +104,8 @@ export default function ContactPage() {
           message: "",
           howHeard: "",
         });
+        window.grecaptcha?.reset();
+
         setSubmitting(false);
       }, 3000);
     } catch (error) {
@@ -101,6 +114,8 @@ export default function ContactPage() {
         duration: 5000,
         position: "top-center",
       });
+      window.grecaptcha?.reset();
+
       setSubmitting(false);
     }
   };
@@ -155,6 +170,7 @@ export default function ContactPage() {
                     className="space-y-6"
                     aria-label="Contact form"
                   >
+                    {/* All your form fields stay the same */}
                     <div>
                       <label
                         htmlFor="fullName"
@@ -233,7 +249,7 @@ export default function ContactPage() {
                         value={formData.phone}
                         onChange={handleChange}
                         className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
-                        placeholder="+234 XXX XXX XXXX"
+                        placeholder="+44 XXX XXX XXXX"
                       />
                     </div>
 
@@ -257,23 +273,20 @@ export default function ContactPage() {
                         className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
                       >
                         <option value="">Select a service</option>
-                        <option value="software-development">
+                        <option value="it-consulting-advisory">
                           IT Consulting & Advisory
                         </option>
-                        <option value="cybersecurity">
+                        <option value="software-development">
                           Business & Domestic Software Development
                         </option>
-                        <option value="software-testing">
+                        <option value="education-training">
                           Education & Training
                         </option>
-                        <option value="ai-automation">
+                        <option value="social-care">
                           Social Care & Community Support
                         </option>
-                        <option value="cloud-solutions">
+                        <option value="data-science-ai">
                           Data Science, AI & Predictive Analytics
-                        </option>
-                        <option value="it-consulting">
-                          IT Strategy & Consulting
                         </option>
                         <option value="multiple">Multiple Services</option>
                         <option value="not-sure">Not Sure Yet</option>
@@ -295,12 +308,7 @@ export default function ContactPage() {
                         aria-label="Select project budget range"
                         className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
                       >
-                        <option value="">Select budget range</option>"
-                        {/*<option value="under-500k"></option>
-                        <option value="500k-2m"></option>
-                        <option value="2m-5m"></option>
-                        <option value="5m-10m"></option>
-                        <option value="above-10m"></option> */}
+                        <option value="">Select budget range</option>
                         <option value="prefer-discuss">
                           Prefer to Discuss
                         </option>
@@ -383,6 +391,14 @@ export default function ContactPage() {
                       </select>
                     </div>
 
+                    {/* reCAPTCHA */}
+                    <div className="flex justify-center">
+                      <div
+                        className="g-recaptcha"
+                        data-sitekey="6LdLoDosAAAAAJTKq0H28k6zMm35urTQXnNvkEPO"
+                      ></div>
+                    </div>
+
                     <p className="text-xs text-[#64748B]" role="note">
                       By submitting this form, you agree to our Privacy Policy.
                       We respect your privacy and will never share your
@@ -392,7 +408,7 @@ export default function ContactPage() {
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="btn-primary w-full inline-flex items-center justify-center gap-2"
+                      className="btn-primary w-full inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       aria-label="Submit contact form"
                     >
                       <Send size={18} aria-hidden="true" />
@@ -400,17 +416,10 @@ export default function ContactPage() {
                     </button>
                   </form>
                 )}
-                {/* Invisible reCAPTCHA container */}
-                <div
-                  ref={recaptchaRef}
-                  className="g-recaptcha"
-                  data-sitekey="6LdLoDosAAAAAJTKq0H28k6zMm35urTQXnNvkEPO"
-                  data-size="invisible"
-                ></div>
               </div>
             </div>
 
-            {/* Contact Information */}
+            {/* Contact Information - keep as is */}
             <div className="space-y-6">
               <div className="card">
                 <h3 className="mb-6">Direct Contact Information</h3>
@@ -422,7 +431,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <h5 className="mb-1 text-[#1E293B]">Phone</h5>
-                      <p className="text-[#64748B] mb-1"> +44 7749 101623</p>
+                      <p className="text-[#64748B] mb-1">+44 7749 101623</p>
                       <p className="text-sm text-[#64748B]">
                         Available: Monday - Friday, 9:00 AM - 17:00 PM GMT
                       </p>
@@ -433,15 +442,15 @@ export default function ContactPage() {
                     <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/10 flex items-center justify-center shrink-0">
                       <Mail className="text-[#1E40AF]" size={24} />
                     </div>
-                    {/* <div>
+                    <div>
                       <h5 className="mb-1 text-[#1E293B]">Email</h5>
                       <p className="text-[#64748B] mb-1">
-                      
+                        admin@acciannginfo.com
                       </p>
                       <p className="text-sm text-[#64748B]">
                         Response Time: Within 24 business hours
                       </p>
-                    </div> */}
+                    </div>
                   </div>
 
                   <div className="flex items-start gap-4">
@@ -468,7 +477,6 @@ export default function ContactPage() {
                     <div>
                       <h5 className="mb-1 text-[#1E293B]">Our Office</h5>
                       <p className="text-[#64748B] mb-1">🇬🇧 United Kingdom</p>
-                      {/* <p className="text-[#64748B]">🇳🇬 Nigeria</p> */}
                       <p className="text-sm text-[#64748B] mt-2">
                         Serving clients worldwide
                       </p>
@@ -487,18 +495,6 @@ export default function ContactPage() {
                   Fill the Form
                 </button>
               </div>
-
-              {/* <div className="card">
-                <h4 className="mb-4">Download Company Profile</h4>
-                <p className="text-[#64748B] mb-4">
-                  Get our comprehensive company brochure with detailed
-                  information about our services, team, and success stories.
-                </p>
-                <button className="btn-secondary inline-flex items-center gap-2">
-                  <Download size={18} />
-                  Download PDF
-                </button>
-              </div> */}
             </div>
           </div>
         </div>
