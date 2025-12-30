@@ -1,6 +1,9 @@
 import { useState } from "react";
+import toast, { Toaster } from "react-hot-toast";
+
 import { Phone, Mail, Clock, MapPin, Send, CheckCircle2 } from "lucide-react";
 import { API_URL } from "../config/api";
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -953,7 +956,6 @@ export default function ContactPage() {
     >
   ) => {
     const { name, value } = e.target;
-
     setFormData({
       ...formData,
       [name]: value,
@@ -973,7 +975,8 @@ export default function ContactPage() {
     return div.innerHTML;
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     // Check rate limit
     if (!checkRateLimit()) {
       return;
@@ -1035,6 +1038,11 @@ export default function ContactPage() {
         throw new Error("Failed to submit form");
       }
 
+      toast.success("Message sent successfully! We'll get back to you soon.", {
+        duration: 5000,
+        position: "top-center",
+      });
+
       recordSubmission();
       setFormSubmitted(true);
 
@@ -1056,102 +1064,140 @@ export default function ContactPage() {
       }, 3000);
     } catch (error) {
       console.error("Failed to submit form:", error);
+
+      toast.error("Oops! Something went wrong. Please try again later.", {
+        duration: 5000,
+        position: "top-center",
+      });
       setRateLimitError("Something went wrong. Please try again.");
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen py-16 bg-linear-to-b from-gray-50 to-white">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold mb-4 text-gray-900">
-            Let's Start Your Digital Transformation
-          </h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Ready to discuss your project? Our expert team is here to answer
-            your questions and provide tailored solutions.
-          </p>
-        </div>
+    <div>
+      <Toaster />
+      <section
+        id="contact"
+        className="section-spacing bg-white"
+        aria-labelledby="contact-heading"
+      >
+        <div className="container-custom">
+          <div className="text-center mb-16">
+            <h2 id="contact-heading" className="mb-4">
+              Let's Start Your Digital Transformation
+            </h2>
+            <p className="text-lg text-[#64748B] max-w-3xl mx-auto">
+              Ready to discuss your project? Our expert team is here to answer
+              your questions and provide tailored solutions for your business
+              needs. Get in touch today for a complimentary consultation.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <div>
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h3 className="text-2xl font-bold mb-6 text-gray-900">
-                Send Us a Message
-              </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* Contact Form */}
+            <div>
+              <div className="card">
+                <h3 className="mb-6">Send Us a Message</h3>
 
-              {rateLimitError && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                  {rateLimitError}
-                </div>
-              )}
-
-              {formSubmitted ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                    <CheckCircle2 size={32} className="text-green-600" />
+                {rateLimitError && (
+                  <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                    {rateLimitError}
                   </div>
-                  <h4 className="text-xl font-bold mb-2 text-green-600">
-                    Thank You!
-                  </h4>
-                  <p className="text-gray-600 text-center">
-                    We've received your message and will get back to you within
-                    24 hours.
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      Full Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="fullName"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      maxLength={100}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="John Doe"
-                    />
-                  </div>
+                )}
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      Business Email <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      maxLength={100}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="john@company.com"
-                    />
+                {formSubmitted ? (
+                  <div
+                    className="flex flex-col items-center justify-center py-12"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    <div
+                      className="w-16 h-16 rounded-full bg-[#10B981]/10 flex items-center justify-center mb-4"
+                      aria-hidden="true"
+                    >
+                      <CheckCircle2 size={32} className="text-[#10B981]" />
+                    </div>
+                    <h4 className="mb-2 text-[#10B981]">Thank You!</h4>
+                    <p className="text-[#64748B] text-center">
+                      We've received your message and will get back to you
+                      within 48 hours.
+                    </p>
                   </div>
+                ) : (
+                  <form
+                    onSubmit={handleSubmit}
+                    className="space-y-6"
+                    aria-label="Contact form"
+                  >
+                    {/* All your form fields stay the same */}
+                    <div>
+                      <label
+                        htmlFor="fullName"
+                        className="block text-sm font-semibold text-[#1E293B] mb-2"
+                      >
+                        Full Name{" "}
+                        <span className="text-red-500" aria-label="required">
+                          *
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        id="fullName"
+                        name="fullName"
+                        value={formData.fullName}
+                        onChange={handleChange}
+                        maxLength={100}
+                        required
+                        aria-required="true"
+                        className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
+                        placeholder="Full Name"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      Company Name
-                    </label>
-                    <input
-                      type="text"
-                      name="companyName"
-                      value={formData.companyName}
-                      onChange={handleChange}
-                      maxLength={100}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Your Company"
-                    />
-                  </div>
+                    <div>
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-semibold text-[#1E293B] mb-2"
+                      >
+                        Business Email{" "}
+                        <span className="text-red-500" aria-label="required">
+                          *
+                        </span>
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                        maxLength={100}
+                        required
+                        aria-required="true"
+                        className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
+                        placeholder="john@company.com"
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      Phone Number
-                    </label>
+                    <div>
+                      <label
+                        htmlFor="companyName"
+                        className="block text-sm font-semibold text-[#1E293B] mb-2"
+                      >
+                        Company Name
+                      </label>
+                      <input
+                        type="text"
+                        id="companyName"
+                        name="companyName"
+                        value={formData.companyName}
+                        onChange={handleChange}
+                        maxLength={100}
+                        className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
+                        placeholder="Your Company"
+                      />
+                    </div>
+
                     <div className="flex gap-2">
                       <select
                         name="countryCode"
@@ -1179,199 +1225,244 @@ export default function ContactPage() {
                     {phoneError && (
                       <p className="mt-1 text-sm text-red-600">{phoneError}</p>
                     )}
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      Service Interest <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      name="serviceInterest"
-                      value={formData.serviceInterest}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                    >
-                      <option value="">Select a service</option>
-                      <option value="it-consulting-advisory">
-                        IT Consulting & Advisory
-                      </option>
-                      <option value="software-development">
-                        Business & Domestic Software Development
-                      </option>
-                      <option value="education-training">
-                        Education & Training
-                      </option>
-                      <option value="social-care">
-                        Social Care & Community Support
-                      </option>
-                      <option value="data-science-ai">
-                        Data Science, AI & Predictive Analytics
-                      </option>
-                      <option value="multiple">Multiple Services</option>
-                      <option value="not-sure">Not Sure Yet</option>
-                    </select>
-                  </div>
+                    <div>
+                      <label
+                        htmlFor="serviceInterest"
+                        className="block text-sm font-semibold text-[#1E293B] mb-2"
+                      >
+                        Service Interest{" "}
+                        <span className="text-red-500" aria-label="required">
+                          *
+                        </span>
+                      </label>
+                      <select
+                        id="serviceInterest"
+                        name="serviceInterest"
+                        value={formData.serviceInterest}
+                        onChange={handleChange}
+                        required
+                        aria-required="true"
+                        className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
+                      >
+                        <option value="">Select a service</option>
+                        <option value="it-consulting-advisory">
+                          IT Consulting & Advisory
+                        </option>
+                        <option value="software-development">
+                          Business & Domestic Software Development
+                        </option>
+                        <option value="education-training">
+                          Education & Training
+                        </option>
+                        <option value="social-care">
+                          Social Care & Community Support
+                        </option>
+                        <option value="data-science-ai">
+                          Data Science, AI & Predictive Analytics
+                        </option>
+                        <option value="multiple">Multiple Services</option>
+                        <option value="not-sure">Not Sure Yet</option>
+                      </select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      Project Budget Range
-                    </label>
-                    <select
-                      name="projectBudget"
-                      value={formData.projectBudget}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                    >
-                      <option value="">Select budget range</option>
-                      <option value="prefer-discuss">Prefer to Discuss</option>
-                    </select>
-                  </div>
+                    <div>
+                      <label
+                        htmlFor="projectBudget"
+                        className="block text-sm font-semibold text-[#1E293B] mb-2"
+                      >
+                        Project Budget Range
+                      </label>
+                      <select
+                        id="projectBudget"
+                        name="projectBudget"
+                        value={formData.projectBudget}
+                        onChange={handleChange}
+                        aria-label="Select project budget range"
+                        className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
+                      >
+                        <option value="">Select budget range</option>
+                        <option value="prefer-discuss">
+                          Prefer to Discuss
+                        </option>
+                      </select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      Project Timeline
-                    </label>
-                    <select
-                      name="projectTimeline"
-                      value={formData.projectTimeline}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                    >
-                      <option value="">Select timeline</option>
-                      <option value="urgent">Urgent (Within 1 month)</option>
-                      <option value="short-term">
-                        Short-term (1-3 months)
-                      </option>
-                      <option value="medium-term">
-                        Medium-term (3-6 months)
-                      </option>
-                      <option value="long-term">Long-term (6+ months)</option>
-                      <option value="flexible">Flexible</option>
-                    </select>
-                  </div>
+                    <div>
+                      <label
+                        htmlFor="projectTimeline"
+                        className="block text-sm font-semibold text-[#1E293B] mb-2"
+                      >
+                        Project Timeline
+                      </label>
+                      <select
+                        id="projectTimeline"
+                        name="projectTimeline"
+                        value={formData.projectTimeline}
+                        onChange={handleChange}
+                        aria-label="Select project timeline"
+                        className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
+                      >
+                        <option value="">Select timeline</option>
+                        <option value="urgent">Urgent (Within 1 month)</option>
+                        <option value="short-term">
+                          Short-term (1-3 months)
+                        </option>
+                        <option value="medium-term">
+                          Medium-term (3-6 months)
+                        </option>
+                        <option value="long-term">Long-term (6+ months)</option>
+                        <option value="flexible">Flexible</option>
+                      </select>
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      Message <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      maxLength={1000}
-                      rows={5}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                      placeholder="Tell us about your project..."
-                    />
-                  </div>
+                    <div>
+                      <label
+                        htmlFor="message"
+                        className="block text-sm font-semibold text-[#1E293B] mb-2"
+                      >
+                        Message{" "}
+                        <span className="text-red-500" aria-label="required">
+                          *
+                        </span>
+                      </label>
+                      <textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        maxLength={1000}
+                        required
+                        aria-required="true"
+                        rows={5}
+                        className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent resize-none"
+                        placeholder="Tell us about your project, challenges, or questions..."
+                      />
+                    </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
-                      How did you hear about us?
-                    </label>
-                    <select
-                      name="howHeard"
-                      value={formData.howHeard}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                    >
-                      <option value="">Select an option</option>
-                      <option value="google">Google Search</option>
-                      <option value="linkedin">LinkedIn</option>
-                      <option value="referral">Referral</option>
-                      <option value="social-media">Social Media</option>
-                      <option value="event">Event/Conference</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
+                    <div>
+                      <label
+                        htmlFor="howHeard"
+                        className="block text-sm font-semibold text-[#1E293B] mb-2"
+                      >
+                        How did you hear about us?
+                      </label>
+                      <select
+                        id="howHeard"
+                        name="howHeard"
+                        value={formData.howHeard}
+                        onChange={handleChange}
+                        aria-label="Select how you heard about us"
+                        className="w-full px-4 py-3 border border-[#64748B]/30 rounded-md focus:outline-none focus:ring-2 focus:ring-[#1E40AF] focus:border-transparent"
+                      >
+                        <option value="">Select an option</option>
+                        <option value="google">Google Search</option>
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="referral">Referral</option>
+                        <option value="social-media">Social Media</option>
+                        <option value="event">Event/Conference</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
 
-                  <p className="text-xs text-gray-600">
-                    By submitting this form, you agree to our Privacy Policy.
-                  </p>
-
-                  <button
-                    onClick={handleSubmit}
-                    disabled={submitting || !!phoneError}
-                    className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold inline-flex items-center justify-center gap-2 hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Send size={18} />
-                    {submitting ? "Sending..." : "Send Message"}
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="space-y-6">
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <h3 className="text-2xl font-bold mb-6 text-gray-900">
-                Direct Contact
-              </h3>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                    <Phone className="text-blue-600" size={24} />
-                  </div>
-                  <div>
-                    <h5 className="font-semibold mb-1">Phone</h5>
-                    <p className="text-gray-600">+44 7749 101623</p>
-                    <p className="text-sm text-gray-500">
-                      Mon-Fri, 9AM-5PM GMT
+                    <p className="text-xs text-[#64748B]" role="note">
+                      By submitting this form, you agree to our Privacy Policy.
+                      We respect your privacy and will never share your
+                      information with third parties.
                     </p>
-                  </div>
-                </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                    <Mail className="text-blue-600" size={24} />
-                  </div>
-                  <div>
-                    <h5 className="font-semibold mb-1">Email</h5>
-                    <p className="text-gray-600">admin@acciannginfo.com</p>
-                    <p className="text-sm text-gray-500">Response within 24h</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                    <Clock className="text-blue-600" size={24} />
-                  </div>
-                  <div>
-                    <h5 className="font-semibold mb-1">Business Hours</h5>
-                    <p className="text-gray-600">Mon-Fri: 9AM-5PM GMT</p>
-                    <p className="text-gray-600">Sat: By Appointment</p>
-                    <p className="text-gray-600">Sun: Closed</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
-                    <MapPin className="text-blue-600" size={24} />
-                  </div>
-                  <div>
-                    <h5 className="font-semibold mb-1">Location</h5>
-                    <p className="text-gray-600">🇬🇧 United Kingdom</p>
-                    <p className="text-sm text-gray-500">
-                      Serving clients worldwide
-                    </p>
-                  </div>
-                </div>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="btn-primary w-full inline-flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      aria-label="Submit contact form"
+                    >
+                      <Send size={18} aria-hidden="true" />
+                      {submitting ? "Sending..." : "Send Message"}
+                    </button>
+                  </form>
+                )}
               </div>
             </div>
 
-            <div className="bg-linear-to-br from-blue-900 to-blue-700 rounded-2xl shadow-lg p-8 text-white">
-              <h4 className="text-xl font-bold mb-4">Ready to Get Started?</h4>
-              <p className="text-blue-100 mb-6">
-                Schedule a free consultation to discuss your project.
-              </p>
-              <button className="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold w-full hover:bg-blue-50 transition-colors">
-                Fill the Form
-              </button>
+            {/* Contact Information - keep as is */}
+            <div className="space-y-6">
+              <div className="card">
+                <h3 className="mb-6">Direct Contact Information</h3>
+
+                <div className="space-y-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/10 flex items-center justify-center shrink-0">
+                      <Phone className="text-[#1E40AF]" size={24} />
+                    </div>
+                    <div>
+                      <h5 className="mb-1 text-[#1E293B]">Phone</h5>
+                      <p className="text-[#64748B] mb-1">+44 7749 101623</p>
+                      <p className="text-sm text-[#64748B]">
+                        Available: Monday - Friday, 9:00 AM - 17:00 PM GMT
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/10 flex items-center justify-center shrink-0">
+                      <Mail className="text-[#1E40AF]" size={24} />
+                    </div>
+                    <div>
+                      <h5 className="mb-1 text-[#1E293B]">Email</h5>
+                      <p className="text-[#64748B] mb-1">info@accian.co.uk</p>
+                      <p className="text-sm text-[#64748B]">
+                        Response Time: Within 24 business hours
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/10 flex items-center justify-center shrink-0">
+                      <Clock className="text-[#1E40AF]" size={24} />
+                    </div>
+                    <div>
+                      <h5 className="mb-1 text-[#1E293B]">Business Hours</h5>
+                      <p className="text-[#64748B]">
+                        Monday - Friday: 9:00 AM - 17:00 PM GMT
+                      </p>
+                      <p className="text-[#64748B]">Saturday: By Appointment</p>
+                      <p className="text-[#64748B]">Sunday: Closed</p>
+                      <p className="text-sm text-[#64748B] mt-2">
+                        Emergency Support: Available 24/7 for existing clients
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-lg bg-[#1E40AF]/10 flex items-center justify-center shrink-0">
+                      <MapPin className="text-[#1E40AF]" size={24} />
+                    </div>
+                    <div>
+                      <h5 className="mb-1 text-[#1E293B]">Our Office</h5>
+                      <p className="text-[#64748B] mb-1">🇬🇧 United Kingdom</p>
+                      <p className="text-sm text-[#64748B] mt-2">
+                        Serving clients worldwide
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card bg-linear-to-br from-[#0A2540] to-[#1E40AF] text-white">
+                <h4 className="mb-4 text-white">Ready to Get Started?</h4>
+                <p className="text-white/90 mb-6">
+                  Schedule a free consultation call to discuss your project
+                  requirements and explore how we can help by.
+                </p>
+                <button className="bg-white text-[#1E40AF] px-6 py-3 rounded-md font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 w-full">
+                  Filling the Form
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

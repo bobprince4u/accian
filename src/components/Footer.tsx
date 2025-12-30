@@ -107,13 +107,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/privacy-policy"
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
                   aria-label="View privacy policy"
                 >
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
                 <a
@@ -203,11 +203,14 @@ export default function Footer() {
                   className="mt-0.5 shrink-0 text-[#14B8A6]"
                   aria-hidden="true"
                 />
+                info@accian.co.uk
                 <a
-                  href="mailto:admin@acciannginfo.com"
+                  href="mailto:info@accian.co.uk"
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
-                  aria-label="Email us at admin@acciannginfo.com"
-                ></a>
+                  aria-label="Email us at info@accian.co.uk"
+                >
+                  info@accian.co.uk
+                </a>
               </li>
               <li className="flex items-start gap-2">
                 <Clock
@@ -277,6 +280,12 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/60">
             <p>© {currentYear} ACCIAN. All Rights Reserved.</p>
             <p>Global Technology & Cybersecurity Company | UK Operations</p>
+            <p>
+              ACCIAN Limited · Company No. 16910869 · Registered in England &
+              Wales
+              <br />
+              Registered Office: Virtual Office
+            </p>
           </div>
         </div>
       </div>

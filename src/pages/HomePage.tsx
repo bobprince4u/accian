@@ -238,6 +238,10 @@ export default function HomePage() {
                     </li>
                   </ul>
                 </div>
+                <p className="text-xs text-gray-500 mt-8 text-center">
+                  Accian Limited is an independent UK company and is not
+                  affiliated with Accion or any similarly named organizations.
+                </p>
               </article>
             </div>
 
@@ -503,7 +507,7 @@ export default function HomePage() {
                 </div>
                 <div className="text-left">
                   <p className="text-sm font-semibold text-[#1E293B]">Email</p>
-                  <p className="text-sm text-[#64748B]"></p>
+                  <p className="text-sm text-[#64748B]">info@accian.co.uk</p>
                 </div>
               </div>
             </div>
