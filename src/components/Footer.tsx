@@ -203,7 +203,7 @@ export default function Footer() {
                   className="mt-0.5 shrink-0 text-[#14B8A6]"
                   aria-hidden="true"
                 />
-                info@accian.co.uk
+
                 <a
                   href="mailto:info@accian.co.uk"
                   className="text-white/70 hover:text-[#14B8A6] transition-colors"
