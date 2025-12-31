@@ -238,7 +238,7 @@ export default function HomePage() {
                     </li>
                   </ul>
                 </div>
-                <p className="text-xs text-gray-500 mt-8 text-center">
+                <p className="text-sm text-gray-500 mt-8 text-center">
                   Accian Limited is an independent UK company and is not
                   affiliated with Accion or any similarly named organizations.
                 </p>
