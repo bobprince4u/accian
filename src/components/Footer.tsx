@@ -284,7 +284,7 @@ export default function Footer() {
               ACCIAN Limited · Company No. 16910869 · Registered in England &
               Wales
               <br />
-              Registered Office: Virtual Office
+              Registered Office: 4 Lidgett Ln, Garforth, Leeds LS25 1EQ
             </p>
           </div>
         </div>
