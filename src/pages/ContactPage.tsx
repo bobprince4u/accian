@@ -1453,11 +1453,11 @@ export default function ContactPage() {
                 <h4 className="mb-4 text-white">Ready to Get Started?</h4>
                 <p className="text-white/90 mb-6">
                   Schedule a free consultation call to discuss your project
-                  requirements and explore how we can help by.
+                  requirements and explore how we can help by filling the form.
                 </p>
-                <button className="bg-white text-[#1E40AF] px-6 py-3 rounded-md font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 w-full">
+                {/* <button className="bg-white text-[#1E40AF] px-6 py-3 rounded-md font-semibold text-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 w-full">
                   Filling the Form
-                </button>
+                </button> */}
               </div>
             </div>
           </div>
