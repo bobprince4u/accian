@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import Cookies from "js-cookie";
 
 import { Phone, Mail, Clock, MapPin, Send, CheckCircle2 } from "lucide-react";
 import { API_URL } from "../config/api";
@@ -884,6 +885,16 @@ export default function ContactPage() {
     },
   ];
 
+  // Load saved form data from cookies if consent exists
+  useEffect(() => {
+    if (Cookies.get("cookie_consent") === "true") {
+      const savedData = Cookies.get("contact_form");
+      if (savedData) {
+        setFormData(JSON.parse(savedData));
+      }
+    }
+  }, []);
+
   // Validate phone number based on country
   const validatePhone = (phone: string, countryCode: string): boolean => {
     const country = countryCodes.find((c) => c.code === countryCode);
@@ -956,10 +967,15 @@ export default function ContactPage() {
     >
   ) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
+    const updatedData = { ...formData, [name]: value };
+    setFormData(updatedData);
+
+    // Save to cookies if consent exists
+    if (Cookies.get("cookie_consent") === "true") {
+      Cookies.set("contact_form", JSON.stringify(updatedData), {
+        expires: 7,
+      });
+    }
 
     if (name === "phone" || name === "countryCode") {
       const phone = name === "phone" ? value : formData.phone;
@@ -1060,6 +1076,9 @@ export default function ContactPage() {
           message: "",
           howHeard: "",
         });
+
+        // Clear saved cookie on submit
+        Cookies.remove("contact_form");
         setSubmitting(false);
       }, 3000);
     } catch (error) {
