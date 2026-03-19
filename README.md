@@ -1,15 +1,16 @@
-# ACCIAN UK Limited - Frontend
+# ACCIAN Limited — Frontend
 
 ![ACCIAN Logo](public/Accian.png)
 
-A modern, responsive web application for ACCIAN UK Limited, showcasing IT consulting, software development, education & training, and social care services.
+A modern, responsive web application for ACCIAN Limited, showcasing IT consulting, cybersecurity, software development, education & training, and social care services.
 
-## 🚀 Live Demo
+## Live Demo
 
-**Production:** [https://accian.co.uk](https://accian.co.uk)  
-**Admin Panel:** [https://accian.co.uk/admin](https://accian.co.uk/admin)
+**Production:** [https://accian.co.uk](https://accian.co.uk)
 
-## 📋 Table of Contents
+---
+
+## Table of Contents
 
 - [Overview](#overview)
 - [Features](#features)
@@ -22,59 +23,72 @@ A modern, responsive web application for ACCIAN UK Limited, showcasing IT consul
 - [Contributing](#contributing)
 - [License](#license)
 
-## 🎯 Overview
+---
 
-ACCIAN's frontend application is a modern, performant web platform built with React and TypeScript. The application provides information about our services, allows clients to submit inquiries, showcases our expertise in technology consulting and software development, and includes a secure admin dashboard for managing business operations.
+## Overview
+
+ACCIAN's frontend is a modern, performant web platform built with **Next.js 16** and **TypeScript**. Migrated from a Vite + React SPA, the application now uses the Next.js App Router for file-based routing, server components, and built-in font optimisation.
 
 ### Key Sections
 
-- **Public Website** - Showcasing services, testimonials, and company information
-- **Contact System** - Client inquiry submission with email notifications
-- **Admin Dashboard** - Secure portal for managing contacts, content, and analytics
+- **Public Website** — Services, global presence, testimonials, and company information
+- **Contact System** — Client inquiry submission with validation, rate limiting, and email notifications
+- **Services Page** — Detailed service descriptions, industry coverage, process steps, and FAQs
 
-## ✨ Features
+---
 
-- **🎨 Modern UI/UX Design** - Clean, professional interface with smooth animations
-- **📱 Fully Responsive** - Optimized for desktop, tablet, and mobile devices
-- **⚡ Fast Performance** - Optimized loading with lazy loading and code splitting
-- **♿ Accessibility** - WCAG 2.1 compliant with proper ARIA labels
-- **🔍 SEO Optimized** - Meta tags and structured data for better search visibility
-- **📧 Contact Form** - Easy-to-use form with validation and email notifications
-- **🎭 Lazy Loading** - Images and components load on demand for better performance
-- **🌐 Multi-page Navigation** - Smooth client-side routing with React Router
-- **💼 Services Showcase** - Dynamic display of company services
-- **⭐ Testimonials** - Client feedback and success stories
-- **🔐 Admin Dashboard** - Secure admin panel for managing content and inquiries
-- **📊 Analytics Dashboard** - View statistics and monitor business metrics
-- **✉️ Contact Management** - Review and manage client inquiries
-- **🔒 Authentication** - JWT-based secure login system
+## Features
+
+- ** Modern UI/UX** — Redesigned editorial aesthetic with Poppins typography and a warm cream/ink palette
+- ** Scroll Animations** — Intersection Observer-based reveal animations with staggered delays throughout
+- ** Animated Cards** — Hover lift, colour transitions, and shadow effects on all interactive cards
+- ** Fully Responsive** — Optimised for desktop, tablet, and mobile devices
+- ** Fast Performance** — Next.js App Router with self-hosted Google Fonts (zero layout shift)
+- ** Accessibility** — WCAG 2.1 compliant with proper ARIA labels and roles
+- ** SEO Optimised** — `<Metadata>` API in `layout.tsx` for title, description, and structured data
+- ** Contact Form** — Full validation, country code selector, rate limiting, and cookie persistence
+- ** Image Skeletons** — Pulse + shimmer loading states on service images
+- ** Security Headers** — CSP, HSTS, X-Frame-Options, and Permissions-Policy via `next.config.ts`
+- ** Marquee Ticker** — Animated service keyword strip between hero and services sections
+- ** Cookie Banner** — GDPR-compliant cookie consent with `js-cookie` persistence
+
+---
 
 ## 🛠 Tech Stack
 
-### Core Technologies
+### Core
 
-- **React 18** - UI library
-- **TypeScript** - Type-safe JavaScript
-- **Vite** - Next-generation frontend tooling
-- **React Router DOM** - Client-side routing
+| Technology | Version | Purpose                             |
+| ---------- | ------- | ----------------------------------- |
+| Next.js    | 16      | App Router, SSR, file-based routing |
+| React      | 19      | UI library                          |
+| TypeScript | 5.9     | Type safety                         |
 
-### Styling & UI
+### Styling
 
-- **Tailwind CSS** - Utility-first CSS framework
-- **Lucide React** - Modern icon library
+| Technology                 | Purpose                  |
+| -------------------------- | ------------------------ |
+| Tailwind CSS v4            | Utility-first styling    |
+| `@tailwindcss/postcss`     | PostCSS integration      |
+| Poppins (next/font/google) | Self-hosted display font |
 
-### Development Tools
+### Libraries
 
-- **ESLint** - Code linting
-- **PostCSS** - CSS processing
-- **Autoprefixer** - CSS vendor prefixing
+| Library         | Purpose             |
+| --------------- | ------------------- |
+| Axios           | API requests        |
+| Lucide React    | Icon library        |
+| React Hot Toast | Toast notifications |
+| js-cookie       | Cookie management   |
+
+---
 
 ## 🚦 Getting Started
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- npm or yarn
+- Node.js v18 or higher
+- npm
 
 ### Installation
 
@@ -94,13 +108,13 @@ ACCIAN's frontend application is a modern, performant web platform built with Re
 3. **Create environment file**
 
    ```bash
-   cp .env.example .env
+   cp .env.example .env.local
    ```
 
 4. **Configure environment variables**
 
    ```env
-   VITE_API_URL=http://localhost:2025
+   NEXT_PUBLIC_API_URL=http://localhost:2025
    ```
 
 5. **Start development server**
@@ -110,169 +124,178 @@ ACCIAN's frontend application is a modern, performant web platform built with Re
    ```
 
 6. **Open your browser**
+   - **Public Site:** `http://localhost:3000`
 
-   - **Public Site:** `http://localhost:5173`
-   - **Admin Panel:** `http://localhost:5173/admin`
+---
 
-### Admin Access
-
-For admin dashboard access, you'll need credentials from the backend. Default login route:
-
-- URL: `/admin/login`
-- Credentials are managed through the backend API
-
-## 📁 Project Structure
+## Project Structure
 
 ```
-accian-frontend/
-├── public/                 # Static assets
-│   ├── Accian.png         # Company logo
-│   └── ...
-├── src/
-│   ├── components/        # Reusable components
-│   │   ├── Navigation.tsx
-│   │   ├── Footer.tsx
-│   │   ├── LazyImage.tsx
-│   │   └── ...
-│   ├── pages/            # Page components
-│   │   ├── HomePage.tsx
-│   │   ├── ServicesPage.tsx
-│   │   ├── ContactPage.tsx
-│   │   ├── admin/        # Admin panel pages
-│   │   │   ├── Dashboard.tsx
-│   │   │   ├── Contacts.tsx
-│   │   │   └── ...
-│   │   └── ...
-│   ├── config/           # Configuration files
-│   │   └── api.ts        # API configuration
-│   ├── App.tsx           # Root component
-│   ├── main.tsx          # Entry point
-│   └── index.css         # Global styles
-├── .env                  # Environment variables (not committed)
-├── .env.example          # Environment template
-├── package.json          # Dependencies
-├── tsconfig.json         # TypeScript config
-├── vite.config.ts        # Vite config
-├── tailwind.config.js    # Tailwind config
-└── README.md            # This file
+accian/
+├── app/                        # Next.js App Router
+│   ├── layout.tsx              # Root layout (Navigation, Footer, Poppins font)
+│   ├── globals.css             # Global styles, Tailwind, custom components
+│   ├── page.tsx                # / — Home page
+│   ├── services/
+│   │   └── page.tsx            # /services
+│   ├── contact/
+│   │   └── page.tsx            # /contact
+│   └── privacy-policy/
+│       └── page.tsx            # /privacy-policy
+│
+├── components/                 # Shared components
+│   ├── Navigation.tsx          # Sticky nav with active route detection
+│   ├── Footer.tsx              # Site footer
+│   ├── CookieBanner.tsx        # GDPR cookie consent banner
+│   ├── ServiceCard.tsx         # Service card with dynamic Lucide icon
+│   ├── LazyImage.tsx           # Lazy-loaded image component
+│   └── Skeletons.tsx           # Pulse skeleton components
+│
+├── data/                       # Static data
+│   ├── HomPageData.ts          # trustIndicators, stats, MARQUEE_ITEMS
+│   └── ServicesMock.ts         # detailedServices, industries, comparisonData, processSteps, faqs
+│
+├── config/
+│   └── api.ts                  # NEXT_PUBLIC_API_URL export
+│
+├── lib/
+│   └── utils.ts                # cn() Tailwind class merge utility
+│
+├── types/                      # Shared TypeScript interfaces
+│   └── index.ts
+│
+├── public/                     # Static assets (served at /)
+│   ├── Accian.png              # Logo
+│   ├── images/
+│   │   └── hero-poster.jpg
+│   └── videos/
+│       └── hero.mp4
+│
+├── next.config.ts              # Security headers, Next.js config
+├── postcss.config.mjs          # Tailwind PostCSS plugin
+├── tsconfig.json               # TypeScript config
+├── netlify.toml                # Netlify deployment config
+├── .env.local                  # Local environment variables (not committed)
+├── .env.example                # Environment variable template
+└── package.json
 ```
 
-## 🔐 Environment Variables
+---
 
-Create a `.env` file in the root directory:
+## Environment Variables
+
+Create a `.env.local` file in the project root:
 
 ```env
 # API Configuration
-VITE_API_URL=https://api.accian.co.uk
-
-# Optional: Analytics (if implemented)
-# VITE_GA_TRACKING_ID=UA-XXXXXXXXX-X
+NEXT_PUBLIC_API_URL=https://api.accian.co.uk
 ```
 
-> **Note:** All environment variables must be prefixed with `VITE_` to be accessible in the application.
+> **Note:** In Next.js, environment variables exposed to the browser **must** be prefixed with `NEXT_PUBLIC_`. Variables without this prefix are server-only.
 
-## 📜 Available Scripts
+---
 
-### Development
+## Available Scripts
 
 ```bash
-npm run dev          # Start development server
+npm run dev        # Start development server (webpack, no Turbopack)
+npm run build      # Build for production
+npm run start      # Start production server
+npm run lint       # Run ESLint
 ```
 
-### Production
+---
 
-```bash
-npm run build        # Build for production
-npm run preview      # Preview production build locally
-```
+## Deployment
 
-### Code Quality
+### Netlify
 
-```bash
-npm run lint         # Run ESLint
-npm run type-check   # Run TypeScript type checking
-```
+This project is deployed on Netlify using the official Next.js plugin.
 
-## 🚀 Deployment
+1. **Install the Netlify Next.js plugin**
 
-### Netlify (Recommended)
+   ```bash
+   npm install -D @netlify/plugin-nextjs
+   ```
 
-1. **Push code to GitHub**
+2. **Ensure `netlify.toml` exists at the project root**
+
+   ```toml
+   [build]
+     command = "npm run build"
+     publish = ".next"
+
+   [[plugins]]
+     package = "@netlify/plugin-nextjs"
+   ```
+
+3. **Set environment variables in Netlify dashboard**
+
+   Go to **Site Settings → Environment Variables** and add:
+
+   ```
+   NEXT_PUBLIC_API_URL = https://api.accian.co.uk
+   ```
+
+4. **Push to GitHub — Netlify auto-deploys on every push**
 
    ```bash
    git add .
-   git commit -m "Initial commit"
-   git push origin main
+   git commit -m "your message"
+   git push origin master
    ```
 
-2. **Connect to Netlify**
+---
 
-   - Go to [Netlify](https://app.netlify.com)
-   - Click "Add new site" → "Import an existing project"
-   - Select your repository
+## Migration Notes (Vite → Next.js)
 
-3. **Configure build settings**
+| Before (Vite + React)      | After (Next.js)                  |
+| -------------------------- | -------------------------------- |
+| `react-router-dom`         | `next/link` + file-based routing |
+| `import.meta.env.VITE_*`   | `process.env.NEXT_PUBLIC_*`      |
+| `src/main.tsx` entry point | `app/layout.tsx`                 |
+| `BrowserRouter / Routes`   | `app/` directory structure       |
+| `vite.config.ts`           | `next.config.ts`                 |
+| Google Fonts via `@import` | `next/font/google` (self-hosted) |
+| `dist/` build output       | `.next/` build output            |
+| Publish directory: `dist`  | Publish directory: `.next`       |
 
-   - Build command: `npm run build`
-   - Publish directory: `dist`
+---
 
-4. **Set environment variables**
-
-   - Go to Site settings → Environment variables
-   - Add `VITE_API_URL` with your API URL
-
-5. **Deploy**
-   - Netlify will automatically build and deploy
-   - Your site will be live at `https://your-site.netlify.app`
-
-### Manual Deployment
-
-```bash
-# Build the project
-npm run build
-
-# The dist/ folder contains the production build
-# Upload contents to your web server
-```
-
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
 ### Coding Standards
 
-- Follow the existing code style
-- Use TypeScript for all new components
-- Write meaningful commit messages
-- Add comments for complex logic
-- Ensure accessibility standards are met
+- Use TypeScript for all components
+- Keep page files to default exports only (Fast Refresh compliance)
+- Move constants and data to `data/` or `lib/` — never export them from page files
+- Add `"use client"` to any component using `useState`, `useEffect`, or browser APIs
+- Follow the existing Tailwind class naming patterns
 
-## 📝 License
+---
 
-This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+## License
 
-Copyright © 2025 ACCIAN Uk Limited. All rights reserved.
+This project is proprietary and confidential. Unauthorised copying, distribution, or use is strictly prohibited.
+
+Copyright © 2025 ACCIAN Limited. All rights reserved.
+
+---
 
 ## 📞 Contact
 
 **ACCIAN Limited**
 
 - Website: [https://accian.co.uk](https://accian.co.uk)
-- Email: admin@acciannginfo.com
+- Email: info@accian.co.uk
 - Phone: +44 7749 101623
-
-## 🙏 Acknowledgments
-
-- Design inspiration from modern web standards
-- Built with modern web technologies
-- Optimized for performance and accessibility
 
 ---
 
-**Built with ❤️ by ACCIAN UK Limited**
+_Built with ❤️ by ACCIAN Limited_
