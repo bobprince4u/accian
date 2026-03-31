@@ -10,16 +10,14 @@ const nextConfig: NextConfig = {
           {
             key: "Content-Security-Policy",
             value: `
-    default-src 'self';
-    script-src 'self' 'unsafe-inline' 'unsafe-eval';
-    connect-src 'self' https://www.google-analytics.com;
-    style-src 'self' 'unsafe-inline';
-    img-src 'self' data: https:;
-    font-src 'self' https:;
-    connect-src 'self' ws: wss:;
-    frame-src 'self' https://www.google.com https://www.google.com/maps;
-
-  `.replace(/\n/g, " "),
+              default-src 'self';
+              script-src 'self' 'unsafe-inline' 'unsafe-eval';
+              connect-src 'self' https://www.google-analytics.com https://api.accian.co.uk ws: wss:;
+              style-src 'self' 'unsafe-inline';
+              img-src 'self' data: https:;
+              font-src 'self' https:;
+              frame-src 'self' https://www.google.com https://www.google.com/maps;
+            `.replace(/\n/g, " "),
           },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
