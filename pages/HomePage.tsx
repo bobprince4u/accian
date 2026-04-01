@@ -142,7 +142,7 @@ const TestimonialSkeleton = () => (
 );
 
 const MARQUEE_ITEMS = [
-  "Cybersecurity",
+  "Cyber security",
   "Cloud Infrastructure",
   "Digital Transformation",
   "ISO 27001",
@@ -212,8 +212,8 @@ export default function HomePage() {
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen overflow-hidden bg-[#F5F3EE]">
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-[100px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-blue-400/8 blur-[80px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-150 h-150 rounded-full bg-blue-600/10 blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-100 h-100 rounded-full bg-blue-400/8 blur-[80px] pointer-events-none" />
         <div className="relative container mx-auto px-6 lg:px-12 min-h-screen grid lg:grid-cols-2 gap-12 items-center pt-24 pb-16">
           <div>
             <div
@@ -222,21 +222,21 @@ export default function HomePage() {
             >
               <span className="block w-7 h-0.5 bg-blue-600 rounded-full" />
               <span className="text-xs font-semibold tracking-widest uppercase text-blue-600">
-                UK Technology &amp; Cybersecurity
+                UK Technology &amp; Cyber security
               </span>
             </div>
             <h1
               className="text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.08] tracking-tight text-[#0D0D0D]"
               style={{ animation: "fadeUp 0.7s 0.2s ease both" }}
             >
-              Global IT, <span className="text-blue-600">Cybersecurity</span>{" "}
-              &amp; Digital Solution
+              Global IT, <span className="text-blue-600">Cyber security</span>{" "}
+              &amp; Digital Solutions
             </h1>
             <p
               className="mt-6 text-base lg:text-lg font-light text-gray-500 leading-relaxed max-w-xl"
               style={{ animation: "fadeUp 0.7s 0.35s ease both" }}
             >
-              ACCIAN is a UK-registered technology and cybersecurity company
+              ACCIAN is a UK-registered technology and cyber security company
               delivering secure, scalable, and intelligent digital solutions
               that help businesses grow, automate, and stay protected.
             </p>
@@ -262,7 +262,7 @@ export default function HomePage() {
               style={{ animation: "fadeUp 0.7s 0.65s ease both" }}
             >
               Accian Limited is an independent UK company and is not affiliated
-              with Accion or any similarly named organizations.
+              with Accion or any similarly named organisations.
             </p>
           </div>
 
@@ -703,7 +703,7 @@ export default function HomePage() {
               Get in Touch
             </p>
             <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-tight mb-5">
-              Ready to Elevate
+              Ready to Transform
               <br />
               Your Business <span className="text-blue-500">Digitally?</span>
             </h2>
@@ -739,7 +739,7 @@ export default function HomePage() {
                 {
                   icon: (
                     <svg
-                      className="text-blue-400 w-[18px] h-[18px]"
+                      className="text-blue-400 w-4.5 h-4.5"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -754,7 +754,7 @@ export default function HomePage() {
                 {
                   icon: (
                     <svg
-                      className="text-blue-400 w-[18px] h-[18px]"
+                      className="text-blue-400 w-4.5 h-4.5"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"

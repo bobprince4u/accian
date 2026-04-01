@@ -60,7 +60,7 @@ function Reveal({
 function ServiceImage({ src, alt }: { src: string; alt: string }) {
   const [loaded, setLoaded] = useState(false);
   return (
-    <div className="relative w-full h-[420px] rounded-2xl overflow-hidden">
+    <div className="relative w-full h-105 rounded-2xl overflow-hidden">
       {/* Pulse skeleton shown until image loads */}
       {!loaded && (
         <div className="absolute inset-0 bg-gray-200 animate-pulse">
@@ -175,7 +175,7 @@ export default function ServicesPage() {
           <source src="/videos/hero.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-linear-to-t from-[#0D0D0D] via-[#0D0D0D]/60 to-transparent" />
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-blue-600/15 blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-125 h-125 rounded-full bg-blue-600/15 blur-[120px] pointer-events-none" />
 
         <div className="relative container mx-auto px-6 lg:px-12">
           <div className="max-w-3xl">
