@@ -382,7 +382,7 @@ const TestimonialSkeleton = ()=>/*#__PURE__*/ (0, __TURBOPACK__imported__module_
         columnNumber: 3
     }, ("TURBOPACK compile-time value", void 0));
 const MARQUEE_ITEMS = [
-    "Cybersecurity",
+    "Cyber security",
     "Cloud Infrastructure",
     "Digital Transformation",
     "ISO 27001",
@@ -447,14 +447,14 @@ function HomePage() {
                 className: "relative min-h-screen overflow-hidden bg-[#F5F3EE]",
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "absolute top-0 right-0 w-[600px] h-[600px] rounded-full bg-blue-600/10 blur-[100px] pointer-events-none"
+                        className: "absolute top-0 right-0 w-150 h-150 rounded-full bg-blue-600/10 blur-[100px] pointer-events-none"
                     }, void 0, false, {
                         fileName: "[project]/pages/HomePage.tsx",
                         lineNumber: 215,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-blue-400/8 blur-[80px] pointer-events-none"
+                        className: "absolute bottom-0 left-0 w-100 h-100 rounded-full bg-blue-400/8 blur-[80px] pointer-events-none"
                     }, void 0, false, {
                         fileName: "[project]/pages/HomePage.tsx",
                         lineNumber: 216,
@@ -480,7 +480,7 @@ function HomePage() {
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-xs font-semibold tracking-widest uppercase text-blue-600",
-                                                children: "UK Technology & Cybersecurity"
+                                                children: "UK Technology & Cyber security"
                                             }, void 0, false, {
                                                 fileName: "[project]/pages/HomePage.tsx",
                                                 lineNumber: 224,
@@ -501,14 +501,14 @@ function HomePage() {
                                             "Global IT, ",
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-blue-600",
-                                                children: "Cybersecurity"
+                                                children: "Cyber security"
                                             }, void 0, false, {
                                                 fileName: "[project]/pages/HomePage.tsx",
                                                 lineNumber: 232,
                                                 columnNumber: 26
                                             }, this),
                                             " ",
-                                            "& Digital Solution"
+                                            "& Digital Solutions"
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/pages/HomePage.tsx",
@@ -520,7 +520,7 @@ function HomePage() {
                                         style: {
                                             animation: "fadeUp 0.7s 0.35s ease both"
                                         },
-                                        children: "ACCIAN is a UK-registered technology and cybersecurity company delivering secure, scalable, and intelligent digital solutions that help businesses grow, automate, and stay protected."
+                                        children: "ACCIAN is a UK-registered technology and cyber security company delivering secure, scalable, and intelligent digital solutions that help businesses grow, automate, and stay protected."
                                     }, void 0, false, {
                                         fileName: "[project]/pages/HomePage.tsx",
                                         lineNumber: 235,
@@ -561,7 +561,7 @@ function HomePage() {
                                         style: {
                                             animation: "fadeUp 0.7s 0.65s ease both"
                                         },
-                                        children: "Accian Limited is an independent UK company and is not affiliated with Accion or any similarly named organizations."
+                                        children: "Accian Limited is an independent UK company and is not affiliated with Accion or any similarly named organisations."
                                     }, void 0, false, {
                                         fileName: "[project]/pages/HomePage.tsx",
                                         lineNumber: 260,
@@ -1800,7 +1800,7 @@ function HomePage() {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                                         className: "text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-tight mb-5",
                                         children: [
-                                            "Ready to Elevate",
+                                            "Ready to Transform",
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("br", {}, void 0, false, {
                                                 fileName: "[project]/pages/HomePage.tsx",
                                                 lineNumber: 707,
@@ -1882,7 +1882,7 @@ function HomePage() {
                                         },
                                         {
                                             icon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                                className: "text-blue-400 w-[18px] h-[18px]",
+                                                className: "text-blue-400 w-4.5 h-4.5",
                                                 viewBox: "0 0 24 24",
                                                 fill: "none",
                                                 stroke: "currentColor",
@@ -1904,7 +1904,7 @@ function HomePage() {
                                         },
                                         {
                                             icon: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
-                                                className: "text-blue-400 w-[18px] h-[18px]",
+                                                className: "text-blue-400 w-4.5 h-4.5",
                                                 viewBox: "0 0 24 24",
                                                 fill: "none",
                                                 stroke: "currentColor",

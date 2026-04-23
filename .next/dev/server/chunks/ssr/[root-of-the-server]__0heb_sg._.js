@@ -282,6 +282,10 @@ const navLinks = [
         path: "/services"
     },
     {
+        name: "Research Support",
+        path: "/research-support"
+    },
+    {
         name: "Contact",
         path: "/contact"
     }
@@ -309,12 +313,12 @@ function Navigation() {
                                 className: "h-10 w-auto"
                             }, void 0, false, {
                                 fileName: "[project]/components/Navigation.tsx",
-                                lineNumber: 34,
+                                lineNumber: 35,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/Navigation.tsx",
-                            lineNumber: 29,
+                            lineNumber: 30,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -330,7 +334,7 @@ function Navigation() {
                                         children: link.name
                                     }, link.name, false, {
                                         fileName: "[project]/components/Navigation.tsx",
-                                        lineNumber: 48,
+                                        lineNumber: 49,
                                         columnNumber: 15
                                     }, this)),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -340,13 +344,13 @@ function Navigation() {
                                     children: "Request Consultation"
                                 }, void 0, false, {
                                     fileName: "[project]/components/Navigation.tsx",
-                                    lineNumber: 62,
+                                    lineNumber: 63,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/components/Navigation.tsx",
-                            lineNumber: 42,
+                            lineNumber: 43,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -360,25 +364,25 @@ function Navigation() {
                                 "aria-hidden": "true"
                             }, void 0, false, {
                                 fileName: "[project]/components/Navigation.tsx",
-                                lineNumber: 82,
+                                lineNumber: 83,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$menu$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__$3c$export__default__as__Menu$3e$__["Menu"], {
                                 size: 24,
                                 "aria-hidden": "true"
                             }, void 0, false, {
                                 fileName: "[project]/components/Navigation.tsx",
-                                lineNumber: 84,
+                                lineNumber: 85,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/components/Navigation.tsx",
-                            lineNumber: 72,
+                            lineNumber: 73,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Navigation.tsx",
-                    lineNumber: 27,
+                    lineNumber: 28,
                     columnNumber: 9
                 }, this),
                 isMenuOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -396,7 +400,7 @@ function Navigation() {
                                 children: link.name
                             }, link.name, false, {
                                 fileName: "[project]/components/Navigation.tsx",
-                                lineNumber: 98,
+                                lineNumber: 99,
                                 columnNumber: 15
                             }, this)),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -407,24 +411,24 @@ function Navigation() {
                             children: "Request Consultation"
                         }, void 0, false, {
                             fileName: "[project]/components/Navigation.tsx",
-                            lineNumber: 113,
+                            lineNumber: 114,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/components/Navigation.tsx",
-                    lineNumber: 91,
+                    lineNumber: 92,
                     columnNumber: 11
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/components/Navigation.tsx",
-            lineNumber: 26,
+            lineNumber: 27,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/components/Navigation.tsx",
-        lineNumber: 22,
+        lineNumber: 23,
         columnNumber: 5
     }, this);
 }
