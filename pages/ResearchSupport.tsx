@@ -500,7 +500,7 @@ export default function ResearchSupportPage() {
                 </svg>
                 Download EOI Form
               </a>
-              <a href="mailto:research@accian.co.uk" className="rs-btn-outline">
+              <a href="mailto:info@accian.co.uk" className="rs-btn-outline">
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
