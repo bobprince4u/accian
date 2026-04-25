@@ -217,7 +217,17 @@ export default function Footer() {
       <div className="border-t border-white/8">
         <div className="container-custom py-5">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs font-light text-white/25">
-            <p>© {currentYear} ACCIAN. All Rights Reserved.</p>
+            <p>
+              <Link
+                href="/internal/quote-builder"
+                className="cursor-default hover:text-white/40 transition-colors duration-300"
+                tabIndex={-1}
+                aria-hidden="true"
+              >
+                ©
+              </Link>{" "}
+              {currentYear} ACCIAN. All Rights Reserved.
+            </p>
             <p>Global Technology &amp; Cybersecurity Company · UK Operations</p>
             <p className="text-center md:text-right">
               ACCIAN Limited · Company No. 16910869 · Registered in England
