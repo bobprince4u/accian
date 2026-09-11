@@ -1,7 +1,6 @@
 import { Metadata } from "next";
-import PrivacyPolicy from "@/pages/PrivacyPolicy";
+import PrivacyPolicy from "@/views/PrivacyPolicy";
 
-// eslint-disable-next-line react-refresh/only-export-components
 export const metadata: Metadata = {
   title: "ACCIAN Limited — Global IT, Cybersecurity & Digital Solutions",
   description:

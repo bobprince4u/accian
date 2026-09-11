@@ -1,6 +1,5 @@
 import { Metadata } from "next";
-import ResearchSupportPage from "@/pages/ResearchSupport";
-// eslint-disable-next-line react-refresh/only-export-components
+import ResearchSupportPage from "@/views/ResearchSupport";
 export const metadata: Metadata = {
   title: "ACCIAN Limited — Global IT, Cybersecurity & Digital Solutions",
   description:

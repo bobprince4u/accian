@@ -30,6 +30,26 @@ interface TestimonialResponse {
   rating?: number;
 }
 
+/**
+ * What `GET /api/services` actually returns.
+ *
+ * The API's field is `shortDescription` (from the `services.short_description`
+ * column); this component's `Service` model calls it `description`. The two
+ * were never mapped, so `services[n].description` was `undefined` and every
+ * service card rendered an empty paragraph. Mapped explicitly below, the same
+ * way the testimonial response already is, rather than renaming the database
+ * column to match the component.
+ */
+interface ServiceResponse {
+  id?: string;
+  slug: string;
+  title: string;
+  shortDescription?: string;
+  icon?: string;
+  features?: string[];
+  link?: string;
+}
+
 // ─── Scroll reveal ────────────────────────────────────────────────────────────
 function useReveal(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null);
@@ -170,7 +190,19 @@ export default function HomePage() {
     try {
       const res = await axios.get(`${API_URL}/api/services`);
       const data = res.data.data || res.data;
-      setServices(Array.isArray(data) ? data : []);
+      setServices(
+        Array.isArray(data)
+          ? data.map((s: ServiceResponse) => ({
+              id: s.id,
+              slug: s.slug,
+              title: s.title,
+              description: s.shortDescription ?? "",
+              icon: s.icon,
+              features: s.features,
+              link: s.link,
+            }))
+          : [],
+      );
     } catch {
       setError("Failed to fetch services");
     } finally {

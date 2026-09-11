@@ -103,8 +103,6 @@ const PACKAGES: { name: string; ids: string[]; label: string }[] = [
   },
 ];
 
-const INTERNAL_PASSWORD = "accian2025"; // change this to whatever you want
-
 // ── Helpers ───────────────────────────────────────────────────
 
 function generateRef(): string {
@@ -126,10 +124,11 @@ function formatPrice(min: number, max: number): string {
 // ── Component ─────────────────────────────────────────────────
 
 export default function QuoteBuilderPage() {
-  // Auth
-  const [authed, setAuthed] = useState<boolean>(false);
-  const [pwInput, setPwInput] = useState<string>("");
-  const [pwError, setPwError] = useState<boolean>(false);
+  // Access is enforced server-side by `proxy.ts` (HTTP Basic Auth on
+  // `/internal/*`), so this component is only ever rendered for a request that
+  // already presented valid credentials. The previous in-browser password
+  // check was removed: it ran after the page had been delivered, so it hid the
+  // UI without withholding it, and its password shipped in a public JS chunk.
 
   // Quote state
   const [quote, setQuote] = useState<QuoteState>({
@@ -152,16 +151,6 @@ export default function QuoteBuilderPage() {
   const [preview, setPreview] = useState<boolean>(false);
   const [emailCopied, setEmailCopied] = useState<boolean>(false);
   const printRef = useRef<HTMLDivElement>(null);
-
-  // ── Auth ──
-  const handleLogin = () => {
-    if (pwInput === INTERNAL_PASSWORD) {
-      setAuthed(true);
-      setPwError(false);
-    } else {
-      setPwError(true);
-    }
-  };
 
   // ── Derived values ──
   const selectedServices = SERVICES.filter((s) => quote.selected[s.id]);
@@ -240,57 +229,6 @@ research@accian.co.uk`;
   };
 
   const printQuote = () => window.print();
-
-  // ── Login screen ──
-  if (!authed) {
-    return (
-      <div className="qb-lock">
-        <style>{`
-          .qb-lock {
-            min-height: 100vh; display: flex; align-items: center; justify-content: center;
-            background: #0F2744; font-family: 'DM Sans', sans-serif;
-          }
-          .qb-lock-card {
-            background: white; border-radius: 12px; padding: 48px 40px; width: 100%; max-width: 380px;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.3); text-align: center;
-          }
-          .qb-lock-logo { font-size: 24px; font-weight: 700; color: #0F2744; margin-bottom: 4px; }
-          .qb-lock-sub  { font-size: 13px; color: #64748B; margin-bottom: 32px; }
-          .qb-lock-label { display: block; text-align: left; font-size: 13px; font-weight: 600; color: #0F2744; margin-bottom: 6px; }
-          .qb-lock-input {
-            width: 100%; padding: 12px 14px; border: 1.5px solid #D8E4F0; border-radius: 6px;
-            font-size: 15px; outline: none; box-sizing: border-box;
-          }
-          .qb-lock-input:focus { border-color: #C8A951; }
-          .qb-lock-btn {
-            width: 100%; margin-top: 20px; padding: 13px; background: #C8A951; color: #0F2744;
-            border: none; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer;
-          }
-          .qb-lock-btn:hover { background: #E2C97E; }
-          .qb-lock-err { color: #dc2626; font-size: 13px; margin-top: 10px; }
-        `}</style>
-        <div className="qb-lock-card">
-          <div className="qb-lock-logo">ACCIAN</div>
-          <div className="qb-lock-sub">Internal Quote Builder — Staff Only</div>
-          <label className="qb-lock-label">Password</label>
-          <input
-            className="qb-lock-input"
-            type="password"
-            value={pwInput}
-            onChange={(e) => setPwInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-            placeholder="Enter staff password"
-          />
-          <button className="qb-lock-btn" onClick={handleLogin}>
-            Enter
-          </button>
-          {pwError && (
-            <div className="qb-lock-err">Incorrect password. Try again.</div>
-          )}
-        </div>
-      </div>
-    );
-  }
 
   // ── Main builder ──
   return (
