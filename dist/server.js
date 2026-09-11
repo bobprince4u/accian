@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("dotenv/config");
 const app_1 = __importDefault(require("./app"));
 const database_1 = require("./config/database");
-const init_1 = require("./migrations/init");
+const migrator_1 = require("./migrations/migrator");
 const PORT = Number(process.env.PORT) || 2025;
 // Startup banner
 console.log("");
@@ -21,7 +21,7 @@ async function startServer() {
         await (0, database_1.connectionDatabase)();
         console.log("✅ Database connected");
         // 2. Run migrations
-        await (0, init_1.runMigrations)();
+        await (0, migrator_1.runMigrations)();
         // 3. Start server
         app_1.default.listen(PORT, () => {
             console.log("🚀 Server Status: RUNNING");

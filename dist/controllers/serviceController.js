@@ -2,6 +2,25 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteService = exports.updateService = exports.createService = exports.getServiceBySlug = exports.getAllServices = void 0;
 const database_1 = require("../config/database");
+const sqlUpdate_1 = require("../utils/sqlUpdate");
+const requestFields_1 = require("../utils/requestFields");
+const serializers_1 = require("../utils/serializers");
+/** Translate request-DTO failures into 400s; anything else is a real error. */
+const handleRequestDtoError = (error, res, next) => {
+    if (error instanceof sqlUpdate_1.UnknownUpdateFieldError) {
+        res.status(400).json({
+            success: false,
+            message: "Unknown field(s) in request body",
+            fields: error.fields,
+        });
+        return;
+    }
+    if (error instanceof sqlUpdate_1.NoUpdateFieldsError) {
+        res.status(400).json({ success: false, message: "No fields to update" });
+        return;
+    }
+    next(error);
+};
 /**
  * Get all services
  * GET /api/services?published=true
@@ -147,43 +166,26 @@ exports.createService = createService;
 const updateService = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const updates = req.body;
-        console.log("📝 Updating service:", id);
-        const filteredUpdates = {};
-        Object.keys(updates).forEach((key) => {
-            if (updates[key] !== undefined) {
-                filteredUpdates[key] = updates[key];
-            }
-        });
-        const keys = Object.keys(filteredUpdates);
-        const values = Object.values(filteredUpdates);
-        if (keys.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "No fields to update",
-            });
-        }
-        const setClause = keys
-            .map((key, index) => `${key} = $${index + 1}`)
-            .join(", ");
-        const result = await (0, database_1.query)(`UPDATE services SET ${setClause}, updated_at = $${keys.length + 1} 
-       WHERE id = $${keys.length + 2} RETURNING *`, [...values, new Date(), id]);
+        const payload = (0, requestFields_1.omitFields)(req.body, requestFields_1.SERVICE_ACCEPTED_BUT_NOT_PERSISTED);
+        // Column identifiers come only from the allowlist; an arbitrary field name
+        // can never reach the SQL text.
+        const { setClause, values, nextIndex } = (0, sqlUpdate_1.buildUpdate)(payload, requestFields_1.SERVICE_FIELDS);
+        const result = await (0, database_1.query)(`UPDATE services SET ${setClause}, updated_at = $${nextIndex}
+       WHERE id = $${nextIndex + 1} RETURNING *`, [...values, new Date(), id]);
         if (result.rows.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: "Service not found",
             });
         }
-        console.log("✅ Service updated");
         res.json({
             success: true,
             message: "Service updated successfully",
-            data: result.rows[0],
+            data: (0, serializers_1.serializeService)(result.rows[0]),
         });
     }
     catch (error) {
-        console.error("❌ Update service error:", error);
-        next(error);
+        return handleRequestDtoError(error, res, next);
     }
 };
 exports.updateService = updateService;

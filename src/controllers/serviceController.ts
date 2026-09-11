@@ -1,5 +1,37 @@
 import { Request, Response, NextFunction } from "express";
 import { query } from "../config/database";
+import {
+  buildUpdate,
+  UnknownUpdateFieldError,
+  NoUpdateFieldsError,
+} from "../utils/sqlUpdate";
+import {
+  SERVICE_FIELDS,
+  SERVICE_ACCEPTED_BUT_NOT_PERSISTED,
+  omitFields,
+} from "../utils/requestFields";
+import { serializeService } from "../utils/serializers";
+
+/** Translate request-DTO failures into 400s; anything else is a real error. */
+const handleRequestDtoError = (
+  error: unknown,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (error instanceof UnknownUpdateFieldError) {
+    res.status(400).json({
+      success: false,
+      message: "Unknown field(s) in request body",
+      fields: error.fields,
+    });
+    return;
+  }
+  if (error instanceof NoUpdateFieldsError) {
+    res.status(400).json({ success: false, message: "No fields to update" });
+    return;
+  }
+  next(error as Error);
+};
 
 // Types for service rows
 interface ServiceRow {
@@ -210,34 +242,18 @@ export const updateService = async (
 ) => {
   try {
     const { id } = req.params;
-    const updates = req.body;
+    const payload = omitFields(req.body, SERVICE_ACCEPTED_BUT_NOT_PERSISTED);
 
-    console.log("📝 Updating service:", id);
-
-    const filteredUpdates: { [key: string]: any } = {};
-    Object.keys(updates).forEach((key) => {
-      if (updates[key] !== undefined) {
-        filteredUpdates[key] = updates[key];
-      }
-    });
-
-    const keys = Object.keys(filteredUpdates);
-    const values = Object.values(filteredUpdates);
-
-    if (keys.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No fields to update",
-      });
-    }
-
-    const setClause = keys
-      .map((key, index) => `${key} = $${index + 1}`)
-      .join(", ");
+    // Column identifiers come only from the allowlist; an arbitrary field name
+    // can never reach the SQL text.
+    const { setClause, values, nextIndex } = buildUpdate(
+      payload,
+      SERVICE_FIELDS
+    );
 
     const result = await query(
-      `UPDATE services SET ${setClause}, updated_at = $${keys.length + 1} 
-       WHERE id = $${keys.length + 2} RETURNING *`,
+      `UPDATE services SET ${setClause}, updated_at = $${nextIndex}
+       WHERE id = $${nextIndex + 1} RETURNING *`,
       [...values, new Date(), id]
     );
 
@@ -248,16 +264,13 @@ export const updateService = async (
       });
     }
 
-    console.log("✅ Service updated");
-
     res.json({
       success: true,
       message: "Service updated successfully",
-      data: result.rows[0],
+      data: serializeService(result.rows[0]),
     });
   } catch (error) {
-    console.error("❌ Update service error:", error);
-    next(error);
+    return handleRequestDtoError(error, res, next);
   }
 };
 

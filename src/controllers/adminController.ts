@@ -1,24 +1,59 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { generateToken } from "../middleware/auth";
 import { query } from "../config/database";
 import { generateRefreshToken, generateAccessToken } from "../utils/token";
+import {
+  toApiContactStatus,
+  toDbContactStatus,
+  CONTACT_STATUSES,
+} from "../utils/contactStatus";
+import {
+  serializeContact,
+  serializeProject,
+  serializeService,
+  serializeTestimonial,
+} from "../utils/serializers";
+import {
+  buildUpdate,
+  buildInsert,
+  UnknownUpdateFieldError,
+  NoUpdateFieldsError,
+} from "../utils/sqlUpdate";
+import {
+  PROJECT_FIELDS,
+  PROJECT_ACCEPTED_BUT_NOT_PERSISTED,
+  omitFields,
+  readField,
+} from "../utils/requestFields";
+
+/**
+ * Translate the request-DTO errors into the API's error envelope. Anything
+ * else is a genuine failure and is passed to the error handler.
+ */
+const handleRequestDtoError = (
+  error: unknown,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (error instanceof UnknownUpdateFieldError) {
+    res.status(400).json({
+      success: false,
+      message: "Unknown field(s) in request body",
+      fields: error.fields,
+    });
+    return;
+  }
+  if (error instanceof NoUpdateFieldsError) {
+    res.status(400).json({ success: false, message: "No fields to update" });
+    return;
+  }
+  next(error as Error);
+};
 
 // ========================
 // Types
 // ========================
-interface AdminUser {
-  id: string; // Changed from number to string
-  email: string;
-  full_name: string;
-  role: string;
-  username: string;
-  password_hash: string;
-  active: boolean;
-  last_login: Date | null;
-}
-
 interface UserPayload {
   id: string;
   email: string;
@@ -26,37 +61,6 @@ interface UserPayload {
   role: string;
 }
 
-interface Contact {
-  id: number;
-  full_name: string;
-  email: string;
-  phone: string;
-  message: string;
-  status: string;
-  created_at: Date;
-  updated_at: Date | null;
-}
-
-interface Project {
-  id: number;
-  title: string;
-  slug: string;
-  industry: string;
-  project_type: string;
-  description: string;
-  challenge: string;
-  solution: string;
-  technology_stack: string;
-  results: string;
-  client_name: string;
-  client_company: string;
-  client_position: string;
-  testimonial: string;
-  featured: boolean;
-  image_url: string;
-  published: boolean;
-  updated_at: Date;
-}
 // ========================
 // Admin Signup / Create Account
 // ========================
@@ -66,9 +70,9 @@ export const createAdmin = async (
   next: NextFunction
 ) => {
   try {
-    const { email, password, fullName, role, username } = req.body;
+    const { email, password, fullName, username } = req.body;
 
-    if (!email || !password || !fullName || !role || !username) {
+    if (!email || !password || !fullName || !username) {
       return res.status(400).json({
         success: false,
         message: "Missing required fields",
@@ -101,13 +105,14 @@ export const createAdmin = async (
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // Create admin
+    // The role is assigned by the server, never taken from the request body:
+    // this is the bootstrap account and it is always an admin.
     const result = await query(
-      `INSERT INTO admin_users 
+      `INSERT INTO admin_users
        (email, password_hash, full_name, role, username, active, created_at)
        VALUES ($1, $2, $3, $4, $5, true, NOW())
        RETURNING id, email, full_name, role, username`,
-      [email, passwordHash, fullName, role, username]
+      [email, passwordHash, fullName, "admin", username]
     );
 
     return res.status(201).json({
@@ -123,51 +128,110 @@ export const createAdmin = async (
 // ========================
 // Refresh Token
 // ========================
-export const refreshToken = async (req: Request, res: Response) => {
-  const { refreshToken } = req.body;
 
-  if (!refreshToken)
-    return res.status(401).json({ message: "Missing refresh token" });
-
-  const stored = await query(
-    "SELECT * FROM refresh_tokens WHERE token = $1 AND revoked = false",
-    [refreshToken]
-  );
-
-  if (!stored.rows.length)
-    return res.status(403).json({ message: "Invalid refresh token" });
-
+/**
+ * POST /api/admin/refresh
+ *
+ * Exchanges a valid refresh token for a new access token. The refresh token
+ * is checked against the database (not just cryptographically) so that a
+ * revoked or expired one cannot be used, and it is rotated on every use: the
+ * presented token is revoked and a new one issued, so a stolen token is
+ * usable at most once before the legitimate client's next refresh invalidates
+ * it.
+ *
+ * This route is deliberately mounted before `authenticateToken`: the whole
+ * point is to be callable once the access token has expired.
+ */
+export const refreshToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const decoded: any = jwt.verify(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET!
+    const { refreshToken: presentedToken } = req.body ?? {};
+
+    if (!presentedToken) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Missing refresh token" });
+    }
+
+    // Must be present, unrevoked, and unexpired according to the database.
+    const stored = await query(
+      `SELECT * FROM refresh_tokens
+       WHERE token = $1 AND revoked = false AND expires_at > NOW()`,
+      [presentedToken]
     );
 
-    // ✅ Fetch user data from database to get email and role
+    if (!stored.rows.length) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid refresh token" });
+    }
+
+    let decoded: { id?: string | number };
+
+    try {
+      decoded = jwt.verify(
+        presentedToken,
+        process.env.JWT_REFRESH_SECRET as string
+      ) as { id?: string | number };
+    } catch {
+      // Signature failed or the token is past its own expiry: revoke the row
+      // so a token that can never succeed does not linger as valid-looking.
+      await query("UPDATE refresh_tokens SET revoked = true WHERE token = $1", [
+        presentedToken,
+      ]);
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid refresh token" });
+    }
+
     const userResult = await query(
       "SELECT id, email, role FROM admin_users WHERE id = $1 AND active = true",
       [decoded.id]
     );
 
     if (userResult.rows.length === 0) {
-      return res.status(403).json({ message: "User not found or inactive" });
+      return res
+        .status(403)
+        .json({ success: false, message: "User not found or inactive" });
     }
 
     const user = userResult.rows[0];
 
-    // Generate new access token with all required fields
     const newAccessToken = generateAccessToken({
       id: user.id.toString(),
       email: user.email,
       role: user.role,
     });
 
-    res.json({
+    // Rotation: the presented token is spent.
+    const newRefreshToken = generateRefreshToken({ id: user.id.toString() });
+
+    await query("UPDATE refresh_tokens SET revoked = true WHERE token = $1", [
+      presentedToken,
+    ]);
+
+    await query(
+      `INSERT INTO refresh_tokens (user_id, token, expires_at)
+       VALUES ($1, $2, NOW() + INTERVAL '7 days')`,
+      [user.id, newRefreshToken]
+    );
+
+    return res.json({
       success: true,
-      data: { accessToken: newAccessToken },
+      data: {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      },
     });
-  } catch {
-    return res.status(403).json({ message: "Expired refresh token" });
+  } catch (error: unknown) {
+    console.error(
+      "❌ Refresh token error:",
+      error instanceof Error ? error.message : String(error)
+    );
+    next(error as Error);
   }
 };
 
@@ -246,11 +310,6 @@ export const login = async (
       [user.id, refreshToken]
     );
 
-    console.log(
-      " [DEBUG] Login successful! Token generated for user:",
-      userPayload.email
-    );
-
     return res.json({
       success: true,
       message: "Login successful",
@@ -262,82 +321,70 @@ export const login = async (
     });
   } catch (error: unknown) {
     console.error(
-      " [DEBUG] An unexpected error occurred during login:",
+      "❌ Login error:",
       error instanceof Error ? error.message : String(error)
     );
     next(error as Error);
   }
 };
 
-// ✅ DEFINE FIRST
-const normalizeStatus = (status?: string) => {
-  switch (status) {
-    case "new":
-      return "New";
-    case "contacted":
-      return "Contacted";
-    case "in_progress":
-      return "In Progress";
-    case "converted":
-      return "Converted";
-    case "closed":
-      return "Closed";
-    default:
-      return "New";
+/**
+ * POST /api/admin/logout
+ *
+ * Revokes the presented refresh token so it cannot be exchanged again. The
+ * access token is a short-lived bearer token and cannot be recalled; it
+ * expires on its own within 15 minutes. That residual window is inherent to
+ * stateless JWTs and is documented rather than papered over.
+ */
+export const logout = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { refreshToken: presentedToken } = req.body ?? {};
+
+    if (!presentedToken) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Missing refresh token" });
+    }
+
+    await query("UPDATE refresh_tokens SET revoked = true WHERE token = $1", [
+      presentedToken,
+    ]);
+
+    // Always 200: logging out an already-revoked token is not an error, and
+    // reporting whether the token existed would leak information.
+    return res.json({ success: true, message: "Logged out successfully" });
+  } catch (error: unknown) {
+    console.error(
+      "❌ Logout error:",
+      error instanceof Error ? error.message : String(error)
+    );
+    next(error as Error);
   }
-};
-
-// Logout - invalidate refresh token
-export const logout = async (req: Request, res: Response) => {
-  const { refreshToken } = req.body;
-
-  if (!refreshToken)
-    return res.status(400).json({ message: "Missing refresh token" });
-
-  await query("UPDATE refresh_tokens SET revoked = true WHERE token = $1", [
-    refreshToken,
-  ]);
-
-  res.json({ success: true, message: "Logged out successfully" });
 };
 
 /// ========================
 // Get All Contacts
 // ========================
 export const getContacts = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    console.log("📬 Fetching all contacts for admin dashboard...");
-
     const result = await query(
       "SELECT * FROM contacts ORDER BY created_at DESC"
     );
 
-    // MAP snake_case to camelCase
-    const contacts = result.rows.map((row) => ({
-      id: row.id,
-      fullName: row.full_name,
-      email: row.email,
-      company: row.company_name || "",
-      phone: row.phone || "",
-      service: row.service_interest || "",
-      budget: row.project_budget || "",
-      timeline: row.project_timeline || "",
-      message: row.message || "",
-      hearAbout: row.how_heard || "",
-      status: normalizeStatus(row.status),
-      createdAt: row.created_at,
-      lastUpdated: row.updated_at || row.created_at,
-    }));
-
-    console.log("✅ Backend mapped contact:", contacts[0]);
+    // Database rows never leave this function: the DTO is the API contract.
+    const contacts = result.rows.map(serializeContact);
 
     res.status(200).json({
       success: true,
-      data: contacts, // Send mapped data
+      data: contacts,
       count: contacts.length,
     });
   } catch (error: unknown) {
@@ -364,8 +411,6 @@ export const getContactById = async (
       });
     }
 
-    console.log(`🔍 Fetching contact with ID: ${id}`);
-
     const result = await query("SELECT * FROM contacts WHERE id = $1", [id]);
 
     if (result.rows.length === 0) {
@@ -375,28 +420,9 @@ export const getContactById = async (
       });
     }
 
-    const row = result.rows[0];
-
-    // Map database fields to frontend field names
-    const contact = {
-      id: row.id,
-      fullName: row.full_name,
-      email: row.email,
-      company: row.company_name || "",
-      phone: row.phone || "",
-      service: row.service_interest || "",
-      budget: row.project_budget || "",
-      timeline: row.project_timeline || "",
-      message: row.message || "",
-      hearAbout: row.how_heard || "",
-      status: mapDatabaseStatus(row.status),
-      createdAt: row.created_at,
-      lastUpdated: row.updated_at || row.created_at,
-    };
-
     res.status(200).json({
       success: true,
-      data: contact,
+      data: serializeContact(result.rows[0]),
     });
   } catch (error: unknown) {
     console.error(
@@ -406,26 +432,6 @@ export const getContactById = async (
     next(error as Error);
   }
 };
-
-// ========================
-// Helper: Map Database Status to Frontend Status
-// ========================
-function mapDatabaseStatus(
-  dbStatus: string
-): "New" | "Contacted" | "In Progress" | "Converted" | "Closed" {
-  const statusMap: Record<
-    string,
-    "New" | "Contacted" | "In Progress" | "Converted" | "Closed"
-  > = {
-    new: "New",
-    contacted: "Contacted",
-    "in-progress": "In Progress",
-    converted: "Converted",
-    closed: "Closed",
-  };
-
-  return statusMap[dbStatus] || "New";
-}
 
 // ========================
 // Update Contact Status
@@ -439,21 +445,15 @@ export const updateContactStatus = async (
     const { id } = req.params;
     const { status } = req.body;
 
-    // Map frontend status to database status
-    const statusMap: Record<string, string> = {
-      New: "new",
-      Contacted: "contacted",
-      "In Progress": "in-progress",
-      Converted: "converted",
-      Closed: "closed",
-    };
-
-    const dbStatus = statusMap[status];
+    // Single shared mapping — the same one the read path uses, so a status
+    // written here can never be read back as something else.
+    const dbStatus = toDbContactStatus(status);
 
     if (!dbStatus) {
       return res.status(400).json({
         success: false,
         message: "Invalid status value",
+        allowed: CONTACT_STATUSES,
       });
     }
 
@@ -468,29 +468,10 @@ export const updateContactStatus = async (
         .json({ success: false, message: "Contact not found" });
     }
 
-    const row = result.rows[0];
-
-    // Map database fields to frontend field names
-    const contact = {
-      id: row.id,
-      fullName: row.full_name,
-      email: row.email,
-      company: row.company_name || "",
-      phone: row.phone || "",
-      service: row.service_interest || "",
-      budget: row.project_budget || "",
-      timeline: row.project_timeline || "",
-      message: row.message || "",
-      hearAbout: row.how_heard || "",
-      status: mapDatabaseStatus(row.status),
-      createdAt: row.created_at,
-      lastUpdated: row.updated_at || row.created_at,
-    };
-
     return res.json({
       success: true,
       message: "Status updated successfully",
-      data: contact,
+      data: serializeContact(result.rows[0]),
     });
   } catch (error: unknown) {
     console.error(
@@ -541,27 +522,53 @@ export const deleteContact = async (
 // Dashboard Stats
 // ========================
 export const getDashboardStats = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    console.log("📊 Fetching dashboard stats...");
+    const [contacts, publishedProjects, newContacts, converted, recent] =
+      await Promise.all([
+        query("SELECT COUNT(*) as total FROM contacts"),
+        query("SELECT COUNT(*) as total FROM projects WHERE published = true"),
+        query("SELECT COUNT(*) as total FROM contacts WHERE status = $1", [
+          "new",
+        ]),
+        query("SELECT COUNT(*) as total FROM contacts WHERE status = $1", [
+          "converted",
+        ]),
+        query("SELECT * FROM contacts ORDER BY created_at DESC LIMIT 5"),
+      ]);
 
-    const [contacts, projects, newContacts, recent] = await Promise.all([
-      query("SELECT COUNT(*) as total FROM contacts"),
-      query("SELECT COUNT(*) as total FROM projects WHERE published = true"),
-      query("SELECT COUNT(*) as total FROM contacts WHERE status = 'new'"),
-      query("SELECT * FROM contacts ORDER BY created_at DESC LIMIT 5"),
-    ]);
+    const totalContacts = parseInt(contacts.rows[0].total as string, 10);
+    const newInquiries = parseInt(newContacts.rows[0].total as string, 10);
+    const convertedContacts = parseInt(converted.rows[0].total as string, 10);
+
+    // "Active" means published, which is what the projects table actually
+    // records (`published BOOLEAN`). There is no project `status` column.
+    const activeProjects = parseInt(
+      publishedProjects.rows[0].total as string,
+      10
+    );
+
+    const conversionRate =
+      totalContacts === 0
+        ? 0
+        : Math.round((convertedContacts / totalContacts) * 1000) / 10;
 
     return res.json({
       success: true,
       data: {
-        totalContacts: parseInt(contacts.rows[0].total as string),
-        totalProjects: parseInt(projects.rows[0].total as string),
-        newContacts: parseInt(newContacts.rows[0].total as string),
-        recentContacts: recent.rows,
+        totalContacts,
+        newInquiries,
+        activeProjects,
+        conversionRate,
+        recentContacts: recent.rows.map(serializeContact),
+
+        // Retained so any existing consumer of the previous shape keeps
+        // working; they are aliases of the fields above.
+        totalProjects: activeProjects,
+        newContacts: newInquiries,
       },
     });
   } catch (error: unknown) {
@@ -574,84 +581,76 @@ export const getDashboardStats = async (
 };
 
 // ========================
-// Create Project
+// Projects
 // ========================
+
+const slugify = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+/**
+ * Create Project
+ *
+ * Uses the same allowlist as `updateProject`, so the two paths accept exactly
+ * the same fields and write exactly the same columns. Anything outside the
+ * allowlist is rejected with 400 rather than silently discarded.
+ */
 export const createProject = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const {
-      title,
-      industry,
-      projectType,
-      description,
-      challenge,
-      solution,
-      technologyStack,
-      results,
-      clientName,
-      clientCompany,
-      clientPosition,
-      testimonial,
-      featured,
-      imageUrl,
-    } = req.body;
+    const payload = omitFields(req.body, PROJECT_ACCEPTED_BUT_NOT_PERSISTED);
 
-    const slug = title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    const title = readField(payload, "title");
+    if (typeof title !== "string" || title.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "title is required",
+      });
+    }
+
+    if (payload.slug === undefined) {
+      payload.slug = slugify(title);
+    }
+
+    // Preserve the previous default: a project created without an explicit
+    // status/published flag is published.
+    if (payload.status === undefined && payload.published === undefined) {
+      payload.published = true;
+    }
+
+    const { columns, values } = buildInsert(payload, PROJECT_FIELDS);
+
+    const placeholders = values.map((_, index) => `$${index + 1}`).join(", ");
 
     const result = await query(
-      `INSERT INTO projects (
-                title, slug, industry, project_type, description,
-                challenge, solution, technology_stack, results,
-                client_name, client_company, client_position, testimonial,
-                featured, image_url, published
-            ) VALUES (
-                $1, $2, $3, $4, $5,
-                $6, $7, $8, $9,
-                $10, $11, $12, $13,
-                $14, $15, true
-            ) RETURNING id, slug`,
-      [
-        title,
-        slug,
-        industry,
-        projectType,
-        description,
-        challenge,
-        solution,
-        technologyStack,
-        results,
-        clientName,
-        clientCompany,
-        clientPosition,
-        testimonial,
-        featured ?? false,
-        imageUrl,
-      ]
+      `INSERT INTO projects (${columns.join(", ")})
+       VALUES (${placeholders})
+       RETURNING *`,
+      values
     );
 
     return res.status(201).json({
       success: true,
       message: "Project created",
-      data: result.rows[0],
+      data: serializeProject(result.rows[0]),
     });
   } catch (error: unknown) {
-    console.error(
-      "❌ Create project error:",
-      error instanceof Error ? error.message : String(error)
-    );
-    next(error as Error);
+    return handleRequestDtoError(error, res, next);
   }
 };
 
-// ========================
-// Update Project
-// ========================
+/**
+ * Update Project
+ *
+ * Previously built the SET clause from `Object.keys(req.body)`, which let a
+ * caller choose the column identifiers in the SQL text. Column names now come
+ * only from the hard-coded allowlist.
+ */
 export const updateProject = async (
   req: Request,
   res: Response,
@@ -659,22 +658,16 @@ export const updateProject = async (
 ) => {
   try {
     const { id } = req.params;
-    const updates = req.body as Record<string, unknown>;
+    const payload = omitFields(req.body, PROJECT_ACCEPTED_BUT_NOT_PERSISTED);
 
-    const keys = Object.keys(updates).filter((k) => updates[k] !== undefined);
-    if (keys.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No fields to update",
-      });
-    }
-
-    const values = keys.map((key) => updates[key]);
-    const setClause = keys.map((key, i) => `${key} = $${i + 1}`).join(", ");
+    const { setClause, values, nextIndex } = buildUpdate(
+      payload,
+      PROJECT_FIELDS
+    );
 
     const result = await query(
-      `UPDATE projects SET ${setClause}, updated_at = $${keys.length + 1} 
-             WHERE id = $${keys.length + 2} RETURNING *`,
+      `UPDATE projects SET ${setClause}, updated_at = $${nextIndex}
+       WHERE id = $${nextIndex + 1} RETURNING *`,
       [...values, new Date(), id]
     );
 
@@ -688,35 +681,38 @@ export const updateProject = async (
     return res.json({
       success: true,
       message: "Project updated",
-      data: result.rows[0],
+      data: serializeProject(result.rows[0]),
     });
   } catch (error: unknown) {
-    console.error(
-      "❌ Update project error:",
-      error instanceof Error ? error.message : String(error)
-    );
-    next(error as Error);
+    return handleRequestDtoError(error, res, next);
   }
 };
 
 // ========================
-// GET ALL Project
+// GET ALL Projects (Admin)
 // ========================
 
+/**
+ * The admin list previously filtered on `published = true`, which hid every
+ * draft from the only UI that can edit or publish one. Admins see all rows;
+ * the public endpoints still filter.
+ */
 export const getProjects = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
     const result = await query(
-      "SELECT * FROM projects WHERE published = true ORDER BY updated_at DESC"
+      "SELECT * FROM projects ORDER BY updated_at DESC NULLS LAST, created_at DESC"
     );
+
+    const projects = result.rows.map(serializeProject);
 
     return res.json({
       success: true,
-      data: result.rows,
-      count: result.rows.length,
+      data: projects,
+      count: projects.length,
     });
   } catch (error: unknown) {
     console.error(
@@ -773,16 +769,16 @@ export const getServices = async (
   next: NextFunction
 ) => {
   try {
-    console.log("📋 Fetching all services (admin)");
-
     const result = await query(
       "SELECT * FROM services ORDER BY order_index ASC, created_at ASC"
     );
 
+    const services = result.rows.map(serializeService);
+
     res.json({
       success: true,
-      data: result.rows,
-      count: result.rows.length,
+      data: services,
+      count: services.length,
     });
   } catch (error: any) {
     console.error("❌ Get services error:", error);
@@ -808,8 +804,6 @@ export const getTestimonials = async (
     const limitNum = parseInt(limit as unknown as string) || 20;
     const offset = (pageNum - 1) * limitNum;
 
-    console.log("📋 Fetching all testimonials (admin)");
-
     const result = await query(
       `SELECT t.*, p.title as project_title, p.slug as project_slug
        FROM testimonials t
@@ -819,27 +813,7 @@ export const getTestimonials = async (
       [limitNum, offset]
     );
 
-    // -----------------------------
-    // Add normalization step
-    // -----------------------------
-    const normalizeTestimonial = (row: any) => ({
-      id: String(row.id), // or row.id if already string
-      name: row.client_name || "Anonymous",
-      position: row.client_position || "",
-      company: row.client_company || "",
-      message: row.testimonial_text || "",
-      rating: Number(row.rating ?? 5),
-      featured: Boolean(row.featured),
-      image: row.image_url || null,
-      createdAt: row.created_at,
-      project: {
-        id: row.project_id,
-        // optional: you can also join projects to get title/slug
-      },
-    });
-
-    const testimonials = result.rows.map(normalizeTestimonial);
-    console.log("First testimonial row:", result.rows[0]);
+    const testimonials = result.rows.map(serializeTestimonial);
 
     // Get total count
     const countResult = await query("SELECT COUNT(*) FROM testimonials");
@@ -847,7 +821,7 @@ export const getTestimonials = async (
 
     res.json({
       success: true,
-      data: result.rows.map(normalizeTestimonial),
+      data: testimonials,
       pagination: {
         total,
         page: pageNum,

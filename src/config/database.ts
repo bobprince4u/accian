@@ -1,7 +1,21 @@
 import { Pool, PoolClient, QueryResult } from "pg";
 
+/**
+ * `DATABASE_URL` is read once, here, at module load.
+ *
+ * The fresh-database migration test needs to point the pool at a throwaway
+ * database. It cannot simply assign `DATABASE_URL`, because `dotenv/config`
+ * runs during the test file's imports and would overwrite it before the test
+ * body executes. `TEST_DATABASE_URL` is therefore its own variable, honoured
+ * only when `NODE_ENV=test` so it can never redirect a running server.
+ */
+const connectionString =
+  process.env.NODE_ENV === "test" && process.env.TEST_DATABASE_URL
+    ? process.env.TEST_DATABASE_URL
+    : process.env.DATABASE_URL;
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString,
   ssl:
     process.env.NODE_ENV === "production"
       ? { rejectUnauthorized: false }
@@ -43,6 +57,11 @@ export const query = async (
   }
 };
 
-exports = {
-  pool,
-};
+/**
+ * Check out a client for work that must run in a single transaction.
+ * The caller is responsible for releasing it.
+ */
+export const getClient = async (): Promise<PoolClient> => pool.connect();
+
+export { pool };
+

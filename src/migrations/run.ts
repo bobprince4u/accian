@@ -1,26 +1,25 @@
-import dotenv from "dotenv";
-import { up } from "./001_add_security_fields";
+/**
+ * Legacy entry point. It used to run only `001_add_security_fields`, which
+ * meant the database could end up partially migrated depending on which
+ * command an operator happened to run. It now delegates to the single
+ * migrator so every entry point produces the same result.
+ */
 
-// Load environment variables FIRST
-dotenv.config();
+import "dotenv/config";
+import { runMigrations } from "./migrator";
 
 const runMigration = async () => {
   try {
     console.log("Starting database migration...");
 
-    // Debug: Check if DATABASE_URL is loaded
     if (!process.env.DATABASE_URL && !process.env.DB_PASSWORD) {
       console.error(
         "❌ Database credentials not found in environment variables!"
       );
-      console.log(
-        "Available env vars:",
-        Object.keys(process.env).filter((k) => k.includes("DB"))
-      );
       process.exit(1);
     }
 
-    await up();
+    await runMigrations();
     console.log("All migrations completed successfully!");
     process.exit(0);
   } catch (error) {

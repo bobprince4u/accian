@@ -217,6 +217,9 @@ const submitContactForm = async (req, res, next) => {
             howHeard: sanitizedData.howHeard || "Not specified",
             referenceNumber,
             timestamp: result.rows[0].created_at,
+            // The template links to /contacts/{{id}}; without this the button in
+            // every admin notification pointed at a literal "{{id}}".
+            id: contactId,
         })
             .catch((err) => console.error("Email sending error (admin):", err));
         // Final API response

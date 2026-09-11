@@ -1,6 +1,12 @@
 import { query } from "../config/database";
 
-export async function runMigrations() {
+/**
+ * Creates the base schema and seeds reference data.
+ *
+ * Every statement is `IF NOT EXISTS` / conditional, so running this against an
+ * existing database is a no-op and never destroys data.
+ */
+export async function initSchema() {
   try {
     console.log("🔄 Running database migrations...");
 
@@ -233,5 +239,8 @@ export async function runMigrations() {
     if (error instanceof Error) {
       console.error("Details:", error.message);
     }
+    // Never swallow this: a half-built schema must stop startup rather than
+    // let the server come up and fail on the first request.
+    throw error;
   }
 }

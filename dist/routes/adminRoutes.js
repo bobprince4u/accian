@@ -58,6 +58,22 @@ router.post("/create", rateLimiter.adminSignup, adminController.createAdmin);
  * * @access  Public
  */
 router.post("/login", rateLimiter.adminLogin, validation_1.validateLogin, adminController_1.login);
+/**
+ * @route   POST /api/admin/refresh
+ * @desc    Exchange a valid refresh token for a new access token
+ * @access  Public — must work once the access token has expired, which is the
+ *          entire purpose of the route. The refresh token itself is the
+ *          credential and is validated against the database.
+ */
+router.post("/refresh", adminController.refreshToken);
+/**
+ * @route   POST /api/admin/logout
+ * @desc    Revoke a refresh token
+ * @access  Public — revoking a credential must not require a currently valid
+ *          access token, otherwise a user whose access token has expired
+ *          cannot log out.
+ */
+router.post("/logout", adminController.logout);
 // Protected routes (require authentication)
 router.use(auth_1.authenticateToken, auth_1.requireAdmin);
 /**

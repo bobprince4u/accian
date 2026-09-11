@@ -1,7 +1,7 @@
 import "dotenv/config";
 import app from "./app";
 import { connectionDatabase } from "./config/database";
-import { runMigrations } from "./migrations/init";
+import { runMigrations } from "./migrations/migrator";
 
 const PORT: number = Number(process.env.PORT) || 2025;
 

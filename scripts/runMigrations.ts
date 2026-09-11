@@ -1,29 +1,18 @@
-import fs from "fs";
-import path from "path";
-import { query } from "../src/config/database";
+/**
+ * Kept so `npm run migrate` keeps working from a source checkout.
+ * The real implementation lives in `src/migrations/migrator.ts`, which is
+ * compiled into `dist` and shared with the server's startup path.
+ */
 
-async function runMigrations() {
-  const migrationsDir = path.join(__dirname, "../src/migrations");
+import "dotenv/config";
+import { runMigrations } from "../src/migrations/migrator";
 
-  const files = fs
-    .readdirSync(migrationsDir)
-    .filter((f) => f.endsWith(".sql"))
-    .sort();
-
-  console.log("📦 Running migrations...");
-
-  for (const file of files) {
-    const sql = fs.readFileSync(path.join(migrationsDir, file), "utf-8");
-
-    console.log(`➡️  Running ${file}`);
-    await query(sql);
-  }
-
-  console.log("✅ All migrations completed");
-  process.exit(0);
-}
-
-runMigrations().catch((err) => {
-  console.error("❌ Migration failed:", err);
-  process.exit(1);
-});
+runMigrations()
+  .then(() => {
+    console.log("✅ All migrations completed");
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error("❌ Migration failed:", err);
+    process.exit(1);
+  });

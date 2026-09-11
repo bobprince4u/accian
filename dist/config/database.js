@@ -1,13 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.query = exports.connectionDatabase = void 0;
+exports.pool = exports.getClient = exports.query = exports.connectionDatabase = void 0;
 const pg_1 = require("pg");
+/**
+ * `DATABASE_URL` is read once, here, at module load.
+ *
+ * The fresh-database migration test needs to point the pool at a throwaway
+ * database. It cannot simply assign `DATABASE_URL`, because `dotenv/config`
+ * runs during the test file's imports and would overwrite it before the test
+ * body executes. `TEST_DATABASE_URL` is therefore its own variable, honoured
+ * only when `NODE_ENV=test` so it can never redirect a running server.
+ */
+const connectionString = process.env.NODE_ENV === "test" && process.env.TEST_DATABASE_URL
+    ? process.env.TEST_DATABASE_URL
+    : process.env.DATABASE_URL;
 const pool = new pg_1.Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString,
     ssl: process.env.NODE_ENV === "production"
         ? { rejectUnauthorized: false }
         : false,
 });
+exports.pool = pool;
 const connectionDatabase = async () => {
     try {
         const client = await pool.connect();
@@ -39,6 +52,9 @@ const query = async (text, params) => {
     }
 };
 exports.query = query;
-exports = {
-    pool,
-};
+/**
+ * Check out a client for work that must run in a single transaction.
+ * The caller is responsible for releasing it.
+ */
+const getClient = async () => pool.connect();
+exports.getClient = getClient;

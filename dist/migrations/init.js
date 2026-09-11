@@ -1,8 +1,14 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.runMigrations = runMigrations;
+exports.initSchema = initSchema;
 const database_1 = require("../config/database");
-async function runMigrations() {
+/**
+ * Creates the base schema and seeds reference data.
+ *
+ * Every statement is `IF NOT EXISTS` / conditional, so running this against an
+ * existing database is a no-op and never destroys data.
+ */
+async function initSchema() {
     try {
         console.log("🔄 Running database migrations...");
         // Create contacts table
@@ -201,5 +207,8 @@ async function runMigrations() {
         if (error instanceof Error) {
             console.error("Details:", error.message);
         }
+        // Never swallow this: a half-built schema must stop startup rather than
+        // let the server come up and fail on the first request.
+        throw error;
     }
 }

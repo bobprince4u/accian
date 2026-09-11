@@ -1,5 +1,48 @@
 import { Request, Response, NextFunction } from "express";
 import { query } from "../config/database";
+import {
+  buildUpdate,
+  buildInsert,
+  UnknownUpdateFieldError,
+  NoUpdateFieldsError,
+} from "../utils/sqlUpdate";
+import {
+  TESTIMONIAL_FIELDS,
+  TESTIMONIAL_ACCEPTED_BUT_NOT_PERSISTED,
+  omitFields,
+  readField,
+} from "../utils/requestFields";
+import { serializeTestimonial } from "../utils/serializers";
+
+/** Translate request-DTO failures into 400s; anything else is a real error. */
+const handleRequestDtoError = (
+  error: unknown,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (error instanceof UnknownUpdateFieldError) {
+    res.status(400).json({
+      success: false,
+      message: "Unknown field(s) in request body",
+      fields: error.fields,
+    });
+    return;
+  }
+  if (error instanceof NoUpdateFieldsError) {
+    res.status(400).json({ success: false, message: "No fields to update" });
+    return;
+  }
+  next(error as Error);
+};
+
+const validateRating = (value: unknown): string | null => {
+  if (value === undefined || value === null || value === "") return null;
+  const rating = Number(value);
+  if (!Number.isFinite(rating) || rating < 1 || rating > 5) {
+    return "Rating must be between 1 and 5";
+  }
+  return null;
+};
 
 interface ProjectData {
   id: number;
@@ -159,75 +202,75 @@ export const getTestimonialById = async (
   }
 };
 
+/**
+ * Create testimonial (Admin)
+ * POST /api/admin/testimonials
+ *
+ * The admin form submits `{name, position, company, message, ...}` but this
+ * handler only destructured `{clientName, testimonialText, ...}`, so every
+ * valid submission failed the required-field check and returned 400. Both
+ * vocabularies are now accepted through one allowlist, which is the same one
+ * `updateTestimonial` uses.
+ */
 export const createTestimonial = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const {
-      clientName,
-      clientPosition,
-      clientCompany,
-      testimonialText,
-      rating,
-      projectId,
-      featured,
-      imageUrl,
-    } = req.body;
+    const payload = omitFields(
+      req.body,
+      TESTIMONIAL_ACCEPTED_BUT_NOT_PERSISTED
+    );
 
-    console.log("📝 Creating testimonial for:", clientName);
+    const name = readField(payload, "name", "clientName");
+    const message = readField(payload, "message", "testimonialText");
 
-    if (!clientName || !testimonialText) {
+    if (!name || !message) {
       return res.status(400).json({
         success: false,
         message: "Client name and testimonial text are required",
       });
     }
 
-    if (rating && (rating < 1 || rating > 5)) {
-      return res.status(400).json({
-        success: false,
-        message: "Rating must be between 1 and 5",
-      });
+    const ratingError = validateRating(
+      readField(payload, "rating") ?? undefined
+    );
+    if (ratingError) {
+      return res.status(400).json({ success: false, message: ratingError });
     }
 
-    const result = await query(
-      `
-            INSERT INTO testimonials (
-                client_name, client_position, client_company,
-                testimonial_text, rating, project_id, featured,
-                image_url, published
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, true)
-            RETURNING id
-        `,
-      [
-        clientName,
-        clientPosition || null,
-        clientCompany || null,
-        testimonialText,
-        rating || null,
-        projectId || null,
-        featured || false,
-        imageUrl || null,
-      ]
-    );
+    if (payload.published === undefined) {
+      payload.published = true;
+    }
 
-    console.log("✅ Testimonial created");
+    const { columns, values } = buildInsert(payload, TESTIMONIAL_FIELDS);
+    const placeholders = values.map((_, index) => `$${index + 1}`).join(", ");
+
+    const result = await query(
+      `INSERT INTO testimonials (${columns.join(", ")})
+       VALUES (${placeholders})
+       RETURNING *`,
+      values
+    );
 
     res.status(201).json({
       success: true,
       message: "Testimonial created successfully",
-      data: {
-        id: result.rows[0].id,
-      },
+      data: serializeTestimonial(result.rows[0]),
     });
   } catch (error) {
-    console.error("❌ Create testimonial error:", error);
-    next(error);
+    return handleRequestDtoError(error, res, next);
   }
 };
 
+/**
+ * Update testimonial (Admin)
+ * PUT /api/admin/testimonials/:id
+ *
+ * Previously built the SET clause from `Object.keys(req.body)`, so a caller
+ * controlled the column identifiers in the SQL text.
+ */
 export const updateTestimonial = async (
   req: Request,
   res: Response,
@@ -235,42 +278,24 @@ export const updateTestimonial = async (
 ) => {
   try {
     const { id } = req.params;
-    const updates: Record<string, any> = req.body;
+    const payload = omitFields(
+      req.body,
+      TESTIMONIAL_ACCEPTED_BUT_NOT_PERSISTED
+    );
 
-    console.log("📝 Updating testimonial:", id);
-
-    if (updates.rating && (updates.rating < 1 || updates.rating > 5)) {
-      return res.status(400).json({
-        success: false,
-        message: "Rating must be between 1 and 5",
-      });
+    const ratingError = validateRating(payload.rating);
+    if (ratingError) {
+      return res.status(400).json({ success: false, message: ratingError });
     }
 
-    const filteredUpdates: Record<string, any> = {};
-    Object.keys(updates).forEach((key) => {
-      if (updates[key] !== undefined) {
-        filteredUpdates[key] = updates[key];
-      }
-    });
-
-    const keys = Object.keys(filteredUpdates);
-    const values = Object.values(filteredUpdates);
-
-    if (keys.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No fields to update",
-      });
-    }
-
-    const setClause = keys
-      .map((key, index) => `${key} = $${index + 1}`)
-      .join(", ");
+    const { setClause, values, nextIndex } = buildUpdate(
+      payload,
+      TESTIMONIAL_FIELDS
+    );
 
     const result = await query(
-      `UPDATE testimonials SET ${setClause} WHERE id = $${
-        keys.length + 1
-      } RETURNING *`,
+      `UPDATE testimonials SET ${setClause}
+       WHERE id = $${nextIndex} RETURNING *`,
       [...values, id]
     );
 
@@ -281,16 +306,13 @@ export const updateTestimonial = async (
       });
     }
 
-    console.log("✅ Testimonial updated");
-
     res.json({
       success: true,
       message: "Testimonial updated successfully",
-      data: result.rows[0],
+      data: serializeTestimonial(result.rows[0]),
     });
   } catch (error) {
-    console.error("❌ Update testimonial error:", error);
-    next(error);
+    return handleRequestDtoError(error, res, next);
   }
 };
 

@@ -48,40 +48,67 @@ const projectRoutes_1 = __importDefault(require("./routes/projectRoutes"));
 const serviceRoutes_1 = __importDefault(require("./routes/serviceRoutes"));
 const testimonialRoutes_1 = __importDefault(require("./routes/testimonialRoutes"));
 //import middleware
-const errorHandler_1 = __importDefault(require("./middleware/errorHandler"));
+const errorHandler_1 = __importStar(require("./middleware/errorHandler"));
 const rateLimiter = __importStar(require("./middleware/rateLimiter"));
 const app = (0, express_1.default)();
 //security middleware
+// One proxy hop (the platform load balancer) is trusted so req.ip and the
+// rate limiter see the real client address. This matches a single-proxy PaaS
+// deployment; it was NOT verifiable from this repository, which contains no
+// deployment manifest. If the API sits behind more than one proxy (e.g. a CDN
+// in front of the platform), this number must be raised to match, and if it
+// sits behind none it should be 0 — a value that is too high lets a client
+// spoof its IP through X-Forwarded-For and evade the rate limiter.
 app.set("trust proxy", 1);
 app.use((0, helmet_1.default)());
 //CORS configuration
-const allowedOrigins = process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL.split(",")
-    : process.env.NODE_ENV === "production"
-        ? [
-            "https://accian.co.uk",
-            "https://www.accian.co.uk",
-            "https://admin.accian.co.uk",
-        ]
-        : [
-            "http://localhost:5173",
-            "http://localhost:5174",
-            "http://localhost:2025",
-            "http://localhost:2024",
-            "http://localhost:2023",
-        ];
+const parseOrigins = (value) => value
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+/**
+ * Allowed origins come from FRONTEND_URL (comma-separated).
+ *
+ * There used to be a hard-coded production fallback list. That meant a
+ * production deployment with FRONTEND_URL missing or misspelt silently served
+ * a baked-in origin list instead of failing, so a configuration error was
+ * invisible until a client was mysteriously blocked. In production the
+ * variable is now required.
+ */
+const resolveAllowedOrigins = () => {
+    if (process.env.FRONTEND_URL) {
+        const origins = parseOrigins(process.env.FRONTEND_URL);
+        if (origins.length > 0)
+            return origins;
+    }
+    if (process.env.NODE_ENV === "production") {
+        throw new Error("FRONTEND_URL must be set in production: it defines the CORS allowlist. " +
+            "Provide a comma-separated list of allowed origins, e.g. " +
+            "FRONTEND_URL=https://example.com,https://admin.example.com");
+    }
+    return [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:2025",
+        "http://localhost:2024",
+        "http://localhost:2023",
+    ];
+};
+const allowedOrigins = resolveAllowedOrigins();
 const corsOptions = {
     origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps, Postman, curl)
+        // Requests with no Origin header (curl, server-to-server, uptime probes,
+        // and the /health check) are allowed: browsers always send Origin on the
+        // cross-origin requests this list exists to control.
         if (!origin)
             return callback(null, true);
         if (allowedOrigins.includes(origin)) {
-            callback(null, true);
+            return callback(null, true);
         }
-        else {
-            console.log(`CORS blocked origin: ${origin}`);
-            callback(new Error("Not allowed by CORS"));
-        }
+        // A rejected origin is a client error, not a server fault. Throwing a bare
+        // Error here produced a 500 from the error handler, which made a
+        // misconfigured client look like backend downtime.
+        return callback(new errorHandler_1.AppError("Not allowed by CORS", 403));
     },
     credentials: true,
     optionsSuccessStatus: 200,
