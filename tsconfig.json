@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "../../accian/src/data"],
+  "include": ["src", "tests", "../../accian/src/data"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

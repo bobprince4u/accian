@@ -14,15 +14,6 @@ export default function ContactsView({
   onUpdateStatus,
   loading = false,
 }: ContactsViewProps) {
-  console.log("=== ContactsView Debug ===");
-  console.log("Total contacts:", contacts.length);
-  console.log("First contact (raw):", contacts[0]);
-
-  if (contacts[0]) {
-    console.log("Company field:", contacts[0].company);
-    console.log("Service field:", contacts[0].service);
-    console.log("All keys:", Object.keys(contacts[0]));
-  }
   return (
     <div>
       <ContactTable

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/AdminDashboard";
+import RequireAuth from "./components/RequireAuth";
 
 export default function App() {
   return (
@@ -11,8 +12,16 @@ export default function App() {
             {/* Login Page */}
             <Route path="/" element={<LoginPage />} />
 
-            {/* Dashboard */}
-            <Route path="/AdminDashboard" element={<AdminDashboard />} />
+            {/* Dashboard — guarded. The guard is a UX layer only; the backend
+                is what actually enforces authorisation on every request. */}
+            <Route
+              path="/AdminDashboard"
+              element={
+                <RequireAuth>
+                  <AdminDashboard />
+                </RequireAuth>
+              }
+            />
           </Routes>
         </main>
       </div>

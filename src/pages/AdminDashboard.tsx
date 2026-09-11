@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
@@ -10,6 +10,15 @@ import ProjectsView from "../components/ProjectsView";
 import ServicesView from "../components/ServicesView";
 import TestimonialsView from "../components/TestimonialsView";
 import ContactModal from "../components/ContactModal";
+import ResourceError from "../components/ResourceError";
+import { useResource } from "../hooks/useResource";
+import { adminLogout } from "../services/adminService";
+import {
+  classifyApiFailure,
+  describeApiFailure,
+  shouldForceLogout,
+} from "../services/apiConfig";
+import * as api from "../services/resourceService";
 import {
   Contact,
   Project,
@@ -23,152 +32,98 @@ function AdminDashboard() {
   const navigate = useNavigate();
 
   const [currentView, setCurrentView] = useState<ViewType>("dashboard");
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const [stats, setStats] = useState<DashboardStats>({
-    totalContacts: 0,
-    newInquiries: 0,
-    activeProjects: 0,
-    conversionRate: 0,
-  });
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // -----------------------------------------
-  // LOGOUT HANDLER
+  // LOGOUT
   // -----------------------------------------
-  const handleLogout = () => {
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("adminUser");
+  const handleLogout = useCallback(async () => {
+    // Revokes the refresh token server-side before clearing local state.
+    await adminLogout();
     navigate("/");
-  };
-
-  // -----------------------------------------
-  // SAFE EXTRACTOR (fixes undefined data errors)
-  // -----------------------------------------
-  const safe = <T,>(res: { data?: { data?: T[] } }): T[] =>
-    Array.isArray(res?.data?.data) ? (res.data.data as T[]) : [];
-
-  // -----------------------------------------
-  // FETCH ALL DATA
-  // -----------------------------------------
-  useEffect(() => {
-    const token = localStorage.getItem("adminToken");
-
-    if (!token) {
-      navigate("/");
-      return;
-    }
-
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const headers = { Authorization: `Bearer ${token}` };
-
-        const [contactsRes, projectsRes, servicesRes, testimonialsRes] =
-          await Promise.all([
-            axios.get("https://api.accian.co.uk/api/admin/contacts", {
-              headers,
-            }),
-            axios.get("https://api.accian.co.uk/api/admin/projects", {
-              headers,
-            }),
-            axios.get("https://api.accian.co.uk/api/admin/services", {
-              headers,
-            }),
-            axios.get("https://api.accian.co.uk/api/admin/testimonials", {
-              headers,
-            }),
-          ]);
-
-        // ========== DEBUG LOGGING ==========
-        console.log("🔍 RAW API RESPONSE:", contactsRes.data);
-        console.log("🔍 FIRST CONTACT RAW:", contactsRes.data.data?.[0]);
-        // ===================================
-
-        // SAFE extraction
-        const contactList: Contact[] = contactsRes.data.data;
-
-        // ========== DEBUG LOGGING ==========
-        console.log("🔍 AFTER SAFE EXTRACTION:", contactList[0]);
-        console.log("🔍 RAW API RESPONSE:", contactsRes.data);
-        console.log("🔍 FIRST CONTACT RAW:", contactsRes.data.data?.[0]);
-        if (contactList[0]) {
-          console.log("🔍 Company:", contactList[0].company);
-          console.log("🔍 Service:", contactList[0].service);
-          console.log("🔍 All keys:", Object.keys(contactList[0]));
-        }
-        // ===================================
-
-        // 🔍 NEW: Check the actual database values
-        if (contactsRes.data.data?.[0]) {
-          console.log("🔍 Raw full_name:", contactsRes.data.data[0].full_name);
-          console.log(
-            "🔍 Raw company_name:",
-            contactsRes.data.data[0].company_name
-          );
-          console.log(
-            "🔍 Raw service_interest:",
-            contactsRes.data.data[0].service_interest
-          );
-          console.log("🔍 Raw email:", contactsRes.data.data[0].email);
-        }
-        const projectList = safe<Project>(projectsRes);
-        const serviceList = safe<Service>(servicesRes);
-        const testimonialList = safe<Testimonial>(testimonialsRes);
-
-        setContacts(contactList);
-        setProjects(projectList);
-        setServices(serviceList);
-        setTestimonials(testimonialList);
-
-        // Stats
-        const newInquiries: number = contactList.filter(
-          (c: Contact) => c.status === "New"
-        ).length;
-        const converted = contactList.filter(
-          (c) => c.status === "Converted"
-        ).length;
-
-        const conversionRate =
-          contactList.length > 0
-            ? Math.round((converted / contactList.length) * 100)
-            : 0;
-
-        setStats({
-          totalContacts: contactList.length,
-          newInquiries,
-          activeProjects: projectList.filter((p) => p.status === "Published")
-            .length,
-          conversionRate,
-        });
-
-        setLoading(false);
-      } catch (err: unknown) {
-        if (axios.isAxiosError(err)) {
-          console.error(
-            "🔥 FETCH DATA ERROR:",
-            err.response?.data || err.message
-          );
-        } else {
-          console.error("🔥 FETCH DATA ERROR:", err);
-        }
-        alert("Session expired or server error. Please login again.");
-        handleLogout();
-      }
-    };
-
-    fetchData();
   }, [navigate]);
+
+  /**
+   * Passed to every resource, but only ever invoked for a genuine 401 — one
+   * that already survived the API client's refresh attempt. A 403, 500 or
+   * network failure leaves the session intact.
+   */
+  const handleSessionLost = useCallback(() => {
+    void handleLogout();
+  }, [handleLogout]);
+
+  // -----------------------------------------
+  // RESOURCES — each loads and fails independently
+  // -----------------------------------------
+  const contacts = useResource<Contact>(
+    api.fetchContacts,
+    "contacts",
+    handleSessionLost
+  );
+  const projects = useResource<Project>(
+    api.fetchProjects,
+    "projects",
+    handleSessionLost
+  );
+  const services = useResource<Service>(
+    api.fetchServices,
+    "services",
+    handleSessionLost
+  );
+  const testimonials = useResource<Testimonial>(
+    api.fetchTestimonials,
+    "testimonials",
+    handleSessionLost
+  );
+
+  // -----------------------------------------
+  // STATS (derived — never stale)
+  // -----------------------------------------
+  const contactList = contacts.data;
+  const converted = contactList.filter((c) => c.status === "Converted").length;
+
+  const stats: DashboardStats = {
+    totalContacts: contactList.length,
+    newInquiries: contactList.filter((c) => c.status === "New").length,
+    // The API serializes `projects.published` (BOOLEAN) to "Published"/"Draft",
+    // so this now compares against a value the API actually emits. It used to
+    // test `project.status === "Published"` against a field the API never
+    // returned, so the count was permanently 0.
+    activeProjects: projects.data.filter((p) => p.status === "Published").length,
+    conversionRate:
+      contactList.length > 0
+        ? Math.round((converted / contactList.length) * 100)
+        : 0,
+  };
 
   // Scroll to top on view change
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [currentView]);
+
+  /** Shared wrapper for write actions: report the failure, never swallow it. */
+  const runAction = async (action: () => Promise<void>, description: string) => {
+    setActionError(null);
+    try {
+      await action();
+    } catch (error) {
+      const status = axios.isAxiosError(error)
+        ? error.response?.status
+        : undefined;
+      const kind = classifyApiFailure(status);
+
+      if (shouldForceLogout(kind)) {
+        void handleLogout();
+        return;
+      }
+
+      // Status only — the response body can echo submitted contact details.
+      console.error(`${description} failed (status: ${status ?? "none"})`);
+      setActionError(describeApiFailure(kind, description));
+    }
+  };
 
   // -----------------------------------------
   // CONTACT HANDLERS
@@ -178,24 +133,12 @@ function AdminDashboard() {
     setIsModalOpen(true);
   };
 
-  const handleUpdateStatus = async (id: string, status: Contact["status"]) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
+  const handleUpdateStatus = async (id: string, status: Contact["status"]) =>
+    runAction(async () => {
+      await api.updateContactStatus(id, status);
 
-      await axios.patch(
-        `https://api.accian.co.uk/api/admin/contacts/${id}`,
-        { status },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "content-Type": "application/json",
-          },
-        }
-      );
-
-      setContacts((prev) =>
-        prev.map((c) =>
+      contacts.patch((current) =>
+        current.map((c) =>
           c.id === id
             ? { ...c, status, lastUpdated: new Date().toISOString() }
             : c
@@ -205,183 +148,64 @@ function AdminDashboard() {
       if (selectedContact?.id === id) {
         setSelectedContact((prev) => (prev ? { ...prev, status } : null));
       }
-
-      const updatedContacts = contacts.map((c) =>
-        c.id === id ? { ...c, status } : c
-      );
-
-      const newInquiries = updatedContacts.filter(
-        (c) => c.status === "New"
-      ).length;
-
-      const converted = updatedContacts.filter(
-        (c) => c.status === "Converted"
-      ).length;
-
-      const conversionRate =
-        updatedContacts.length > 0
-          ? Math.round((converted / updatedContacts.length) * 100)
-          : 0;
-
-      setStats((prev) => ({
-        ...prev,
-        newInquiries,
-        conversionRate,
-      }));
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update status. Please try again.");
-    }
-  };
+    }, "the contact status");
 
   // -----------------------------------------
   // PROJECT HANDLERS
   // -----------------------------------------
-  const handleAddProject = async (projectData: Omit<Project, "id">) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      const res = await axios.post(
-        "https://api.accian.co.uk/api/admin/projects",
-        projectData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "content-Type": "application/json",
-          },
-        }
-      );
-
-      // Add the new project returned from backend
-      setProjects((prev) => [res.data.data, ...prev]);
-    } catch (err) {
-      console.error("Add Project Error:", err);
-      alert("Failed to add project.");
-    }
-  };
+  const handleAddProject = async (projectData: Omit<Project, "id">) =>
+    runAction(async () => {
+      const created = await api.createProject(projectData);
+      projects.patch((current) => [created, ...current]);
+    }, "the new project");
 
   const handleUpdateProject = async (
     id: string,
     projectData: Omit<Project, "id">
-  ) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      const res = await axios.put(
-        `https://api.accian.co.uk/api/admin/projects/${id}`,
-        projectData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "content-Type": "application/json",
-          },
-        }
+  ) =>
+    runAction(async () => {
+      const updated = await api.updateProject(id, projectData);
+      projects.patch((current) =>
+        current.map((p) => (p.id === id ? updated : p))
       );
-
-      setProjects((prev) => prev.map((p) => (p.id === id ? res.data.data : p)));
-    } catch (err) {
-      console.error("Update Project Error:", err);
-      alert("Failed to update project.");
-    }
-  };
+    }, "the project");
 
   const handleDeleteProject = async (id: string) => {
-    try {
-      if (!confirm("Are you sure you want to delete this project?")) return;
+    if (!confirm("Are you sure you want to delete this project?")) return;
 
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      await axios.delete(`https://api.accian.co.uk/api/admin/projects/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "content-Type": "application/json",
-        },
-      });
-
-      setProjects((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
-      console.error("Delete Project Error:", err);
-      alert("Failed to delete project.");
-    }
+    return runAction(async () => {
+      await api.deleteProject(id);
+      projects.patch((current) => current.filter((p) => p.id !== id));
+    }, "the project deletion");
   };
 
   // -----------------------------------------
   // SERVICE HANDLERS
   // -----------------------------------------
-
-  const handleAddService = async (serviceData: Omit<Service, "id">) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      const res = await axios.post(
-        "https://api.accian.co.uk/api/admin/services",
-        serviceData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "content-Type": "application/json",
-          },
-        }
-      );
-
-      setServices((prev) => [res.data.data, ...prev]);
-    } catch (err) {
-      console.error("Add Service Error:", err);
-      alert("Failed to add service.");
-    }
-  };
+  const handleAddService = async (serviceData: Omit<Service, "id">) =>
+    runAction(async () => {
+      const created = await api.createService(serviceData);
+      services.patch((current) => [created, ...current]);
+    }, "the new service");
 
   const handleUpdateService = async (
     id: string,
     serviceData: Omit<Service, "id">
-  ) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      const res = await axios.put(
-        `https://api.accian.co.uk/api/admin/services/${id}`,
-        serviceData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "content-Type": "application/json",
-          },
-        }
+  ) =>
+    runAction(async () => {
+      const updated = await api.updateService(id, serviceData);
+      services.patch((current) =>
+        current.map((s) => (s.id === Number(id) ? updated : s))
       );
-
-      setServices((prev) =>
-        prev.map((p) => (p.id === Number(id) ? res.data.data : p))
-      );
-    } catch (err) {
-      console.error("Update Project Error:", err);
-      alert("Failed to update project.");
-    }
-  };
+    }, "the service");
 
   const handleDeleteService = async (id: string) => {
-    try {
-      if (!confirm("Are you sure you want to delete this project?")) return;
+    if (!confirm("Are you sure you want to delete this service?")) return;
 
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      await axios.delete(`https://api.accian.co.uk/api/admin/services/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "content-Type": "application/json",
-        },
-      });
-
-      setServices((prev) => prev.filter((p) => p.id !== Number(id)));
-    } catch (err) {
-      console.error("Delete Project Error:", err);
-      alert("Failed to delete project.");
-    }
+    return runAction(async () => {
+      await api.deleteService(id);
+      services.patch((current) => current.filter((s) => s.id !== Number(id)));
+    }, "the service deletion");
   };
 
   // -----------------------------------------
@@ -389,79 +213,30 @@ function AdminDashboard() {
   // -----------------------------------------
   const handleAddTestimonial = async (
     testimonialData: Omit<Testimonial, "id">
-  ) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      const res = await axios.post(
-        "https://api.accian.co.uk/api/admin/testimonials",
-        testimonialData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "content-Type": "application/json",
-          },
-        }
-      );
-
-      setTestimonials((prev) => [res.data.data, ...prev]);
-    } catch (err) {
-      console.error("Add Service Error:", err);
-      alert("Failed to add service.");
-    }
-  };
+  ) =>
+    runAction(async () => {
+      const created = await api.createTestimonial(testimonialData);
+      testimonials.patch((current) => [created, ...current]);
+    }, "the new testimonial");
 
   const handleUpdateTestimonial = async (
     id: string,
     testimonialData: Omit<Testimonial, "id">
-  ) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      const res = await axios.put(
-        `https://api.accian.co.uk/api/admin/testimonials/${id}`,
-        testimonialData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "content-Type": "application/json",
-          },
-        }
+  ) =>
+    runAction(async () => {
+      const updated = await api.updateTestimonial(id, testimonialData);
+      testimonials.patch((current) =>
+        current.map((t) => (t.id === id ? updated : t))
       );
-
-      setTestimonials((prev) =>
-        prev.map((p) => (p.id === id ? res.data.data : p))
-      );
-    } catch (err) {
-      console.error("Update Project Error:", err);
-      alert("Failed to update project.");
-    }
-  };
+    }, "the testimonial");
 
   const handleDeleteTestimonial = async (id: string) => {
-    try {
-      if (!confirm("Are you sure you want to delete this project?")) return;
+    if (!confirm("Are you sure you want to delete this testimonial?")) return;
 
-      const token = localStorage.getItem("adminToken");
-      if (!token) return handleLogout();
-
-      await axios.delete(
-        `https://api.accian.co.uk/api/admin/testimonials/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "content-Type": "application/json",
-          },
-        }
-      );
-
-      setTestimonials((prev) => prev.filter((p) => p.id !== id));
-    } catch (err) {
-      console.error("Delete Project Error:", err);
-      alert("Failed to delete project.");
-    }
+    return runAction(async () => {
+      await api.deleteTestimonial(id);
+      testimonials.patch((current) => current.filter((t) => t.id !== id));
+    }, "the testimonial deletion");
   };
 
   // -----------------------------------------
@@ -517,6 +292,13 @@ function AdminDashboard() {
         <Header title={getViewTitle()} subtitle={getViewSubtitle()} />
 
         <main className="p-6">
+          {actionError && (
+            <ResourceError
+              message={actionError}
+              onDismiss={() => setActionError(null)}
+            />
+          )}
+
           <AnimatePresence mode="wait">
             <motion.div
               key={currentView}
@@ -526,51 +308,97 @@ function AdminDashboard() {
               transition={{ duration: 0.3 }}
             >
               {currentView === "dashboard" && (
-                <DashboardView
-                  stats={stats}
-                  recentContacts={contacts}
-                  onViewContact={handleViewContact}
-                  loading={loading}
-                />
+                <>
+                  {contacts.error && (
+                    <ResourceError
+                      message={contacts.error.message}
+                      onRetry={contacts.retry}
+                    />
+                  )}
+                  {projects.error && (
+                    <ResourceError
+                      message={projects.error.message}
+                      onRetry={projects.retry}
+                    />
+                  )}
+                  <DashboardView
+                    stats={stats}
+                    recentContacts={contacts.data}
+                    onViewContact={handleViewContact}
+                    loading={contacts.loading || projects.loading}
+                  />
+                </>
               )}
 
               {currentView === "contacts" && (
-                <ContactsView
-                  contacts={contacts}
-                  onViewContact={handleViewContact}
-                  onUpdateStatus={handleUpdateStatus}
-                  loading={loading}
-                />
+                <>
+                  {contacts.error && (
+                    <ResourceError
+                      message={contacts.error.message}
+                      onRetry={contacts.retry}
+                    />
+                  )}
+                  <ContactsView
+                    contacts={contacts.data}
+                    onViewContact={handleViewContact}
+                    onUpdateStatus={handleUpdateStatus}
+                    loading={contacts.loading}
+                  />
+                </>
               )}
 
               {currentView === "projects" && (
-                <ProjectsView
-                  projects={projects}
-                  onAdd={handleAddProject}
-                  onUpdate={handleUpdateProject}
-                  onDelete={handleDeleteProject}
-                  loading={loading}
-                />
+                <>
+                  {projects.error && (
+                    <ResourceError
+                      message={projects.error.message}
+                      onRetry={projects.retry}
+                    />
+                  )}
+                  <ProjectsView
+                    projects={projects.data}
+                    onAdd={handleAddProject}
+                    onUpdate={handleUpdateProject}
+                    onDelete={handleDeleteProject}
+                    loading={projects.loading}
+                  />
+                </>
               )}
 
               {currentView === "services" && (
-                <ServicesView
-                  services={services}
-                  onAdd={handleAddService}
-                  onUpdate={handleUpdateService}
-                  onDelete={handleDeleteService}
-                  loading={loading}
-                />
+                <>
+                  {services.error && (
+                    <ResourceError
+                      message={services.error.message}
+                      onRetry={services.retry}
+                    />
+                  )}
+                  <ServicesView
+                    services={services.data}
+                    onAdd={handleAddService}
+                    onUpdate={handleUpdateService}
+                    onDelete={handleDeleteService}
+                    loading={services.loading}
+                  />
+                </>
               )}
 
               {currentView === "testimonials" && (
-                <TestimonialsView
-                  testimonials={testimonials}
-                  onAdd={handleAddTestimonial}
-                  onUpdate={handleUpdateTestimonial}
-                  onDelete={handleDeleteTestimonial}
-                  loading={loading}
-                />
+                <>
+                  {testimonials.error && (
+                    <ResourceError
+                      message={testimonials.error.message}
+                      onRetry={testimonials.retry}
+                    />
+                  )}
+                  <TestimonialsView
+                    testimonials={testimonials.data}
+                    onAdd={handleAddTestimonial}
+                    onUpdate={handleUpdateTestimonial}
+                    onDelete={handleDeleteTestimonial}
+                    loading={testimonials.loading}
+                  />
+                </>
               )}
             </motion.div>
           </AnimatePresence>

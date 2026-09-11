@@ -12,6 +12,13 @@ dist
 dist-ssr
 *.local
 
+# Local environment overrides.
+# `.env` itself is tracked and holds only VITE_API_URL (a public API origin,
+# not a credential). These per-developer override files must never be, and
+# Vite gives them precedence over `.env`.
+.env.local
+.env.*.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Mail, Lock, Loader2 } from "lucide-react";
 
+import { adminLogin, adminSignup } from "../services/adminService";
+import { toAuthErrorMessage } from "../services/authErrors";
+
 type AuthMode = "login" | "signup";
 
 interface LoginFormProps {
@@ -40,54 +43,32 @@ export function LoginForm({
     setError("");
     setIsLoading(true);
 
-    // Direct URLs for login and signup
-    const endpoint =
-      mode === "login"
-        ? "https://api.accian.co.uk/api/admin/login"
-        : "https://api.accian.co.uk/api/admin/create";
-
     try {
-      // Prepare request body based on mode
-      const body =
-        mode === "login"
-          ? { email, password }
-          : {
-              email,
-              password,
-              fullName: email.split("@")[0].replace(/[._]/g, " "), // Generate name from email
-              username: email.split("@")[0],
-              role: "admin",
-            };
+      if (mode === "login") {
+        // Stores the access token *and* the refresh token, so the session can
+        // survive the 15-minute access-token expiry.
+        await adminLogin({ email, password });
+      } else {
+        await adminSignup({
+          email,
+          password,
+          fullName: email.split("@")[0].replace(/[._]/g, " "),
+          username: email.split("@")[0],
+        });
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Authentication failed");
-      }
-
-      const { accessToken, user } = data.data || {};
-
-      if (accessToken) localStorage.setItem("adminToken", accessToken);
-      if (user) localStorage.setItem("adminUser", JSON.stringify(user));
-
-      // ✅ Permanently disable signup after success
-      if (mode === "signup") {
+        // `/create` issues no tokens — it creates the bootstrap account and
+        // does not sign it in. The user must now log in with these details.
         localStorage.setItem("signupDisabled", "true");
         setSignupDisabled(true);
         setMode("login");
+        setPassword("");
+        setError("Account created. Please sign in.");
+        return;
       }
 
       onSuccess();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unknown error occurred"
-      );
+      setError(toAuthErrorMessage(err));
     } finally {
       setIsLoading(false);
     }

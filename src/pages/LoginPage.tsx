@@ -4,6 +4,7 @@ import { LoginForm } from "../components/LoginForm";
 import { SignupForm } from "../components/SignupForm";
 import { LoadingSkeleton } from "../components/LoadingSkeleton";
 import { motion, AnimatePresence } from "framer-motion";
+import { getAccessToken } from "../services/apiClient";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export default function LoginPage() {
   const [allowSignup, setAllowSignup] = useState(true); // controls Sign Up button visibility
 
   useEffect(() => {
-    const token = localStorage.getItem("adminToken");
+    const token = getAccessToken();
     const accountCreated = localStorage.getItem("adminAccountCreated");
 
     if (token) {

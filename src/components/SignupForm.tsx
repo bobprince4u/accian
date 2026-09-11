@@ -10,6 +10,9 @@ import {
   ArrowLeft,
 } from "lucide-react";
 
+import { adminSignup } from "../services/adminService";
+import { toAuthErrorMessage } from "../services/authErrors";
+
 interface SignupFormProps {
   onSuccess: () => void;
   onBackToLogin: () => void;
@@ -40,42 +43,20 @@ export function SignupForm({ onSuccess, onBackToLogin }: SignupFormProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch(
-        "https://api.accian.co.uk/api/admin/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            fullName: formData.name,
-            username: formData.username,
-            email: formData.email,
-            role: "admin",
-            password: formData.password,
-          }),
-        }
-      );
+      await adminSignup({
+        fullName: formData.name,
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+      });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
-      // Store JWT token if provided
-      if (data.token) {
-        localStorage.setItem("authToken", data.token);
-      }
-
-      // Store user data if provided
-      if (data.user) {
-        localStorage.setItem("userData", JSON.stringify(data.user));
-      }
-
+      // `/create` returns the new admin row and no tokens: creating the
+      // account does not sign it in. The previous code stored `data.token`
+      // and `data.user` under keys (`authToken`, `userData`) that no longer
+      // exist in the response and that nothing else in the app ever read.
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create account");
+      setError(toAuthErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
