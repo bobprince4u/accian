@@ -1,6 +1,37 @@
+# Netlify configuration for the PUBLIC SITE (accian.co.uk) only.
+#
+# This repository is a monorepo containing three independently deployed
+# applications, so each one carries its own netlify.toml. Netlify searches for
+# a configuration file in this order: package directory, then base directory,
+# then repository root. A file at the repository root would apply to EVERY site
+# connected to this repo, which is exactly what must not happen here -- the
+# public site and the admin are separate Netlify sites with different builds.
+# There is therefore deliberately no netlify.toml at the repository root.
+#
+# REQUIRED DASHBOARD CHANGE -- this build will not run until it is made.
+# Before consolidation this app was the repository root, so the site's build
+# settings needed no base or package directory. The app now lives at apps/web/,
+# and a Netlify site cannot discover that on its own. In the site's
+# Build & deploy -> Build settings, set:
+#
+#     Package directory:  apps/web
+#     Base directory:     (leave empty -- the repository root)
+#     Build command:      npm run build:web
+#     Publish directory:  apps/web/.next
+#
+# Base is left at the root on purpose: npm workspaces keep a single lockfile at
+# the repository root, and Netlify installs dependencies from the base
+# directory. Pointing base at apps/web would leave it looking for a lockfile
+# that is not there. The package directory tells Netlify which app this site
+# builds without moving the install away from the workspace root.
+#
+# The command and publish values above are also set below, which is what makes
+# them reproducible from source rather than existing only in a dashboard. The
+# one setting that cannot live in this file is the package directory: Netlify
+# only exposes that in the UI.
 [build]
-  command = "npm run build"
-  publish = ".next"
+  command = "npm run build:web"
+  publish = "apps/web/.next"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
