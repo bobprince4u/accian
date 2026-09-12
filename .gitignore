@@ -1,0 +1,57 @@
+# Monorepo root ignore rules.
+#
+# Each application keeps its own .gitignore for build output specific to its
+# framework (apps/web/.gitignore for .next/, apps/api/.gitignore for dist/,
+# apps/admin/.gitignore for dist/). This file covers what is shared across the
+# whole repository, so that a rule like node_modules cannot go missing at the
+# root the way it did when the web app's .gitignore moved into apps/web/.
+
+# Dependencies. npm workspaces hoists most packages to the root node_modules,
+# but each workspace can also have its own, so both shapes are matched.
+node_modules/
+apps/*/node_modules/
+packages/*/node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files. Never commit real credentials; .env.example is the
+# tracked, value-free template. apps/admin/.env is a pre-existing tracked
+# exception documented in docs/deployment.md: it holds only VITE_API_URL,
+# which is a public, client-bundled value, not a secret.
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Build output, by framework. Repeated here so a stray build at the root or in
+# a new workspace is ignored before it can be committed.
+.next/
+out/
+dist/
+dist-ssr/
+dist-test/
+build/
+coverage/
+*.tsbuildinfo
+
+# Editor and OS
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.local
+
+# Netlify local state
+.netlify/

@@ -1,0 +1,107 @@
+# Netlify configuration for the PUBLIC SITE (accian.co.uk) only.
+#
+# This repository is a monorepo containing three independently deployed
+# applications, so each one carries its own netlify.toml. Netlify searches for
+# a configuration file in this order: package directory, then base directory,
+# then repository root. A file at the repository root would apply to EVERY site
+# connected to this repo, which is exactly what must not happen here -- the
+# public site and the admin are separate Netlify sites with different builds.
+# There is therefore deliberately no netlify.toml at the repository root.
+#
+# REQUIRED DASHBOARD CHANGE -- this build will not run until it is made.
+# Before consolidation this app was the repository root, so the site's build
+# settings needed no base or package directory. The app now lives at apps/web/,
+# and a Netlify site cannot discover that on its own. In the site's
+# Build & deploy -> Build settings, set:
+#
+#     Package directory:  apps/web
+#     Base directory:     (leave empty -- the repository root)
+#     Build command:      npm run build:web
+#     Publish directory:  apps/web/.next
+#
+# Base is left at the root on purpose: npm workspaces keep a single lockfile at
+# the repository root, and Netlify installs dependencies from the base
+# directory. Pointing base at apps/web would leave it looking for a lockfile
+# that is not there. The package directory tells Netlify which app this site
+# builds without moving the install away from the workspace root.
+#
+# The command and publish values above are also set below, which is what makes
+# them reproducible from source rather than existing only in a dashboard. The
+# one setting that cannot live in this file is the package directory: Netlify
+# only exposes that in the UI.
+[build]
+  command = "npm run build:web"
+  publish = "apps/web/.next"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "http://accian.co.uk/*"
+  to = "https://accian.co.uk/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.accian.co.uk/*"
+  to = "https://accian.co.uk/:splat"
+  status = 301
+  force = true
+
+# This file is the single source of truth for response headers.
+#
+# The same headers were previously also declared in `next.config.ts`, and the
+# two copies had drifted: different HSTS max-age values, and a `frame-src`
+# that existed in only one of them. Netlify's own guidance is to pick one
+# source of truth per header, and to keep security headers here rather than in
+# framework config, because these apply uniformly to static assets *and* to
+# function (SSR) responses. The duplicate block in `next.config.ts` has been
+# removed; see the note there.
+#
+# Trade-off worth knowing: headers declared here do not apply to `next dev` or
+# a local `next start`, so a CSP violation will not surface locally. Verify
+# against a deploy preview:
+#   curl -sI https://<deploy-preview>.netlify.app/ | grep -i content-security-policy
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+    # Directive notes, all verified against the current source:
+    #   style-src   fonts.googleapis.com is REQUIRED. `app/internal/quote-builder/page.tsx`
+    #               and `views/ResearchSupport.tsx` each load a stylesheet with
+    #               `@import url('https://fonts.googleapis.com/...')`. An @import is
+    #               governed by style-src, and 'unsafe-inline' does not cover it, so
+    #               both policies previously blocked those two font loads outright.
+    #   font-src    fonts.gstatic.com is the host those stylesheets then pull the
+    #               font files from. Everything else is self-hosted by `next/font`,
+    #               so this no longer needs a blanket `https:`.
+    #   connect-src google-analytics.com removed: there is no analytics, gtag or
+    #               external script anywhere in the source.
+    #   frame-src   omitted deliberately. There is no iframe, embed or object in the
+    #               source, and default-src 'self' already covers the directive.
+    #   script-src  'unsafe-inline' and 'unsafe-eval' are retained as-is. Tightening
+    #               them needs a nonce/hash strategy and a deploy to verify, which is
+    #               beyond a stabilization fix — flagged as follow-up work.
+    Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.accian.co.uk; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests;"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=()"
+
+# The `/*.html` and `/assets/*` cache rules that used to sit here were left over
+# from the Vite build and matched nothing under Next.js: Next routes are
+# extensionless (no `.html` at the site root) and its hashed output is served
+# from `/_next/static/`, not `/assets/`. No replacement rule is added here —
+# the Netlify Next.js adapter configures cache-control for `/_next/static/` and
+# for rendered pages itself, and a hand-written rule would compete with it.
+
+[[headers]]
+  for = "/internal/*"
+  [headers.values]
+    X-Robots-Tag = "noindex"
+
+[[redirects]]
+  from = "/internal/*"
+  to = "/internal/:splat"
+  status = 200
+  conditions = {Role = ["admin"]}

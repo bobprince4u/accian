@@ -1,0 +1,33 @@
+{
+  "name": "accian-monorepo",
+  "private": true,
+  "version": "0.0.0",
+  "description": "ACCIAN product repository: three independently deployable applications.",
+  "engines": {
+    "node": ">=22.0.0 <23"
+  },
+  "workspaces": [
+    "apps/web",
+    "apps/admin",
+    "apps/api",
+    "packages/types"
+  ],
+  "scripts": {
+    "build:web": "npm run build --workspace accian",
+    "build:admin": "npm run build --workspace admin",
+    "build:api": "npm run build --workspace accian-backend",
+    "dev:web": "npm run dev --workspace accian",
+    "dev:admin": "npm run dev --workspace admin",
+    "lint:web": "npm run lint --workspace accian",
+    "lint:admin": "npm run lint --workspace admin",
+    "test:api": "npm run test --workspace accian-backend",
+    "test:admin": "npm run test --workspace admin",
+    "guards": "node scripts/check-architecture.mjs"
+  },
+  "overrides": {
+    "framer-motion": {
+      "motion-dom": "12.23.23",
+      "motion-utils": "12.23.6"
+    }
+  }
+}

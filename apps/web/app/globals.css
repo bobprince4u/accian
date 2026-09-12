@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* ── Brand colours ───────────────────────────────────────────────────── */
+  --cream: #f5f3ee;
+  --cream-dark: #ede9e0;
+  --cream-darker: #e8e4da;
+  --ink: #0d0d0d;
+  --blue: #1b4fff;
+  --blue-dark: #1440e0;
+  --muted: #666666;
+  --border-light: #d8d3c9;
+  --border-mid: #e0dbd2;
+
+  /* ── Radius ──────────────────────────────────────────────────────────── */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply antialiased;
+    background-color: var(--cream);
+    color: var(--ink);
+    font-family: var(--font-poppins), sans-serif;
+  }
+
+  h1 {
+    @apply font-extrabold tracking-tight leading-tight;
+  }
+  h2 {
+    @apply font-bold tracking-tight leading-tight;
+  }
+  h3 {
+    @apply font-semibold tracking-tight leading-snug;
+  }
+  h4 {
+    @apply font-semibold leading-snug;
+  }
+  h5 {
+    @apply font-medium;
+  }
+  p {
+    @apply leading-relaxed;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ── Components ──────────────────────────────────────────────────────────── */
+@layer components {
+  /* Buttons */
+  .btn-primary {
+    @apply inline-block bg-[#0D0D0D] hover:bg-[#1B4FFF] text-white text-sm font-semibold
+           px-7 py-3.5 rounded-lg transition-colors duration-200 text-center;
+  }
+
+  .btn-secondary {
+    @apply inline-block border border-[#D8D3C9] hover:border-[#0D0D0D] text-[#0D0D0D]
+           text-sm font-medium px-7 py-3.5 rounded-lg transition-colors duration-200 text-center;
+  }
+
+  .btn-blue {
+    @apply inline-block bg-[#1B4FFF] hover:opacity-85 text-white text-sm font-semibold
+           px-7 py-3.5 rounded-lg transition-opacity duration-200 text-center;
+  }
+
+  .btn-outline-white {
+    @apply inline-block border border-white/15 hover:border-white/40 text-white
+           text-sm font-medium px-7 py-3.5 rounded-lg transition-colors duration-200 text-center;
+  }
+
+  /* Cards */
+  .card {
+    @apply bg-white border border-[#E8E4DC] rounded-2xl p-8
+           transition-all duration-300;
+  }
+
+  .card-dark {
+    @apply bg-[#0D0D0D] rounded-2xl p-8 text-white;
+  }
+
+  .card-cream {
+    @apply bg-[#EDE9E0] border border-[#E0DBD2] rounded-2xl p-8;
+  }
+
+  /* Layout */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-spacing {
+    @apply py-20 lg:py-24 px-6 lg:px-12;
+  }
+
+  /* Eyebrow label */
+  .eyebrow {
+    @apply text-xs font-semibold tracking-widest uppercase text-[#1B4FFF];
+  }
+
+  /* Section divider line */
+  .section-rule {
+    @apply border-b border-[#D8D3C9];
+  }
+
+  /* Input fields */
+  .input {
+    @apply w-full bg-[#F5F3EE] border border-[#D8D3C9] rounded-lg px-4 py-3
+           text-sm font-light text-[#0D0D0D] placeholder:text-gray-400
+           focus:outline-none focus:border-[#1B4FFF] focus:ring-2 focus:ring-[#1B4FFF]/10
+           transition-colors;
+  }
+
+  .label {
+    @apply block text-xs font-semibold tracking-wide uppercase text-[#0D0D0D] mb-2;
+  }
+
+  /* Nav */
+  .nav-link {
+    @apply text-sm font-light text-gray-500 hover:text-[#0D0D0D] transition-colors duration-200;
+  }
+
+  .nav-link-active {
+    @apply text-sm font-medium text-[#1B4FFF];
+  }
+}
+
+/* ── Marquee animation ───────────────────────────────────────────────────── */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+::-webkit-scrollbar-thumb {
+  background: #1b4fff;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #0d0d0d;
+}
+
+/* ── Tailwind theme tokens ───────────────────────────────────────────────── */
+@theme inline {
+  --font-poppins: var(--font-poppins);
+
+  --color-cream: #f5f3ee;
+  --color-cream-dark: #ede9e0;
+  --color-ink: #0d0d0d;
+  --color-blue: #1b4fff;
+  --color-muted: #666666;
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+
+  --animate-marquee: marquee 28s linear infinite;
+}

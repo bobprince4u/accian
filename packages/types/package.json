@@ -1,0 +1,12 @@
+{
+  "name": "@accian/types",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Placeholder for the shared API contract types. Not yet consumed by any application.",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "engines": {
+    "node": ">=22.0.0 <23"
+  }
+}
