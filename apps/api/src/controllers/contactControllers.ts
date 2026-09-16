@@ -189,7 +189,7 @@ export const submitContactForm = async (
     };
 
     console.log(
-      "📝 Processing contact form submission from:",
+      " Processing contact form submission from:",
       sanitizedData.email
     );
 
@@ -234,7 +234,7 @@ export const submitContactForm = async (
     ]);
 
     console.log(
-      `✅ Contact saved with ID: ${contactId}, Reference: ${referenceNumber}`
+      ` Contact saved with ID: ${contactId}, Reference: ${referenceNumber}`
     );
 
     // Send emails asynchronously
@@ -260,7 +260,7 @@ export const submitContactForm = async (
         howHeard: sanitizedData.howHeard || "Not specified",
         referenceNumber,
         timestamp: result.rows[0].created_at,
-        // The template links to /contacts/{{id}}; without this the button in
+        // The template links to /AdminDashboard; without this the button in
         // every admin notification pointed at a literal "{{id}}".
         id: contactId,
       })
@@ -274,7 +274,7 @@ export const submitContactForm = async (
       data: { id: contactId, referenceNumber },
     });
   } catch (error: unknown) {
-    console.error("❌ Contact form submission error:", error);
+    console.error(" Contact form submission error:", error);
     next(error);
   }
 };
