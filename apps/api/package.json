@@ -8,7 +8,6 @@
     "dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' server.ts",
     "test": "rm -rf dist-test && tsc -p tsconfig.test.json && mkdir -p dist-test/src/templates dist-test/src/migrations && cp -R src/templates/. dist-test/src/templates/ && cp src/migrations/*.sql dist-test/src/migrations/ && NODE_ENV=test node --experimental-test-isolation=none --test \"dist-test/tests/*.test.js\"",
     "build": "tsc && mkdir -p dist/templates dist/migrations && cp -R src/templates/. dist/templates/ && cp src/migrations/*.sql dist/migrations/",
-    "build:types": "npm run build --workspace @accian/types",
     "migrate": "ts-node scripts/runMigrations.ts",
     "migrate:down": "ts-node -e \"require('./src/migrations/001_add_security_fields').down().then(() => process.exit(0)).catch((e) => { console.error(e); process.exit(1); })\""
   },
