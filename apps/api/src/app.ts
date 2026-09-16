@@ -54,7 +54,7 @@ const resolveAllowedOrigins = (): string[] => {
     throw new Error(
       "FRONTEND_URL must be set in production: it defines the CORS allowlist. " +
         "Provide a comma-separated list of allowed origins, e.g. " +
-        "FRONTEND_URL=https://example.com,https://admin.example.com"
+        "FRONTEND_URL=https://example.com,https://admin.example.com",
     );
   }
 
@@ -68,6 +68,8 @@ const resolveAllowedOrigins = (): string[] => {
 };
 
 const allowedOrigins = resolveAllowedOrigins();
+
+console.log("🌐 CORS allowed origins:", allowedOrigins);
 
 const corsOptions: CorsOptions = {
   origin: (origin, callback) => {
