@@ -11,13 +11,13 @@ import {
   Cloud,
   TestTube,
 } from "lucide-react";
-import { Service } from "../types";
+import { Service, ServiceInput } from "../types";
 import ServiceFormModal from "./ServiceFormModal";
 
 interface ServicesViewProps {
   services: Service[];
-  onAdd: (service: Omit<Service, "id">) => void;
-  onUpdate: (id: string, service: Omit<Service, "id">) => void;
+  onAdd: (service: ServiceInput) => void;
+  onUpdate: (id: string, service: ServiceInput) => void;
   onDelete: (id: string) => void;
   loading?: boolean;
 }
@@ -76,7 +76,7 @@ export default function ServicesView({
     }
   };
 
-  const handleSave = (serviceData: Omit<Service, "id">) => {
+  const handleSave = (serviceData: ServiceInput) => {
     if (editingService) {
       onUpdate(String(editingService.id), serviceData);
     } else {

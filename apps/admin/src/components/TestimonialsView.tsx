@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Edit, Trash2, Star, MoreVertical } from "lucide-react";
-import { Testimonial } from "../types";
+import { Testimonial, TestimonialInput } from "../types";
 import TestimonialFormModal from "./TestimonialFormModal";
 
 interface TestimonialsViewProps {
   testimonials: Testimonial[];
-  onAdd: (testimonial: Omit<Testimonial, "id">) => void;
-  onUpdate: (id: string, testimonial: Omit<Testimonial, "id">) => void;
+  onAdd: (testimonial: TestimonialInput) => void;
+  onUpdate: (id: string, testimonial: TestimonialInput) => void;
   onDelete: (id: string) => void;
   loading?: boolean;
 }
@@ -53,7 +53,7 @@ export default function TestimonialsView({
     }
   };
 
-  const handleSave = (testimonialData: Omit<Testimonial, "id">) => {
+  const handleSave = (testimonialData: TestimonialInput) => {
     if (editingTestimonial) {
       onUpdate(editingTestimonial.id, testimonialData);
     } else {

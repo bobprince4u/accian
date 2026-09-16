@@ -2,37 +2,81 @@
  * Response serializers: DATABASE snake_case -> API contract camelCase.
  *
  * Database rows must never become the public API contract directly. Every
- * admin endpoint that previously returned `SELECT *` rows now returns an
- * explicit DTO built here, so the shape the clients consume is defined in one
- * place and cannot drift when a column is added or renamed.
+ * endpoint that previously returned `SELECT *` rows, or hand-built an object
+ * literal inline, now returns an explicit DTO built here, so the shape the
+ * clients consume is defined in one place and cannot drift when a column is
+ * added or renamed.
+ *
+ * The DTO types are imported from `@accian/types`, the shared contract package.
+ * They are imported as `import type`, which TypeScript erases at compile time:
+ * this file compiles against the contract but the emitted JavaScript carries no
+ * `require("@accian/types")`. That matters because the API's hosting root is
+ * `apps/api` (see docs/deployment.md §5), where a workspace symlink is not
+ * guaranteed to exist -- a runtime dependency would pass every local check and
+ * then fail in production.
  *
  * Field meanings are taken from the live schema in `src/migrations/init.ts`
- * and from the shapes the admin UI already binds to — nothing is invented.
+ * and from the shapes the clients already bind to -- nothing is invented.
  */
 
-import { toApiContactStatus, ContactStatus } from "./contactStatus";
+import type {
+  AdminUser,
+  Contact,
+  Project,
+  ProjectResult,
+  ProjectSummary,
+  Service,
+  ServiceSummary,
+  Testimonial,
+} from "@accian/types";
+import { toApiContactStatus } from "./contactStatus";
 
 type Row = Record<string, any>;
+
+/**
+ * The DTO names this module has always exported, now defined by the shared
+ * contract rather than restated here. Keeping the aliases means every existing
+ * import keeps working and the contract has exactly one definition.
+ */
+export type ContactDto = Contact;
+export type ProjectDto = Project;
+export type ProjectSummaryDto = ProjectSummary;
+export type ServiceDto = Service;
+export type ServiceSummaryDto = ServiceSummary;
+export type TestimonialDto = Testimonial;
+export type AdminUserDto = AdminUser;
+export type { ProjectResult };
+
+/**
+ * Timestamps as the contract states them: strings.
+ *
+ * `pg` returns `TIMESTAMP` columns as `Date`, and `res.json()` would convert
+ * those to ISO strings anyway -- so this changes nothing on the wire. What it
+ * changes is honesty: the DTO type now says `string` and the value is a
+ * string, instead of the type claiming one thing while the object holds
+ * another until Express happens to serialise it.
+ *
+ * A value that is already a string is passed through untouched rather than
+ * reparsed, which preserves whatever precision the database sent.
+ */
+const toIsoString = (value: unknown): string => {
+  if (value instanceof Date) return value.toISOString();
+  if (typeof value === "string") return value;
+  return "";
+};
+
+/** As `toIsoString`, for columns the contract declares nullable. */
+const toIsoStringOrNull = (value: unknown): string | null => {
+  if (value === null || value === undefined) return null;
+  return toIsoString(value);
+};
+
+const asStringArray = (value: unknown): string[] =>
+  Array.isArray(value) ? value.map(String) : [];
 
 // ─────────────────────────────────────────────────────────────
 // Contacts
 // ─────────────────────────────────────────────────────────────
-
-export interface ContactDto {
-  id: string;
-  fullName: string;
-  email: string;
-  company: string;
-  phone: string;
-  service: string;
-  budget: string;
-  timeline: string;
-  message: string;
-  hearAbout: string;
-  status: ContactStatus;
-  createdAt: Date | string;
-  lastUpdated: Date | string;
-}
 
 export const serializeContact = (row: Row): ContactDto => ({
   id: String(row.id),
@@ -46,41 +90,13 @@ export const serializeContact = (row: Row): ContactDto => ({
   message: row.message ?? "",
   hearAbout: row.how_heard ?? "",
   status: toApiContactStatus(row.status),
-  createdAt: row.created_at,
-  lastUpdated: row.updated_at ?? row.created_at,
+  createdAt: toIsoString(row.created_at),
+  lastUpdated: toIsoString(row.updated_at ?? row.created_at),
 });
 
 // ─────────────────────────────────────────────────────────────
 // Projects
 // ─────────────────────────────────────────────────────────────
-
-export interface ProjectResult {
-  metric: string;
-  value: string;
-}
-
-export interface ProjectDto {
-  id: string;
-  title: string;
-  slug: string;
-  client: string;
-  category: string;
-  industry: string;
-  description: string;
-  challenge: string;
-  solution: string;
-  image: string;
-  status: "Published" | "Draft";
-  featured: boolean;
-  technologies: string[];
-  results: ProjectResult[];
-  clientCompany: string;
-  clientPosition: string;
-  testimonial: string;
-  orderIndex: number;
-  createdAt: Date | string;
-  lastUpdated: Date | string;
-}
 
 /**
  * `projects.results` is a TEXT column. The admin UI models it as an array of
@@ -133,39 +149,44 @@ export const serializeProject = (row: Row): ProjectDto => ({
   image: row.image_url ?? "",
   status: row.published === false ? "Draft" : "Published",
   featured: Boolean(row.featured),
-  technologies: Array.isArray(row.technology_stack) ? row.technology_stack : [],
+  technologies: asStringArray(row.technology_stack),
   results: parseProjectResults(row.results),
   clientCompany: row.client_company ?? "",
   clientPosition: row.client_position ?? "",
   testimonial: row.testimonial ?? "",
   orderIndex: Number(row.order_index ?? 0),
-  createdAt: row.created_at,
-  lastUpdated: row.updated_at ?? row.created_at,
+  createdAt: toIsoString(row.created_at),
+  lastUpdated: toIsoString(row.updated_at ?? row.created_at),
 });
+
+/**
+ * The lighter shape `GET /api/projects` returns.
+ *
+ * Derived from `serializeProject` by selecting fields rather than by mapping
+ * the row a second time, so the list and detail endpoints cannot disagree
+ * about what a field means. The list query selects fewer columns; the omitted
+ * ones are the long-form case-study fields and the client attribution.
+ */
+export const serializeProjectSummary = (row: Row): ProjectSummaryDto => {
+  const project = serializeProject(row);
+  return {
+    id: project.id,
+    title: project.title,
+    slug: project.slug,
+    industry: project.industry,
+    category: project.category,
+    description: project.description,
+    technologies: project.technologies,
+    results: project.results,
+    image: project.image,
+    featured: project.featured,
+    createdAt: project.createdAt,
+  };
+};
 
 // ─────────────────────────────────────────────────────────────
 // Services
 // ─────────────────────────────────────────────────────────────
-
-export interface ServiceDto {
-  id: number;
-  title: string;
-  slug: string;
-  icon: string | null;
-  shortDescription: string;
-  fullDescription: string | null;
-  features: string[];
-  technologyStack: string[];
-  processSteps: string[];
-  idealFor: string[];
-  orderIndex: number;
-  published: boolean;
-  createdAt: Date | string;
-  updatedAt: Date | string | null;
-}
-
-const asStringArray = (value: unknown): string[] =>
-  Array.isArray(value) ? value.map(String) : [];
 
 export const serializeService = (row: Row): ServiceDto => ({
   id: Number(row.id),
@@ -180,26 +201,36 @@ export const serializeService = (row: Row): ServiceDto => ({
   idealFor: asStringArray(row.ideal_for),
   orderIndex: Number(row.order_index ?? 0),
   published: row.published !== false,
-  createdAt: row.created_at,
-  updatedAt: row.updated_at ?? null,
+  createdAt: toIsoString(row.created_at),
+  updatedAt: toIsoStringOrNull(row.updated_at),
 });
+
+/**
+ * The lighter shape `GET /api/services` returns.
+ *
+ * As with projects, this selects from the full DTO rather than re-mapping the
+ * row. The list query does not select the long-form columns, so returning the
+ * full DTO there would answer with `fullDescription: null` and empty arrays --
+ * fields that look like real absent data but are really unselected columns.
+ */
+export const serializeServiceSummary = (row: Row): ServiceSummaryDto => {
+  const service = serializeService(row);
+  return {
+    id: service.id,
+    title: service.title,
+    slug: service.slug,
+    icon: service.icon,
+    shortDescription: service.shortDescription,
+    features: service.features,
+    orderIndex: service.orderIndex,
+    published: service.published,
+    createdAt: service.createdAt,
+  };
+};
 
 // ─────────────────────────────────────────────────────────────
 // Testimonials
 // ─────────────────────────────────────────────────────────────
-
-export interface TestimonialDto {
-  id: string;
-  name: string;
-  position: string;
-  company: string;
-  message: string;
-  rating: number;
-  featured: boolean;
-  image: string | null;
-  createdAt: Date | string;
-  project: { id: number; title?: string; slug?: string } | null;
-}
 
 export const serializeTestimonial = (row: Row): TestimonialDto => ({
   id: String(row.id),
@@ -210,7 +241,7 @@ export const serializeTestimonial = (row: Row): TestimonialDto => ({
   rating: Number(row.rating ?? 5),
   featured: Boolean(row.featured),
   image: row.image_url ?? null,
-  createdAt: row.created_at,
+  createdAt: toIsoString(row.created_at),
   project: row.project_id
     ? {
         id: Number(row.project_id),
@@ -218,4 +249,23 @@ export const serializeTestimonial = (row: Row): TestimonialDto => ({
         slug: row.project_slug,
       }
     : null,
+});
+
+// ─────────────────────────────────────────────────────────────
+// Admin users
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * The administrator as the API describes them.
+ *
+ * `password_hash` is not selected by any caller and is not mapped here, so it
+ * cannot reach a response even if a future query starts selecting it. The
+ * `username` column is deliberately omitted: it is part of the signup request,
+ * not part of the user contract, and no client reads it back.
+ */
+export const serializeAdminUser = (row: Row): AdminUserDto => ({
+  id: String(row.id),
+  email: row.email ?? "",
+  fullName: row.full_name ?? "",
+  role: row.role ?? "",
 });

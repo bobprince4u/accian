@@ -44,27 +44,6 @@ const validateRating = (value: unknown): string | null => {
   return null;
 };
 
-interface ProjectData {
-  id: number;
-  title: string;
-  slug: string;
-}
-
-interface Testimonial {
-  id: number;
-  client_name: string;
-  client_position: string | null;
-  client_company: string | null;
-  testimonial_text: string;
-  rating: number | null;
-  featured: boolean;
-  image_url: string | null;
-  project_id: number | null;
-  project_title?: string;
-  project_slug?: string;
-  created_at: string;
-}
-
 export const getAllTestimonials = async (
   req: Request,
   res: Response,
@@ -111,24 +90,7 @@ export const getAllTestimonials = async (
 
     res.json({
       success: true,
-      data: result.rows.map((testimonial: Testimonial) => ({
-        id: testimonial.id,
-        clientName: testimonial.client_name,
-        clientPosition: testimonial.client_position,
-        clientCompany: testimonial.client_company,
-        testimonialText: testimonial.testimonial_text,
-        rating: testimonial.rating,
-        featured: testimonial.featured,
-        imageUrl: testimonial.image_url,
-        project: testimonial.project_id
-          ? {
-              id: testimonial.project_id,
-              title: testimonial.project_title,
-              slug: testimonial.project_slug,
-            }
-          : null,
-        createdAt: testimonial.created_at,
-      })),
+      data: result.rows.map(serializeTestimonial),
       pagination: {
         total,
         page: parseInt(page),
@@ -173,28 +135,9 @@ export const getTestimonialById = async (
       });
     }
 
-    const testimonial: Testimonial = result.rows[0];
-
     res.json({
       success: true,
-      data: {
-        id: testimonial.id,
-        clientName: testimonial.client_name,
-        clientPosition: testimonial.client_position,
-        clientCompany: testimonial.client_company,
-        testimonialText: testimonial.testimonial_text,
-        rating: testimonial.rating,
-        featured: testimonial.featured,
-        imageUrl: testimonial.image_url,
-        project: testimonial.project_id
-          ? {
-              id: testimonial.project_id,
-              title: testimonial.project_title,
-              slug: testimonial.project_slug,
-            }
-          : null,
-        createdAt: testimonial.created_at,
-      },
+      data: serializeTestimonial(result.rows[0]),
     });
   } catch (error) {
     console.error("❌ Get testimonial by ID error:", error);

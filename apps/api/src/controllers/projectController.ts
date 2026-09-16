@@ -1,31 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { query } from "../config/database";
-
-// ─────────────────────────────────────────────────────────────
-// Types
-// ─────────────────────────────────────────────────────────────
-
-interface ProjectRow {
-  id: number;
-  title: string;
-  slug: string;
-  industry: string;
-  project_type: string;
-  description: string;
-  technology_stack: string;
-  results: string;
-  image_url: string;
-  featured: boolean;
-  created_at: string;
-
-  // Optional fields (single project)
-  challenge?: string;
-  solution?: string;
-  client_name?: string;
-  client_position?: string;
-  client_company?: string;
-  testimonial?: string;
-}
+import {
+  serializeProject,
+  serializeProjectSummary,
+} from "../utils/serializers";
 
 // ─────────────────────────────────────────────────────────────
 // Get All Projects
@@ -76,19 +54,7 @@ export const getAllProjects = async (
 
     res.json({
       success: true,
-      data: result.rows.map((project: ProjectRow) => ({
-        id: project.id,
-        title: project.title,
-        slug: project.slug,
-        industry: project.industry,
-        projectType: project.project_type,
-        description: project.description,
-        technologyStack: project.technology_stack,
-        results: project.results,
-        imageUrl: project.image_url,
-        featured: project.featured,
-        createdAt: project.created_at,
-      })),
+      data: result.rows.map(serializeProjectSummary),
       pagination: {
         total,
         page: pageNum,
@@ -118,12 +84,12 @@ export const getProjectBySlug = async (
     console.log("📂 Fetching project by slug:", slug);
 
     const result = await query(
-      `SELECT 
+      `SELECT
                 p.id, p.title, p.slug, p.industry, p.project_type,
                 p.description, p.challenge, p.solution, p.technology_stack,
-                p.results, p.image_url, p.featured,
+                p.results, p.image_url, p.featured, p.published,
                 p.client_name, p.client_position, p.client_company, p.testimonial,
-                p.created_at
+                p.order_index, p.created_at, p.updated_at
             FROM projects p
             WHERE p.slug = $1 AND p.published = true`,
       [slug]
@@ -137,35 +103,9 @@ export const getProjectBySlug = async (
       return;
     }
 
-    const project: ProjectRow = result.rows[0];
-
-    const formattedProject = {
-      id: project.id,
-      title: project.title,
-      slug: project.slug,
-      industry: project.industry,
-      projectType: project.project_type,
-      description: project.description,
-      challenge: project.challenge,
-      solution: project.solution,
-      technologyStack: project.technology_stack,
-      results: project.results,
-      imageUrl: project.image_url,
-      featured: project.featured,
-      testimonial: project.testimonial
-        ? {
-            text: project.testimonial,
-            clientName: project.client_name,
-            clientPosition: project.client_position,
-            clientCompany: project.client_company,
-          }
-        : null,
-      createdAt: project.created_at,
-    };
-
     res.json({
       success: true,
-      data: formattedProject,
+      data: serializeProject(result.rows[0]),
     });
   } catch (error) {
     console.error("❌ Get project by slug error:", error);

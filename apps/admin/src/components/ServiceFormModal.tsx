@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Trash2, Save } from "lucide-react";
-import { Service } from "../types";
+import { Service, ServiceInput } from "../types";
 
 interface ServiceFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (service: Service) => void;
+  onSave: (service: ServiceInput) => void;
   service?: Service | null;
 }
 
@@ -38,7 +38,7 @@ export default function ServiceFormModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const payload: Service = {
+    const payload: ServiceInput = {
       title: formData.title,
       slug: formData.title.toLowerCase().replace(/\s+/g, "-"),
       icon: formData.icon,

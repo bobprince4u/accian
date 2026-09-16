@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Star, Save, Upload } from "lucide-react";
-import { Testimonial } from "../types";
+import { Testimonial, TestimonialInput } from "../types";
 
 interface TestimonialFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (testimonial: Omit<Testimonial, "id">) => void; // ← Changed this line
+  onSave: (testimonial: TestimonialInput) => void;
   testimonial?: Testimonial | null;
 }
 
@@ -24,14 +24,15 @@ export default function TestimonialFormModal({
     rating: testimonial?.rating || 5,
     image: testimonial?.image || "",
     featured: testimonial?.featured || false,
-    createdAt: testimonial?.createdAt || new Date().toISOString(),
   });
 
   const [hoveredRating, setHoveredRating] = useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Pass the data directly without transformation
+    // `createdAt` is the database's to assign (`created_at DEFAULT
+    // CURRENT_TIMESTAMP`), so it is not part of the submission. The API
+    // discarded it anyway.
     onSave({
       name: formData.name,
       position: formData.position,
@@ -40,7 +41,6 @@ export default function TestimonialFormModal({
       rating: formData.rating,
       featured: formData.featured,
       image: formData.image,
-      createdAt: formData.createdAt,
     });
     onClose();
   };

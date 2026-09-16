@@ -1,29 +1,76 @@
 /**
  * Shared API contract types for the ACCIAN product.
  *
- * This package is SCAFFOLDING ONLY. It is deliberately empty.
+ * This package is the single source of truth for the shapes that cross the
+ * HTTP boundary between `apps/api` and its two clients, `apps/web` and
+ * `apps/admin`.
  *
- * Phase 2 is a repository consolidation: it moves three applications into one
- * repository without changing their behaviour. Defining the shared contract is
- * a separate piece of work, because doing it properly means resolving contract
- * disagreements that Phase 2 is not allowed to touch -- the pre-refactor audit
- * recorded, among others:
+ * Scope, deliberately narrow:
  *
- *   - `Service` has three separate definitions and none matches the backend.
- *   - `Project` is severely diverged between the admin and the API.
- *   - `DashboardStats` has three of four fields wrong.
- *   - Contact status uses two divergent maps inside the backend itself.
+ *   - It describes the API contract, NOT the PostgreSQL schema. Where the two
+ *     disagree, the database name is an implementation detail and the mapping
+ *     belongs to the API.
+ *   - It is framework-agnostic. No Express, Next.js, React, Vite, pg or email
+ *     provider types appear here, and nothing in it reads an environment
+ *     variable.
+ *   - It contains no runtime logic beyond small guards over literal unions.
  *
- * Populating this file would therefore require picking a winner for each of
- * those, which changes product behaviour. See docs/accian-integration-audit.md
- * sections 19 and 20, and docs/known-issues.md.
+ * It carries no dependencies, and it is consumable from both module systems:
+ * `apps/api` is CommonJS, `apps/web` and `apps/admin` are ESM.
  *
- * The package exists now so that the workspace layout, the root lockfile and
- * the build scripts are already correct when that work starts. No application
- * imports it, and nothing here should be imported until the contract is agreed.
- *
- * The authoritative source for these types should be the database schema, which
- * the API owns: apps/api/src/models/schema.sql.
+ * TypeScript types are erased at runtime. They are not a substitute for the
+ * API's own validation -- the backend stays authoritative.
  */
 
-export {};
+// The `.js` extensions are required: Node's ESM resolver does not guess them,
+// and TypeScript maps a `.js` specifier back to the `.ts` source when
+// compiling. Bundlers accept them too, so one spelling works everywhere.
+
+export type {
+  ApiSuccess,
+  ApiSuccessList,
+  Pagination,
+  PaginatedResponse,
+  ApiError,
+  ApiFieldError,
+  ApiResponse,
+  ApiPaginatedResponse,
+  PaginationQuery,
+} from "./api.js";
+export { isApiError } from "./api.js";
+
+export type {
+  Contact,
+  ContactStatus,
+  ContactSubmission,
+  ContactSubmissionResult,
+  ContactStatusUpdate,
+} from "./contact.js";
+export { CONTACT_STATUSES, isContactStatus } from "./contact.js";
+
+export type { Service, ServiceSummary, ServiceInput } from "./service.js";
+
+export type {
+  Testimonial,
+  TestimonialInput,
+  TestimonialProject,
+} from "./testimonial.js";
+
+export type {
+  Project,
+  ProjectSummary,
+  ProjectInput,
+  ProjectResult,
+  ProjectStatus,
+} from "./project.js";
+export { PROJECT_STATUSES, isProjectStatus } from "./project.js";
+
+export type { DashboardStats } from "./dashboard.js";
+
+export type {
+  AdminUser,
+  LoginRequest,
+  LoginResult,
+  RefreshRequest,
+  RefreshResult,
+} from "./auth.js";

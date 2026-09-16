@@ -131,9 +131,11 @@ rather than silently falling back to a development origin.
 | `DB_PASSWORD` | Yes | Database password. **Secret.** |
 | `JWT_ACCESS_SECRET` | Yes | Signing key for access tokens. **Secret.** |
 | `JWT_REFRESH_SECRET` | Yes | Signing key for refresh tokens. **Secret.** |
-| `SENDGRID_API_KEY` | Yes | SendGrid credential. **Secret.** |
-| `SENDGRID_FROM_EMAIL` | Yes | Verified sender address. |
-| `ADMIN_EMAIL` | Yes | Recipient for contact-form notifications. |
+| `RESEND_API_KEY` | Yes | Resend credential. **Secret.** Belongs to `apps/api` only — never to `apps/web` or `apps/admin`. |
+| `RESEND_FROM_EMAIL` | Yes | Verified sender address. Must be on a domain verified in Resend (§ below). |
+| `ADMIN_EMAIL` | Yes | Recipient for contact-form notifications. Without it, admin notifications fail and say so by name. |
+| `SENDGRID_API_KEY` | **Remove** | Former provider. No longer read by any code. Delete it from the host. |
+| `SENDGRID_FROM_EMAIL` | Deprecated | Still honoured as a fallback sender so a half-renamed environment keeps working. Rename to `RESEND_FROM_EMAIL`; the API logs a warning while it is in use. |
 | `EMAIL_USER` | — | Legacy sender address; see `docs/known-issues.md`. |
 | `FRONTEND_URL` | **Should be set** | Comma-separated CORS allowlist. See the warning below. |
 | `NODE_ENV` | Yes | Must be `production` in production. |
@@ -149,6 +151,64 @@ contains no values.
 > invisible until someone needs to change an origin.** The value is also split
 > on `,` **without trimming whitespace**: `"a.com, b.com"` yields `" b.com"`,
 > which will never match an `Origin` header. Do not put spaces after the commas.
+
+### Email provider: SendGrid → Resend
+
+The API sends two emails per contact-form submission: a confirmation to the
+person who submitted, and a notification to `ADMIN_EMAIL`. Phase 3 replaced
+SendGrid with Resend. `@sendgrid/mail` is no longer a dependency.
+
+The provider sits behind `apps/api/src/services/emailProvider.ts`. Templates,
+placeholder substitution, HTML escaping and `email_logs` are unchanged — the
+migration changed only how a message leaves the process.
+
+**Cutover, in order:**
+
+1. Verify the sending domain in Resend (below). Nothing sends until this is done.
+2. Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` on the API host.
+3. Deploy.
+4. Confirm a real submission produces both emails and two `sent` rows in
+   `email_logs`.
+5. Only then remove `SENDGRID_API_KEY` and `SENDGRID_FROM_EMAIL` from the host.
+
+Step 5 is last on purpose: while `SENDGRID_FROM_EMAIL` is still set, it acts as
+a fallback sender, so a partially-renamed environment keeps sending from the
+right address instead of silently falling back to the hardcoded
+`noreply@accian.co.uk`.
+
+**Domain verification (DNS).** Resend will not deliver from a domain it has not
+verified. The records are generated per-domain in the Resend dashboard —
+**they are not reproduced here, because they are account-specific and inventing
+them would produce a domain that silently fails to send.** Retrieve them from
+Resend → Domains → add `accian.co.uk` → follow the records it displays.
+
+Expect to add, at the registrar that holds `accian.co.uk` DNS:
+
+- a **DKIM** record (a `TXT` or `CNAME` record on a Resend-provided selector
+  subdomain), and
+- an **SPF** record (a `TXT` record on the sending subdomain), and
+- optionally a **DMARC** policy record on `_dmarc.accian.co.uk`.
+
+If `accian.co.uk` already publishes an SPF record for another sender, it must
+be **merged**, not duplicated — a domain with two `TXT` SPF records fails SPF
+outright. No DNS change has been made as part of this phase.
+
+`RESEND_FROM_EMAIL` must be an address on the verified domain. A verified
+domain plus an unverified `From` address is the most common cause of a
+`validation_error` from the provider.
+
+**Key handling.** `RESEND_API_KEY` is read only inside `emailProvider.ts`, at
+send time. It is never logged, never returned to an API client, and never
+placed in an error message: provider errors pass through `redactProviderMessage`,
+which strips key- and address-shaped substrings before anything is written to
+stdout or to `email_logs.error_message`. It must not be added to `apps/web` or
+`apps/admin` in any form — a `VITE_`-prefixed copy would ship inside the browser
+bundle.
+
+**Tests never send.** `setEmailTransport` replaces the transport in the suite,
+and the real transport refuses to construct a client at all under
+`NODE_ENV=test`, so the suite cannot reach the provider even if a real key is
+present in the environment.
 
 ---
 
@@ -287,6 +347,37 @@ only honours overrides from the workspace root. Hence the nested form above.
 
 `npm ci` was verified to be **idempotent** against this lockfile: it installs
 without rewriting the file, byte for byte.
+
+### `@accian/types` is a compile-time-only dependency of `apps/api`
+
+`packages/types` holds the shared API contract. `apps/api` consumes it, but
+**only as types** — every import of it in the API is a type-only import, so
+TypeScript erases it during compilation and the name appears nowhere in
+`apps/api/dist/`.
+
+This is deliberate, and it is why the package is declared in the API's
+**`devDependencies`** rather than its `dependencies`:
+
+- §5 records that the API's root directory must be `apps/api`, and **which host
+  runs it is not known from this repository.**
+- If that host runs `npm install` inside `apps/api` alone, rather than from the
+  repository root, there is no workspace symlink and `@accian/types` does not
+  resolve at all.
+- Because the dependency is erased at compile time, that install still produces
+  a working API. A runtime import would crash the process on boot.
+
+Verified, not assumed: after a production build, `@accian/types` is absent from
+the API's `require` graph, and its runtime exports appear **zero** times in the
+admin's browser bundle.
+
+The practical rule: **never add a value import of `@accian/types` to
+`apps/api`** — no enums, no constants, no runtime helpers, only `import type`.
+Doing so would turn a compile-time dependency into a runtime one and break a
+host that installs inside `apps/api`.
+
+The same applies to `resend`, in the opposite direction: it *is* a genuine
+runtime dependency of `apps/api` and is declared in `dependencies`. It must
+never be added to `apps/web` or `apps/admin`.
 
 > **Platform-specific binaries.** See §7 — the committed lockfile contains all
 > 8 `@next/swc-*` platform entries, so Netlify (Linux x64), macOS and Windows

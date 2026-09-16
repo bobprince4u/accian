@@ -7,7 +7,15 @@
  */
 
 import { apiClient } from "./apiClient";
-import type { Contact, Project, Service, Testimonial } from "../types";
+import type {
+  Contact,
+  Project,
+  ProjectInput,
+  Service,
+  ServiceInput,
+  Testimonial,
+  TestimonialInput,
+} from "../types";
 
 /** The API envelope is `{ success, data, count }`. */
 const unwrapList = <T>(payload: unknown): T[] => {
@@ -36,13 +44,13 @@ export const fetchProjects = async (): Promise<Project[]> =>
   unwrapList<Project>((await apiClient.get("/projects")).data);
 
 export const createProject = async (
-  project: Omit<Project, "id">
+  project: ProjectInput
 ): Promise<Project> =>
   unwrapItem<Project>((await apiClient.post("/projects", project)).data);
 
 export const updateProject = async (
   id: string,
-  project: Omit<Project, "id">
+  project: ProjectInput
 ): Promise<Project> =>
   unwrapItem<Project>((await apiClient.put(`/projects/${id}`, project)).data);
 
@@ -56,13 +64,13 @@ export const fetchServices = async (): Promise<Service[]> =>
   unwrapList<Service>((await apiClient.get("/services")).data);
 
 export const createService = async (
-  service: Omit<Service, "id">
+  service: ServiceInput
 ): Promise<Service> =>
   unwrapItem<Service>((await apiClient.post("/services", service)).data);
 
 export const updateService = async (
   id: string,
-  service: Omit<Service, "id">
+  service: ServiceInput
 ): Promise<Service> =>
   unwrapItem<Service>((await apiClient.put(`/services/${id}`, service)).data);
 
@@ -76,7 +84,7 @@ export const fetchTestimonials = async (): Promise<Testimonial[]> =>
   unwrapList<Testimonial>((await apiClient.get("/testimonials")).data);
 
 export const createTestimonial = async (
-  testimonial: Omit<Testimonial, "id">
+  testimonial: TestimonialInput
 ): Promise<Testimonial> =>
   unwrapItem<Testimonial>(
     (await apiClient.post("/testimonials", testimonial)).data
@@ -84,7 +92,7 @@ export const createTestimonial = async (
 
 export const updateTestimonial = async (
   id: string,
-  testimonial: Omit<Testimonial, "id">
+  testimonial: TestimonialInput
 ): Promise<Testimonial> =>
   unwrapItem<Testimonial>(
     (await apiClient.put(`/testimonials/${id}`, testimonial)).data

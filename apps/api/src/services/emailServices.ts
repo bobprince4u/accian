@@ -1,7 +1,11 @@
-import sgMail from "@sendgrid/mail";
 import fs from "fs/promises";
 import path from "path";
 import { query } from "../config/database";
+import {
+  EmailMessage,
+  getEmailTransport,
+  redactProviderMessage,
+} from "./emailProvider";
 
 interface UserConfirmationData {
   to: string;
@@ -25,20 +29,37 @@ interface AdminNotificationData {
   id?: number;
 }
 
-// Initialize SendGrid
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-const FROM_EMAIL =
+/**
+ * Sender identity, read at send time rather than at import.
+ *
+ * `RESEND_FROM_EMAIL` is the Phase 3 name. `SENDGRID_FROM_EMAIL` and
+ * `EMAIL_USER` remain as fallbacks so that an environment still carrying the
+ * previous provider's variable names keeps sending from the right address
+ * while they are renamed. A deployment that swapped only its API key would
+ * otherwise fall back silently to the hardcoded default. Both fallbacks are
+ * deprecated — see docs/deployment.md.
+ */
+const fromEmail = (): string =>
+  process.env.RESEND_FROM_EMAIL ||
   process.env.SENDGRID_FROM_EMAIL ||
   process.env.EMAIL_USER ||
   "noreply@accian.co.uk";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 
-if (SENDGRID_API_KEY) {
-  sgMail.setApiKey(SENDGRID_API_KEY);
-  console.log("✅ SendGrid initialized");
-  console.log(`📧 From Email: ${FROM_EMAIL}`);
-} else {
-  console.error("❌ SENDGRID_API_KEY not found in environment variables");
+const adminEmail = (): string | undefined => process.env.ADMIN_EMAIL;
+
+// Startup diagnostic only, and presence only — the key is read inside the
+// transport at send time and is never held, logged or returned by this module.
+if (process.env.RESEND_API_KEY) {
+  console.log("✅ Email provider configured (resend)");
+  console.log(`📧 From Email: ${fromEmail()}`);
+} else if (process.env.NODE_ENV !== "test") {
+  console.error("❌ RESEND_API_KEY not found in environment variables");
+}
+
+if (process.env.SENDGRID_FROM_EMAIL && !process.env.RESEND_FROM_EMAIL) {
+  console.warn(
+    "⚠️  SENDGRID_FROM_EMAIL is deprecated; rename it to RESEND_FROM_EMAIL"
+  );
 }
 
 // Load email template
@@ -132,18 +153,17 @@ export const sendUserConfirmation = async (
       referenceNumber: data.referenceNumber,
     });
 
-    const msg = {
+    const msg: EmailMessage = {
       to: data.to,
       from: {
-        email: FROM_EMAIL,
+        email: fromEmail(),
         name: "ACCIAN Limited",
       },
       subject: "Thank you for contacting ACCIAN Limited",
       html: html,
     };
 
-    const response = await sgMail.send(msg);
-    const messageId = response[0].headers["x-message-id"];
+    const { messageId } = await getEmailTransport().send(msg);
 
     await logEmail("user_confirmation", data.to, msg.subject, "sent");
     console.log(`✅ Confirmation email sent (ref ${data.referenceNumber})`);
@@ -151,13 +171,13 @@ export const sendUserConfirmation = async (
 
     return { success: true, messageId: messageId };
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    // Redacted at the boundary: a provider message can quote back the
+    // address it rejected, and this string is both logged and stored in
+    // `email_logs.error_message`.
+    const errorMessage = redactProviderMessage(
+      error instanceof Error ? error.message : String(error)
+    );
     console.error("❌ Failed to send user confirmation email:", errorMessage);
-
-    // Log SendGrid-specific error details
-    if (error && typeof error === "object" && "response" in error) {
-      console.error("SendGrid Error Details:", (error as any).response?.body);
-    }
 
     await logEmail(
       "user_confirmation",
@@ -191,36 +211,41 @@ export const sendAdminNotification = async (
       }),
     });
 
-    const msg = {
-      to: ADMIN_EMAIL,
+    // Previously `to` was `ADMIN_EMAIL` unchecked, so a missing variable
+    // handed the provider an undefined recipient and the failure surfaced as
+    // a provider error. Failing here names the actual cause.
+    const recipient = adminEmail();
+    if (!recipient) {
+      throw new Error("ADMIN_EMAIL is not set; admin notification not sent");
+    }
+
+    const msg: EmailMessage = {
+      to: recipient,
       from: {
-        email: FROM_EMAIL,
+        email: fromEmail(),
         name: "ACCIAN Contact Form",
       },
       subject: `🔔 New Contact Form Submission - ${data.referenceNumber}`,
       html: html,
     };
 
-    const response = await sgMail.send(msg);
-    const messageId = response[0].headers["x-message-id"];
+    const { messageId } = await getEmailTransport().send(msg);
 
-    await logEmail("admin_notification", ADMIN_EMAIL, msg.subject, "sent");
+    await logEmail("admin_notification", recipient, msg.subject, "sent");
 
-    console.log(`✅ Admin notification email sent`);
+    console.log(` Admin notification email sent`);
     console.log(`📬 Message ID: ${messageId}`);
 
     return { success: true, messageId: messageId };
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("❌ Failed to send admin notification email:", errorMessage);
-
-    if (error && typeof error === "object" && "response" in error) {
-      console.error("SendGrid Error Details:", (error as any).response?.body);
-    }
+    const errorMessage = redactProviderMessage(
+      error instanceof Error ? error.message : String(error)
+    );
+    console.error(" Failed to send admin notification email:", errorMessage);
 
     await logEmail(
       "admin_notification",
-      ADMIN_EMAIL || "",
+      adminEmail() || "",
       "Admin Notification",
       "failed",
       errorMessage

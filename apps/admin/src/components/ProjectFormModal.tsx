@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Upload, Plus, Trash2, Save } from "lucide-react";
-import { Project } from "../types";
+import { Project, ProjectInput } from "../types";
 
 interface ProjectFormModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (project: Omit<Project, "id">) => void;
+  onSave: (project: ProjectInput) => void;
   project?: Project | null;
 }
 
@@ -29,8 +29,11 @@ export default function ProjectFormModal({
     featured: project?.featured || false,
     technologies: project?.technologies || ([] as string[]),
     results: project?.results || ([] as { metric: string; value: string }[]),
-    completedDate:
-      project?.completedDate || new Date().toISOString().split("T")[0],
+    // The projects table has no column for this, so the API accepts it and
+    // discards it, and never returns it. Reading `project?.completedDate` was
+    // therefore always `undefined` even when editing an existing project; the
+    // field defaults to today either way.
+    completedDate: new Date().toISOString().split("T")[0],
   });
 
   const [currentTech, setCurrentTech] = useState("");

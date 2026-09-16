@@ -10,7 +10,7 @@ import {
   SERVICE_ACCEPTED_BUT_NOT_PERSISTED,
   omitFields,
 } from "../utils/requestFields";
-import { serializeService } from "../utils/serializers";
+import { serializeService, serializeServiceSummary } from "../utils/serializers";
 
 /** Translate request-DTO failures into 400s; anything else is a real error. */
 const handleRequestDtoError = (
@@ -32,24 +32,6 @@ const handleRequestDtoError = (
   }
   next(error as Error);
 };
-
-// Types for service rows
-interface ServiceRow {
-  id: number;
-  title: string;
-  slug: string;
-  icon: string | null;
-  short_description: string;
-  full_description?: string | null;
-  features: string[];
-  technology_stack?: string[];
-  process_steps?: string[];
-  ideal_for?: string[];
-  order_index: number;
-  published: boolean;
-  created_at: Date;
-  updated_at?: Date | null;
-}
 
 /**
  * Get all services
@@ -82,17 +64,7 @@ export const getAllServices = async (
 
     res.json({
       success: true,
-      data: result.rows.map((service: ServiceRow) => ({
-        id: service.id,
-        title: service.title,
-        slug: service.slug,
-        icon: service.icon,
-        shortDescription: service.short_description,
-        features: service.features,
-        orderIndex: service.order_index,
-        published: service.published,
-        createdAt: service.created_at,
-      })),
+      data: result.rows.map(serializeServiceSummary),
       count: result.rows.length,
     });
   } catch (error) {
@@ -132,25 +104,9 @@ export const getServiceBySlug = async (
       });
     }
 
-    const service: ServiceRow = result.rows[0];
-
     res.json({
       success: true,
-      data: {
-        id: service.id,
-        title: service.title,
-        slug: service.slug,
-        icon: service.icon,
-        shortDescription: service.short_description,
-        fullDescription: service.full_description,
-        features: service.features,
-        technologyStack: service.technology_stack,
-        processSteps: service.process_steps,
-        idealFor: service.ideal_for,
-        orderIndex: service.order_index,
-        createdAt: service.created_at,
-        updatedAt: service.updated_at,
-      },
+      data: serializeService(result.rows[0]),
     });
   } catch (error) {
     console.error("❌ Get service by slug error:", error);
@@ -161,6 +117,11 @@ export const getServiceBySlug = async (
 /**
  * Create service (Admin)
  * POST /api/admin/services
+ *
+ * Returns the created service in full, as the other create endpoints do. It
+ * previously returned only `{id, slug}`, and the admin dashboard splices the
+ * response straight into its service list — so a newly created service
+ * rendered with an undefined title and description until the page reloaded.
  */
 export const createService = async (
   req: Request,
@@ -200,7 +161,7 @@ export const createService = async (
         features, technology_stack, process_steps, ideal_for,
         order_index, published
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, true)
-      RETURNING id, slug`,
+      RETURNING *`,
       [
         title,
         slug,
@@ -220,10 +181,7 @@ export const createService = async (
     res.status(201).json({
       success: true,
       message: "Service created successfully",
-      data: {
-        id: result.rows[0].id,
-        slug: result.rows[0].slug,
-      },
+      data: serializeService(result.rows[0]),
     });
   } catch (error) {
     console.error("❌ Create service error:", error);

@@ -9,13 +9,13 @@ import {
   MoreVertical,
   Briefcase,
 } from "lucide-react";
-import { Project } from "../types";
+import { Project, ProjectInput } from "../types";
 import ProjectFormModal from "./ProjectFormModal";
 
 interface ProjectsViewProps {
   projects: Project[];
-  onAdd: (project: Omit<Project, "id">) => Promise<void>;
-  onUpdate: (id: string, project: Omit<Project, "id">) => Promise<void>;
+  onAdd: (project: ProjectInput) => Promise<void>;
+  onUpdate: (id: string, project: ProjectInput) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   loading?: boolean;
 }

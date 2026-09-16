@@ -4,10 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { Globe, Clock, Star } from "lucide-react";
+import type { ServiceSummary, Testimonial as ApiTestimonial } from "@accian/types";
 import { trustIndicators, stats } from "../data/HomPageData";
 import { API_URL } from "../config/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+/**
+ * View models, not API shapes.
+ *
+ * These describe what the cards on this page render. The API shapes they are
+ * built from come from `@accian/types` and are mapped explicitly below, so a
+ * change to the contract surfaces here as a type error rather than as an
+ * empty paragraph at runtime.
+ */
 interface Service {
   id?: string;
   slug: string;
@@ -22,32 +32,6 @@ interface Testimonial {
   author: string;
   position: string;
   rating?: number;
-}
-interface TestimonialResponse {
-  testimonialText: string;
-  clientName: string;
-  clientPosition?: string;
-  rating?: number;
-}
-
-/**
- * What `GET /api/services` actually returns.
- *
- * The API's field is `shortDescription` (from the `services.short_description`
- * column); this component's `Service` model calls it `description`. The two
- * were never mapped, so `services[n].description` was `undefined` and every
- * service card rendered an empty paragraph. Mapped explicitly below, the same
- * way the testimonial response already is, rather than renaming the database
- * column to match the component.
- */
-interface ServiceResponse {
-  id?: string;
-  slug: string;
-  title: string;
-  shortDescription?: string;
-  icon?: string;
-  features?: string[];
-  link?: string;
 }
 
 // ─── Scroll reveal ────────────────────────────────────────────────────────────
@@ -192,14 +176,13 @@ export default function HomePage() {
       const data = res.data.data || res.data;
       setServices(
         Array.isArray(data)
-          ? data.map((s: ServiceResponse) => ({
-              id: s.id,
+          ? data.map((s: ServiceSummary) => ({
+              id: String(s.id),
               slug: s.slug,
               title: s.title,
               description: s.shortDescription ?? "",
-              icon: s.icon,
+              icon: s.icon ?? undefined,
               features: s.features,
-              link: s.link,
             }))
           : [],
       );
@@ -216,10 +199,10 @@ export default function HomePage() {
       const data = res.data.data || res.data;
       setTestimonials(
         Array.isArray(data)
-          ? data.map((t: TestimonialResponse) => ({
-              quote: t.testimonialText,
-              author: t.clientName,
-              position: t.clientPosition || "",
+          ? data.map((t: ApiTestimonial) => ({
+              quote: t.message,
+              author: t.name,
+              position: t.position || "",
               rating: t.rating || 5,
             }))
           : [],

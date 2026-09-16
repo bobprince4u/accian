@@ -9,6 +9,7 @@ import {
   CONTACT_STATUSES,
 } from "../utils/contactStatus";
 import {
+  serializeAdminUser,
   serializeContact,
   serializeProject,
   serializeService,
@@ -118,7 +119,7 @@ export const createAdmin = async (
     return res.status(201).json({
       success: true,
       message: "Admin account created successfully",
-      data: result.rows[0],
+      data: serializeAdminUser(result.rows[0]),
     });
   } catch (error) {
     console.error(" Create admin error:", error);

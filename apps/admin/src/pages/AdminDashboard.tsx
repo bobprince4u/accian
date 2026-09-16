@@ -22,8 +22,11 @@ import * as api from "../services/resourceService";
 import {
   Contact,
   Project,
+  ProjectInput,
   Service,
+  ServiceInput,
   Testimonial,
+  TestimonialInput,
   DashboardStats,
   ViewType,
 } from "../types";
@@ -153,16 +156,13 @@ function AdminDashboard() {
   // -----------------------------------------
   // PROJECT HANDLERS
   // -----------------------------------------
-  const handleAddProject = async (projectData: Omit<Project, "id">) =>
+  const handleAddProject = async (projectData: ProjectInput) =>
     runAction(async () => {
       const created = await api.createProject(projectData);
       projects.patch((current) => [created, ...current]);
     }, "the new project");
 
-  const handleUpdateProject = async (
-    id: string,
-    projectData: Omit<Project, "id">
-  ) =>
+  const handleUpdateProject = async (id: string, projectData: ProjectInput) =>
     runAction(async () => {
       const updated = await api.updateProject(id, projectData);
       projects.patch((current) =>
@@ -182,16 +182,13 @@ function AdminDashboard() {
   // -----------------------------------------
   // SERVICE HANDLERS
   // -----------------------------------------
-  const handleAddService = async (serviceData: Omit<Service, "id">) =>
+  const handleAddService = async (serviceData: ServiceInput) =>
     runAction(async () => {
       const created = await api.createService(serviceData);
       services.patch((current) => [created, ...current]);
     }, "the new service");
 
-  const handleUpdateService = async (
-    id: string,
-    serviceData: Omit<Service, "id">
-  ) =>
+  const handleUpdateService = async (id: string, serviceData: ServiceInput) =>
     runAction(async () => {
       const updated = await api.updateService(id, serviceData);
       services.patch((current) =>
@@ -211,9 +208,7 @@ function AdminDashboard() {
   // -----------------------------------------
   // TESTIMONIAL HANDLERS
   // -----------------------------------------
-  const handleAddTestimonial = async (
-    testimonialData: Omit<Testimonial, "id">
-  ) =>
+  const handleAddTestimonial = async (testimonialData: TestimonialInput) =>
     runAction(async () => {
       const created = await api.createTestimonial(testimonialData);
       testimonials.patch((current) => [created, ...current]);
@@ -221,7 +216,7 @@ function AdminDashboard() {
 
   const handleUpdateTestimonial = async (
     id: string,
-    testimonialData: Omit<Testimonial, "id">
+    testimonialData: TestimonialInput
   ) =>
     runAction(async () => {
       const updated = await api.updateTestimonial(id, testimonialData);
