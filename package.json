@@ -13,7 +13,7 @@
     "packages/types"
   ],
   "scripts": {
-    "build:web": "npm run build --workspace accian",
+    "build:web": "npm run build:types && npm run build --workspace accian",
     "build:admin": "npm run build --workspace admin",
     "build:types": "npm run build --workspace @accian/types",
     "build:api": "npm run build --workspace accian-backend",

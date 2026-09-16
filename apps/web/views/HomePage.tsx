@@ -4,7 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import axios from "axios";
 import { Globe, Clock, Star } from "lucide-react";
-import type { ServiceSummary, Testimonial as ApiTestimonial } from "@accian/types";
+import type {
+  ServiceSummary,
+  Testimonial as ApiTestimonial,
+} from "@accian/types";
 import { trustIndicators, stats } from "../data/HomPageData";
 import { API_URL } from "../config/api";
 
