@@ -116,8 +116,19 @@ const replacePlaceholders = (
     escapeHtml(String(data[key] ?? ""))
   );
 
-// Log email to database
-const logEmail = async (
+/**
+ * Record the outcome of a send in `email_logs`.
+ *
+ * Exported so that every email this application sends is accounted for in one
+ * table, whichever module composed it. It records the type, the recipient and
+ * the outcome — never the content of a message, and never an unredacted
+ * provider error.
+ *
+ * A logging failure is swallowed on purpose: the email itself has already been
+ * accepted or rejected by then, and failing the request because the audit row
+ * could not be written would turn a healthy send into a client-visible error.
+ */
+export const logEmail = async (
   emailType: string,
   recipientEmail: string | undefined,
   subject: string,

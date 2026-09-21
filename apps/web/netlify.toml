@@ -68,10 +68,12 @@
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
     # Directive notes, all verified against the current source:
     #   style-src   fonts.googleapis.com is REQUIRED. `app/internal/quote-builder/page.tsx`
-    #               and `views/ResearchSupport.tsx` each load a stylesheet with
-    #               `@import url('https://fonts.googleapis.com/...')`. An @import is
-    #               governed by style-src, and 'unsafe-inline' does not cover it, so
-    #               both policies previously blocked those two font loads outright.
+    #               loads a stylesheet with `@import url('https://fonts.googleapis.com/...')`.
+    #               An @import is governed by style-src, and 'unsafe-inline' does not
+    #               cover it, so the policy previously blocked that font load outright.
+    #               `views/ResearchSupport.tsx` did the same until it was rebuilt on the
+    #               site's own palette and Poppins; quote-builder is now the only caller,
+    #               and this directive can go when that page follows.
     #   font-src    fonts.gstatic.com is the host those stylesheets then pull the
     #               font files from. Everything else is self-hosted by `next/font`,
     #               so this no longer needs a blanket `https:`.

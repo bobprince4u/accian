@@ -134,6 +134,7 @@ rather than silently falling back to a development origin.
 | `RESEND_API_KEY` | Yes | Resend credential. **Secret.** Belongs to `apps/api` only — never to `apps/web` or `apps/admin`. |
 | `RESEND_FROM_EMAIL` | Yes | Verified sender address. Must be on a domain verified in Resend (§ below). |
 | `ADMIN_EMAIL` | Yes | Recipient for contact-form notifications. Without it, admin notifications fail and say so by name. |
+| `PRE_CONSULTATION_RECIPIENT` | Yes | Recipient for PhD pre-consultation submissions and their attachments — `info@accian.co.uk` in production. Falls back to `ADMIN_EMAIL`; with neither set, `POST /api/pre-consultation` answers with a delivery failure instead of telling an applicant their form arrived. |
 | `SENDGRID_API_KEY` | **Remove** | Former provider. No longer read by any code. Delete it from the host. |
 | `SENDGRID_FROM_EMAIL` | Deprecated | Still honoured as a fallback sender so a half-renamed environment keeps working. Rename to `RESEND_FROM_EMAIL`; the API logs a warning while it is in use. |
 | `EMAIL_USER` | — | Legacy sender address; see `docs/known-issues.md`. |
@@ -155,12 +156,24 @@ contains no values.
 ### Email provider: SendGrid → Resend
 
 The API sends two emails per contact-form submission: a confirmation to the
-person who submitted, and a notification to `ADMIN_EMAIL`. Phase 3 replaced
-SendGrid with Resend. `@sendgrid/mail` is no longer a dependency.
+person who submitted, and a notification to `ADMIN_EMAIL`. It sends a third
+kind of message, unrelated to the contact form: one pre-consultation submission
+to `PRE_CONSULTATION_RECIPIENT`, carrying the applicant's documents as
+attachments. Phase 3 replaced SendGrid with Resend. `@sendgrid/mail` is no
+longer a dependency.
 
 The provider sits behind `apps/api/src/services/emailProvider.ts`. Templates,
 placeholder substitution, HTML escaping and `email_logs` are unchanged — the
 migration changed only how a message leaves the process.
+
+**Attachment budget.** A pre-consultation message can carry up to 20 MB of
+documents (`PRE_CONSULTATION_FILE_LIMITS.maxTotalBytes`), and base64 encoding
+inflates that by roughly a third on the way to the provider. Resend's own
+message-size ceiling therefore has to be above that figure, or a submission
+with a full set of documents is rejected at send time and the applicant is
+correctly told their form was not received. If the limits in
+`packages/types/src/preConsultation.ts` are ever raised, check the provider's
+ceiling in the same change.
 
 **Cutover, in order:**
 

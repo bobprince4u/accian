@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "./dist-test",
+    "noEmit": false,
+    "noEmitOnError": true,
+    "incremental": false,
+    // The app itself is bundled by Next and never sees these settings. The
+    // test build is read by Node directly, which does no extension guessing,
+    // so the output is CommonJS — the one format that still resolves
+    // `./schema` without the source having to spell out a `.js` suffix it
+    // does not have.
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "verbatimModuleSyntax": false,
+    "plugins": []
+  },
+  // Logic only. The components and views are React, and rendering them would
+  // mean a DOM, a renderer and a test framework this repo deliberately does
+  // not have — every rule worth testing was extracted into lib/ for exactly
+  // that reason.
+  "include": ["lib/**/*.ts", "config/**/*.ts", "tests/**/*.ts"],
+  "exclude": ["node_modules", ".next", "dist-test"]
+}

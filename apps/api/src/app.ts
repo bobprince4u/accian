@@ -6,6 +6,7 @@ import compression from "compression";
 
 //import routes
 import contactRoutes from "./routes/contactRoutes";
+import preConsultationRoutes from "./routes/preConsultationRoutes";
 import adminRoutes from "./routes/adminRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import serviceRoutes from "./routes/serviceRoutes";
@@ -126,6 +127,7 @@ app.get("/", (req: Request, res: Response) => {
       health: "/health",
       projects: "/api/projects",
       contact: "/api/contact",
+      preConsultation: "/api/pre-consultation",
       admin: "/api/admin",
       services: "/api/services",
       testimonials: "/api/testimonials",
@@ -146,6 +148,7 @@ app.get("/health", (req: Request, res: Response) => {
 
 // API Routes
 app.use("/api/contact", contactRoutes);
+app.use("/api/pre-consultation", preConsultationRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/services", serviceRoutes);

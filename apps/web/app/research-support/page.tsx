@@ -1,9 +1,10 @@
 import { Metadata } from "next";
 import ResearchSupportPage from "@/views/ResearchSupport";
+
 export const metadata: Metadata = {
-  title: "ACCIAN Limited — Global IT, Cybersecurity & Digital Solutions",
+  title: "Research Support — PhD Research Pathway | ACCIAN Limited",
   description:
-    "ACCIAN is a UK-registered technology and cybersecurity company delivering secure, scalable, and intelligent",
+    "Topic identification, supervisor matching, proposal development and application guidance for MRes, MPhil and PhD applicants. Start with a free pre-consultation.",
 };
 
 export default function Page() {

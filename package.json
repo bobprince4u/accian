@@ -23,6 +23,7 @@
     "lint:admin": "npm run lint --workspace admin",
     "test:api": "npm run test --workspace accian-backend",
     "test:admin": "npm run test --workspace admin",
+    "test:web": "npm run build:types && npm run test --workspace accian",
     "guards": "node scripts/check-architecture.mjs"
   },
   "overrides": {

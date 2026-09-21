@@ -584,13 +584,26 @@ export default function ContactPage() {
                       />
                     </div>
                     <div>
-                      <label className={labelCls}>Phone Number</label>
+                      <label htmlFor="phone" className={labelCls}>
+                        Phone Number
+                      </label>
+                      {/*
+                        Both controls need help to behave on a narrow screen. A
+                        flex item defaults to `min-width: auto`, so the select
+                        will not shrink below its widest option and the input
+                        will not shrink below the ~20 characters a text input
+                        reserves by default — together they overflowed the card
+                        on phones. The select is given a fixed width and told
+                        not to shrink; the input is allowed to.
+                      */}
                       <div className="flex gap-2">
                         <select
+                          id="countryCode"
                           name="countryCode"
                           value={formData.countryCode}
                           onChange={handleChange}
-                          className="bg-[#F5F3EE] border border-[#D8D3C9] rounded-lg px-2 py-3 text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all duration-200"
+                          aria-label="Country dialling code"
+                          className="w-28 shrink-0 bg-[#F5F3EE] border border-[#D8D3C9] rounded-lg px-2 py-3 text-sm focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all duration-200"
                         >
                           {countryCodes.map((c, i) => (
                             <option key={i} value={c.code}>
@@ -600,15 +613,20 @@ export default function ContactPage() {
                         </select>
                         <input
                           type="tel"
+                          id="phone"
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
                           placeholder="7749101623"
-                          className={`flex-1 bg-[#F5F3EE] border ${phoneError ? "border-red-400 ring-2 ring-red-400/10" : "border-[#D8D3C9]"} rounded-lg px-4 py-3 text-sm font-light focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all duration-200`}
+                          aria-invalid={phoneError ? true : undefined}
+                          aria-describedby={phoneError ? "phone-error" : undefined}
+                          className={`min-w-0 flex-1 bg-[#F5F3EE] border ${phoneError ? "border-red-400 ring-2 ring-red-400/10" : "border-[#D8D3C9]"} rounded-lg px-4 py-3 text-sm font-light focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all duration-200`}
                         />
                       </div>
                       {phoneError && (
                         <p
+                          id="phone-error"
+                          role="alert"
                           className="mt-1.5 text-xs text-red-500"
                           style={{ animation: "fadeUp 0.3s ease both" }}
                         >

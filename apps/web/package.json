@@ -10,7 +10,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "rm -rf dist-test && tsc -p tsconfig.test.json && node -e \"require('fs').writeFileSync('dist-test/package.json', '{\\\"type\\\":\\\"commonjs\\\"}\\n')\" && node --test \"dist-test/tests/*.test.js\""
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.12",

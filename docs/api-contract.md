@@ -167,6 +167,7 @@ from §3.
 | Method | Path | Request | Payload | Envelope |
 |---|---|---|---|---|
 | `POST` | `/api/contact` | `ContactSubmission` | `ContactSubmissionResult` | single |
+| `POST` | `/api/pre-consultation` | **multipart** — see below | `{ referenceId, submittedAt }` | single |
 | `GET` | `/api/projects` | `PaginationQuery` | `ProjectSummary[]` | **pagination** |
 | `GET` | `/api/projects/:slug` | — | `Project` | single |
 | `GET` | `/api/services` | — | `ServiceSummary[]` | **count** |
@@ -180,6 +181,55 @@ a client needing `fullDescription`, `technologyStack`, `processSteps`,
 `ProjectSummary` versus `Project`.
 
 Note the asymmetry: projects and testimonials paginate, services does not.
+
+#### `POST /api/pre-consultation` is the only multipart endpoint
+
+Everything else here speaks JSON. This one takes `multipart/form-data`, because
+it carries the applicant's documents alongside their answers. The consequences
+are worth stating plainly:
+
+- **Every value arrives as a string.** Multi-choice fields (`researchMethods`,
+  `studyCountries`, `fundingNeeds`, `supportAreas`) arrive as **repeated parts**
+  with the same name and are normalised to arrays server-side. There are no
+  numbers and no booleans on the wire; `declarationAccepted` is the string
+  `"true"`.
+- **A client must not set `Content-Type` itself.** The browser sets it,
+  including the multipart boundary. Setting it by hand produces a body the
+  parser cannot read.
+- **Field names, option values and file limits come from
+  `@accian/types` → `preConsultation.ts`**, which the web form renders from and
+  the API validates against. `apps/api` keeps a runtime copy in
+  `src/utils/preConsultationContract.ts` (it may only `import type` from the
+  package — §7 of `docs/deployment.md`), and a drift test fails if the two
+  disagree.
+- **Document slots** are `cv`, `transcripts`, `certificates`, `proposal`,
+  `personalStatement`, `englishTest`. Only `cv` is required. `.pdf`, `.doc` and
+  `.docx` only, 8 MB per file, 20 MB and 10 files per submission — enforced
+  again server-side, where each file's **bytes** are also sniffed, so a `.pdf`
+  that is really an HTML page is refused even though its name and size pass.
+- **Required text fields** are `fullName`, `email`, `declarationAccepted`,
+  `declarationName` and `declarationDate`. Nothing else is mandatory; a blank
+  optional field is omitted from the body rather than sent empty.
+- **Rate limit:** 3 accepted submissions per IP per hour. Rejected submissions
+  do not consume the allowance, so correcting a validation error cannot lock an
+  applicant out mid-form.
+
+Status codes carry meaning a client acts on:
+
+| Status | Means | Client behaviour |
+|---|---|---|
+| `201` | Delivered. The payload's `referenceId` is the applicant's reference. | Show the confirmation. |
+| `400` | Validation. `errors[]` holds `{ path, msg }` per field, `path` being the field name. | Show each message against its field. |
+| `429` | Over the rate limit. | Show `message` as-is. |
+| `502` | The form was fine; delivery failed. | Offer a retry. Do **not** claim receipt. |
+
+`201` is returned **only after the email provider has accepted the message**,
+attachments included — unlike `POST /api/contact`, which answers first and
+sends in the background. An applicant is never given a reference for a
+submission that did not leave the building.
+
+Nothing is written to the database. The email is the record; `email_logs`
+records that it was sent and holds none of its content.
 
 ### Admin — auth
 

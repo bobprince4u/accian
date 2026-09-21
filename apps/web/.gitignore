@@ -29,6 +29,11 @@ dist
 dist-ssr
 *.local
 
+# Compiled test build. `npm test` type-checks the form logic into plain
+# JavaScript here so `node --test` can run it without a bundler; the directory
+# is rebuilt from scratch on every run.
+dist-test
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

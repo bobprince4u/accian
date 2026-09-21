@@ -17,11 +17,34 @@
 
 import { Resend } from "resend";
 
+/**
+ * A file attached to an outgoing message.
+ *
+ * `content` is held in memory. Nothing in this application writes an uploaded
+ * document to disk, so an attachment exists only between the multipart parse
+ * and the provider call.
+ */
+export interface EmailAttachment {
+  /** Applicant-facing name, already sanitised by the caller. */
+  filename: string;
+  content: Buffer;
+  contentType?: string;
+}
+
 export interface EmailMessage {
   to: string;
   from: { email: string; name: string };
   subject: string;
   html: string;
+  /**
+   * Where a reply should go, when that is not the sender.
+   *
+   * The pre-consultation notification is sent from the application's own
+   * address but is about an applicant, so a consultant hitting Reply should
+   * reach the applicant rather than a noreply mailbox.
+   */
+  replyTo?: string;
+  attachments?: EmailAttachment[];
 }
 
 export interface EmailSendResult {
@@ -116,11 +139,27 @@ class ResendTransport implements EmailTransport {
     // Resend reports failure in the resolved value rather than by throwing.
     // Converting it to a throw here is what lets the callers keep a single
     // try/catch, exactly as they had with SendGrid.
+    //
+    // `replyTo` and `attachments` are omitted entirely when absent rather than
+    // passed as undefined, so a message with no attachments produces the same
+    // request body it did before attachments existed.
     const { data, error } = await client.emails.send({
       from: formatAddress(message.from),
       to: message.to,
       subject: message.subject,
       html: message.html,
+      ...(message.replyTo ? { replyTo: message.replyTo } : {}),
+      ...(message.attachments && message.attachments.length > 0
+        ? {
+            attachments: message.attachments.map((attachment) => ({
+              filename: attachment.filename,
+              content: attachment.content,
+              ...(attachment.contentType
+                ? { contentType: attachment.contentType }
+                : {}),
+            })),
+          }
+        : {}),
     });
 
     if (error) {

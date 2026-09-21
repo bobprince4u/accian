@@ -48,6 +48,32 @@ export type {
 } from "./contact.js";
 export { CONTACT_STATUSES, isContactStatus } from "./contact.js";
 
+export type {
+  PreConsultationOption,
+  PreConsultationDocumentSlot,
+  PreConsultationSubmission,
+  PreConsultationRequiredField,
+  PreConsultationResult,
+} from "./preConsultation.js";
+export {
+  RESEARCH_METHODS,
+  INTENDED_PROGRAMMES,
+  STUDY_MODES,
+  STUDY_COUNTRIES,
+  FUNDING_NEEDS,
+  SUPPORT_AREAS,
+  RESEARCH_EXPERIENCE_ANSWERS,
+  PRE_CONSULTATION_DOCUMENTS,
+  PRE_CONSULTATION_FILE_LIMITS,
+  PRE_CONSULTATION_ACCEPT_HINT,
+  PRE_CONSULTATION_REQUIRED_FIELDS,
+  PRE_CONSULTATION_MAX_LENGTHS,
+  PRE_CONSULTATION_DECLARATION,
+  PRE_CONSULTATION_PRIVACY_NOTICE,
+  labelForOption,
+  isPreConsultationOption,
+} from "./preConsultation.js";
+
 export type { Service, ServiceSummary, ServiceInput } from "./service.js";
 
 export type {

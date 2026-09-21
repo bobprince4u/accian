@@ -8,8 +8,9 @@ repositories into one; it did not set out to change how the applications behave,
 so pre-existing bugs were documented rather than quietly fixed. Where an issue
 *was* introduced or changed by the consolidation, it says so.
 
-Nothing in this list blocks a build. All three applications build, lint and test
-clean from this repository.
+Nothing in this list blocks a build. All three applications build and lint clean
+from this repository, and the test suites pass with one exception, recorded as
+[§13](#13-one-api-email-test-asserts-a-link-the-template-does-not-contain).
 
 ---
 
@@ -202,26 +203,37 @@ removes the entries entirely. Do not use it here.
 
 ---
 
-## 9. `packages/types` is an empty scaffold
+## 9. ~~`packages/types` is an empty scaffold~~ — resolved
 
-**Severity: none — it is intentional, and the reason matters.**
+**Severity: none — kept for the reasoning, which still applies.**
 
-`packages/types` exists with a `package.json` and a `src/index.ts` containing
-`export {};`. No application imports it.
+**No longer true.** `packages/types` now holds the shared contract
+(`api`, `auth`, `contact`, `dashboard`, `project`, `service`, `testimonial`,
+`preConsultation`) and all three applications consume it. The entry is kept
+because the reason it was *once* empty explains how the contract was
+eventually filled in, and the same constraint still governs changes to it.
 
-It is empty because populating it would mean **choosing** a definition wherever
-the three applications currently disagree, and every such choice changes product
-behaviour. The disagreements are real and documented in
+It was empty because populating it meant **choosing** a definition wherever the
+three applications disagreed, and every such choice changes product behaviour.
+The disagreements are documented in
 [`accian-integration-audit.md`](./accian-integration-audit.md) §19–20:
 
-- `Service` has three different definitions, none matching the backend's schema
-- `Project` has diverged severely between admin and API
-- `DashboardStats` — three of its four fields differ from what the API returns
-- contact `status` has two divergent value maps
+- `Service` had three different definitions, none matching the backend's schema
+- `Project` had diverged severely between admin and API
+- `DashboardStats` — three of its four fields differed from what the API returns
+- contact `status` had two divergent value maps
 
-Picking winners is a contract-alignment project with its own testing needs. Phase
-2's brief says explicitly not to turn it into the shared-contract phase, so the
-package is scaffolding for that future work and nothing more.
+Phase 2's brief said explicitly not to turn consolidation into the
+shared-contract phase, so the package stayed scaffolding until Phase 3 did that
+work deliberately, with its own tests. `preConsultation.ts` was added later
+still, for the PhD pre-consultation form; it had no legacy definitions to
+reconcile, being new on both sides.
+
+One constraint from that work is load-bearing and easy to break: **`apps/api`
+may only `import type` from this package** — see
+[`deployment.md`](./deployment.md) §7 — so it keeps a runtime copy of the
+pre-consultation constants in `src/utils/preConsultationContract.ts`, guarded
+by a drift test.
 
 ---
 
@@ -284,3 +296,51 @@ files normally.
 history, which Phase 2's rules forbid — and which would be a bad trade regardless:
 it would change every commit hash in all three lineages, breaking the rollback
 refs above. `--follow` works today; that is sufficient.
+
+---
+
+## 13. One API email test asserts a link the template does not contain
+
+**Severity: low — one failing test, no production impact.**
+
+`npm run test:api` reports **179 of 180 passing**. The failure is
+`tests/email.test.ts` → `sendAdminNotification` → *"the admin panel link
+resolves to a real contact id"*:
+
+```
+The input did not match the regular expression /\/contacts\/42/
+```
+
+The test sends a notification for contact `id: 42` and expects the email to
+link to `/contacts/42`. It does not, because
+`src/templates/emailTemplates/adminNotification.html` contains exactly one
+button, and it is a fixed link:
+
+```html
+<a href="https://admin.accian.co.uk/AdminDashboard" class="button">
+```
+
+There is no `{{id}}` placeholder anywhere in the template, so no substitution
+could satisfy the assertion.
+
+**It is pre-existing.** The template at `HEAD` has no per-contact link either:
+
+```bash
+git show HEAD:apps/api/src/templates/emailTemplates/adminNotification.html | grep -c "contacts/"
+# 0
+```
+
+**Why not fixed here.** The two candidate fixes are not equivalent, and picking
+between them is a product decision rather than a test repair:
+
+- **Change the template** to deep-link `{{adminUrl}}/contacts/{{id}}`. This is
+  what the test describes and is genuinely more useful to whoever opens the
+  notification — but it needs the admin SPA to have a route at that path, which
+  has not been verified, and it changes an email that currently works.
+- **Change the test** to assert the dashboard link that is actually there. This
+  goes green immediately and quietly discards the intent someone wrote down.
+
+Either is a small change. Neither belongs in a feature branch that touches
+neither the contact form nor the admin panel, so the failure is recorded here
+instead of being absorbed into unrelated work.
+

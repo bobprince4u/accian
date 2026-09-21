@@ -16,7 +16,16 @@ import { defineConfig, globalIgnores } from 'eslint/config'
  *    in `proxy.ts` — server-side code that legitimately reads `process.env`.
  */
 export default defineConfig([
-  globalIgnores(['.next', 'out', 'dist', 'node_modules', 'next-env.d.ts']),
+  globalIgnores([
+    '.next',
+    'out',
+    'dist',
+    // Compiled output of `npm test`. Linting a build of the sources is
+    // duplicate work, and the emitted JavaScript matches no config block here.
+    'dist-test',
+    'node_modules',
+    'next-env.d.ts',
+  ]),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -34,6 +43,14 @@ export default defineConfig([
     files: ['proxy.ts', '*.config.{ts,js}'],
     languageOptions: {
       globals: globals.node,
+    },
+  },
+  {
+    // Run by `node --test`, so they need Node's globals as well as the
+    // browser ones the code under test uses.
+    files: ['tests/**/*.ts'],
+    languageOptions: {
+      globals: { ...globals.browser, ...globals.node },
     },
   },
 ])
