@@ -9,8 +9,7 @@ so pre-existing bugs were documented rather than quietly fixed. Where an issue
 *was* introduced or changed by the consolidation, it says so.
 
 Nothing in this list blocks a build. All three applications build and lint clean
-from this repository, and the test suites pass with one exception, recorded as
-[§13](#13-one-api-email-test-asserts-a-link-the-template-does-not-contain).
+from this repository, and all test suites pass.
 
 ---
 
@@ -299,11 +298,12 @@ refs above. `--follow` works today; that is sufficient.
 
 ---
 
-## 13. One API email test asserts a link the template does not contain
+## 13. ~~One API email test asserts a link the template does not contain~~ — resolved
 
-**Severity: low — one failing test, no production impact.**
+**Severity: none — kept because the admin panel still has no per-contact route,
+which is the fact the test now pins.**
 
-`npm run test:api` reports **179 of 180 passing**. The failure is
+For a while `npm run test:api` reported **179 of 180 passing**. The failure was
 `tests/email.test.ts` → `sendAdminNotification` → *"the admin panel link
 resolves to a real contact id"*:
 
@@ -311,36 +311,37 @@ resolves to a real contact id"*:
 The input did not match the regular expression /\/contacts\/42/
 ```
 
-The test sends a notification for contact `id: 42` and expects the email to
-link to `/contacts/42`. It does not, because
-`src/templates/emailTemplates/adminNotification.html` contains exactly one
-button, and it is a fixed link:
+It was briefly recorded here as an open product decision — deep-link the
+template, or rewrite the assertion. **That was a misreading: the decision had
+already been made.** `git log` on the template shows commit `762930c0`
+(16 September 2026, *"fix: update admin contact email link"*) replacing the deep
+link deliberately:
 
-```html
-<a href="https://admin.accian.co.uk/AdminDashboard" class="button">
+```diff
+-        <a href="https://admin.accian.co.uk/contacts/{{id}}" class="button"
++       <a href="https://admin.accian.co.uk/AdminDashboard" class="button"
 ```
 
-There is no `{{id}}` placeholder anywhere in the template, so no substitution
-could satisfy the assertion.
+And it was right to. `apps/admin/src/App.tsx` declares exactly two routes, `/`
+and `/AdminDashboard`; there is no `/contacts/:id`. Contacts are reached through
+`ContactsView` and `ContactModal` *inside* the dashboard and have no URL of
+their own, so the old deep link 404'd in every notification the API ever sent.
+The template was the thing being fixed; the test was simply not updated
+alongside it.
 
-**It is pre-existing.** The template at `HEAD` has no per-contact link either:
+**Resolved** by rewriting the assertion to pin the deliberate behaviour rather
+than the abandoned intent. It now checks that the button points at
+`/AdminDashboard`, that `/contacts/` has *not* come back, and that the
+reference number is present — which is how a recipient finds one submission
+once the dashboard opens, absent a per-contact URL.
 
-```bash
-git show HEAD:apps/api/src/templates/emailTemplates/adminNotification.html | grep -c "contacts/"
-# 0
-```
+The same commit left a comment in `contactControllers.ts` saying the `id` it
+passes is what stops the button rendering a literal `{{id}}`. The template no
+longer contains `{{id}}`, so that was no longer true either; the comment now
+says why the key is kept (substitution is template-driven, so an unused key is
+inert) rather than claiming a job it no longer does.
 
-**Why not fixed here.** The two candidate fixes are not equivalent, and picking
-between them is a product decision rather than a test repair:
-
-- **Change the template** to deep-link `{{adminUrl}}/contacts/{{id}}`. This is
-  what the test describes and is genuinely more useful to whoever opens the
-  notification — but it needs the admin SPA to have a route at that path, which
-  has not been verified, and it changes an email that currently works.
-- **Change the test** to assert the dashboard link that is actually there. This
-  goes green immediately and quietly discards the intent someone wrote down.
-
-Either is a small change. Neither belongs in a feature branch that touches
-neither the contact form nor the admin panel, so the failure is recorded here
-instead of being absorbed into unrelated work.
+**If a deep link is wanted back**, the order is: add a `/contacts/:id` route to
+the admin SPA, then change the template, then this test. Doing it in the other
+order ships a broken button.
 

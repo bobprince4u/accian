@@ -260,8 +260,10 @@ export const submitContactForm = async (
         howHeard: sanitizedData.howHeard || "Not specified",
         referenceNumber,
         timestamp: result.rows[0].created_at,
-        // The template links to /AdminDashboard; without this the button in
-        // every admin notification pointed at a literal "{{id}}".
+        // The template's button links to /AdminDashboard and carries no
+        // {{id}}, so this is no longer what keeps the link working. It is kept
+        // because substitution is driven by the template: an unused key is
+        // inert, and the id is here for whenever a per-contact route exists.
         id: contactId,
       })
       .catch((err) => console.error("Email sending error (admin):", err));

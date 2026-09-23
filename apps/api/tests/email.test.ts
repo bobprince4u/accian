@@ -214,7 +214,7 @@ describe("sendAdminNotification", () => {
     assert.match(send.sent[0].html, /\$50,000 — see \$&amp; and \$1/);
   });
 
-  test("the admin panel link resolves to a real contact id", async () => {
+  test("the admin panel link points at a route the admin app has", async () => {
     const db = stubQuery(() => ({ rows: [], rowCount: 1 }));
     const send = stubSend();
     cleanups.push(db.restore, send.restore);
@@ -222,8 +222,17 @@ describe("sendAdminNotification", () => {
     await sendAdminNotification({ ...contactData, id: 42 });
 
     const { html } = send.sent[0];
-    assert.match(html, /\/contacts\/42/);
-    assert.ok(!html.includes("{{id}}"), "the id placeholder survived");
+
+    // This assertion used to expect /contacts/42. Commit 762930c0 replaced that
+    // deep link with the dashboard one on purpose: `apps/admin/src/App.tsx`
+    // routes only "/" and "/AdminDashboard", so the per-contact URL 404'd.
+    // Restoring the deep link means adding that route to the admin SPA first.
+    assert.match(html, /href="https:\/\/admin\.accian\.co\.uk\/AdminDashboard"/);
+    assert.ok(!html.includes("/contacts/"), "the broken deep link is back");
+
+    // Without a per-contact URL, the reference number is how the recipient
+    // finds this specific submission once the dashboard opens.
+    assert.match(html, /ACC-2026-0001/);
   });
 
   test("a placeholder with no data becomes empty, not literal text", async () => {
