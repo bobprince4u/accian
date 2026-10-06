@@ -168,7 +168,7 @@ export default function HomePage() {
           <div>
             <div
               className="inline-flex items-center gap-2 mb-7"
-              style={{ animation: "fadeUp 0.6s 0.1s ease both" }}
+              style={{ animation: "fadeUp 0.42s 0s ease" }}
             >
               <span className="block w-7 h-0.5 bg-blue-600 rounded-full" />
               <span className="text-xs font-semibold tracking-widest uppercase text-blue-700">
@@ -177,13 +177,13 @@ export default function HomePage() {
             </div>
             <h1
               className="text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-[1.08] tracking-tight text-[#0D0D0D]"
-              style={{ animation: "fadeUp 0.7s 0.2s ease both" }}
+              style={{ animation: "fadeUp 0.42s 0.06s ease" }}
             >
               Technology consulting &amp; <span className="text-blue-700">research support</span>
             </h1>
             <p
               className="mt-6 text-base lg:text-lg font-light text-gray-600 leading-relaxed max-w-xl"
-              style={{ animation: "fadeUp 0.7s 0.35s ease both" }}
+              style={{ animation: "fadeUp 0.42s 0.12s ease" }}
             >
               Practical IT advice, software development and data solutions for
               businesses. Research guidance for applicants preparing for an
@@ -191,7 +191,7 @@ export default function HomePage() {
             </p>
             <div
               className="flex flex-col sm:flex-row gap-3 mt-8"
-              style={{ animation: "fadeUp 0.7s 0.5s ease both" }}
+              style={{ animation: "fadeUp 0.42s 0.18s ease" }}
             >
               <Link
                 href="/contact"
@@ -208,7 +208,7 @@ export default function HomePage() {
             </div>
             <p
               className="mt-7 text-xs font-light text-gray-600"
-              style={{ animation: "fadeUp 0.7s 0.65s ease both" }}
+              style={{ animation: "fadeUp 0.42s 0.24s ease" }}
             >
               Accian Limited is an independent UK company and is not affiliated
               with Accion or any similarly named organisations.
@@ -269,9 +269,9 @@ export default function HomePage() {
             <p className="text-sm text-[#555555]">No services are currently listed. <Link href="/services" className="text-[#1B4FFF] underline">View our service overview</Link> or <Link href="/contact" className="text-[#1B4FFF] underline">contact ACCIAN</Link>.</p>
           ) : (
             <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {services.map((service) => {
+              {services.map((service, index) => {
                 const anchors: Record<string, string> = { "it-consulting-advisory": "it-consulting", "it-consulting": "it-consulting", "software-development": "software-development", "education-training": "education-training", "social-care": "social-care", "social-care-community-support": "social-care", "data-science-ai": "data-science-ai" };
-                return <ServiceCard key={service.id || service.slug} {...service} features={service.features || []} link={anchors[service.slug] ? `/services#${anchors[service.slug]}` : "/services"} />;
+                return <Reveal key={service.id || service.slug} delay={index * 80} className="h-full"><ServiceCard {...service} features={service.features || []} link={anchors[service.slug] ? `/services#${anchors[service.slug]}` : "/services"} /></Reveal>;
               })}
             </div>
           )}

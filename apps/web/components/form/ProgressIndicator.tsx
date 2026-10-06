@@ -26,7 +26,7 @@ export default function ProgressIndicator({ steps, current, furthest, onJump, di
         <p aria-live="polite" className="font-semibold">Step {current + 1} of {total}: {stops[current]?.shortTitle}</p>
         <span className="text-[#666666]">{current === steps.length ? "Ready to review" : "Review before you submit"}</span>
       </div>
-      <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-[#E0DBD2]" aria-hidden="true"><div className="h-full bg-[#1B4FFF]" style={{ width: `${((current + 1) / total) * 100}%` }} /></div>
+      <div className="mb-4 h-1.5 overflow-hidden rounded-full bg-[#E0DBD2]" aria-hidden="true"><div className="progress-fill h-full origin-left bg-[#1B4FFF]" style={{ transform: `scaleX(${(current + 1) / total})` }} /></div>
       <label className="block text-sm font-medium sm:hidden" htmlFor="form-step">Go to a section</label>
       <select id="form-step" value={current} disabled={disabled} onChange={(event) => onJump(Number(event.target.value))} className="input mt-2 sm:hidden">
         {stops.map((stop, index) => <option key={stop.id} value={index} disabled={index > furthest}>{index + 1}. {stop.shortTitle}</option>)}

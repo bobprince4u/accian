@@ -1,0 +1,2521 @@
+{
+  "routes": {
+    "matrix": [
+      {
+        "path": "/",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 22,
+        "staggerDelays": [
+          80,
+          150,
+          160,
+          240,
+          120
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 41,
+        "staggerDelays": [
+          80,
+          160,
+          60,
+          120,
+          180,
+          240,
+          100,
+          200
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 33,
+        "staggerDelays": [
+          90,
+          180,
+          240,
+          220,
+          110,
+          120,
+          60,
+          200,
+          100,
+          50,
+          150
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 1,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 2,
+        "staggerDelays": [
+          100
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 8,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 22,
+        "staggerDelays": [
+          80,
+          150,
+          160,
+          240,
+          120
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 41,
+        "staggerDelays": [
+          80,
+          160,
+          120,
+          60,
+          180,
+          240,
+          100,
+          200
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 33,
+        "staggerDelays": [
+          90,
+          180,
+          240,
+          110,
+          220,
+          60,
+          120,
+          150,
+          100,
+          200,
+          50
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 1,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 2,
+        "staggerDelays": [
+          100
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 8,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 22,
+        "staggerDelays": [
+          80,
+          150,
+          160,
+          240,
+          120
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 41,
+        "staggerDelays": [
+          80,
+          160,
+          60,
+          120,
+          240,
+          180,
+          100,
+          200
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 33,
+        "staggerDelays": [
+          90,
+          240,
+          180,
+          110,
+          220,
+          120,
+          60,
+          100,
+          150,
+          50,
+          200
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 1,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 2,
+        "staggerDelays": [
+          100
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 8,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 22,
+        "staggerDelays": [
+          80,
+          150,
+          240,
+          160,
+          120
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 41,
+        "staggerDelays": [
+          80,
+          160,
+          180,
+          120,
+          60,
+          240,
+          100,
+          200
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 33,
+        "staggerDelays": [
+          180,
+          240,
+          90,
+          220,
+          110,
+          60,
+          120,
+          150,
+          100,
+          200,
+          50
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 1,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 2,
+        "staggerDelays": [
+          100
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 8,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 22,
+        "staggerDelays": [
+          80,
+          150,
+          240,
+          160,
+          120
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 31,
+        "staggerDelays": [
+          80,
+          160,
+          100,
+          240,
+          180,
+          200,
+          120,
+          60
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 33,
+        "staggerDelays": [
+          90,
+          180,
+          240,
+          110,
+          220,
+          60,
+          120,
+          50,
+          200,
+          100,
+          150
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 1,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 2,
+        "staggerDelays": [
+          100
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 8,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 22,
+        "staggerDelays": [
+          150,
+          80,
+          160,
+          240,
+          120
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 41,
+        "staggerDelays": [
+          80,
+          160,
+          120,
+          60,
+          180,
+          240,
+          100,
+          200
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 33,
+        "staggerDelays": [
+          90,
+          180,
+          240,
+          220,
+          110,
+          60,
+          120,
+          50,
+          200,
+          100,
+          150
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 1,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 2,
+        "staggerDelays": [
+          100
+        ],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true,
+        "motions": 8,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/services",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/research-support",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/pre-consultation",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/contact",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      },
+      {
+        "path": "/privacy-policy",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true,
+        "motions": 0,
+        "staggerDelays": [],
+        "brokenImages": []
+      }
+    ],
+    "interactions": [],
+    "noJS": [
+      {
+        "path": "/",
+        "pass": true
+      },
+      {
+        "path": "/services",
+        "pass": true
+      },
+      {
+        "path": "/research-support",
+        "pass": true
+      },
+      {
+        "path": "/pre-consultation",
+        "pass": true
+      },
+      {
+        "path": "/contact",
+        "pass": true
+      },
+      {
+        "path": "/privacy-policy",
+        "pass": true
+      }
+    ],
+    "errors": []
+  },
+  "interactions": {
+    "checks": [
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 320,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 375,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 390,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 768,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 1024,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 1440,
+        "motion": "no-preference",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 320,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 375,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 390,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 768,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 1024,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Service anchor remains below sticky navigation",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Keyboard FAQ and visible focus",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact validation",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact safe server failure retains answers",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Contact success uses server reference",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research validation",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 2",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 3",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 4",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 5",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research step 6",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload rejects invalid type",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Upload keeps accepted document",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Review retains document and answers",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research safe failure retains review",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Research success uses server reference",
+        "width": 1440,
+        "motion": "reduce",
+        "pass": true
+      },
+      {
+        "name": "Service hover and live reduced-motion switch",
+        "pass": true
+      }
+    ],
+    "errors": [],
+    "posts": [
+      {
+        "path": "/api/contact",
+        "width": 320,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 320,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 320,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 320,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 375,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 375,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 375,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 375,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 390,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 390,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 390,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 390,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 768,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 768,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 768,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 768,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 1024,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 1024,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 1024,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 1024,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 1440,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 1440,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 1440,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 1440,
+        "motion": "no-preference",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 320,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 320,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 320,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 320,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 375,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 375,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 375,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 375,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 390,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 390,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 390,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 390,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 768,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 768,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 768,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 768,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 1024,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 1024,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 1024,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 1024,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 1440,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/contact",
+        "width": 1440,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 1440,
+        "motion": "reduce",
+        "payloadVerified": true
+      },
+      {
+        "path": "/api/pre-consultation",
+        "width": 1440,
+        "motion": "reduce",
+        "payloadVerified": true
+      }
+    ],
+    "expectedConsoleErrors": [
+      {
+        "width": 320,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 320,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 375,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 375,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 768,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 1024,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 1024,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 1440,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 1440,
+        "motion": "no-preference",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 320,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 320,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 375,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 375,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 768,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 1024,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 1024,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 1440,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      },
+      {
+        "width": 1440,
+        "motion": "reduce",
+        "message": "Failed to load resource: the server responded with a status of 503 (Service Unavailable)"
+      }
+    ]
+  },
+  "extras": {
+    "checks": [
+      {
+        "name": "One main/h1 and zero animation-induced layout shifts",
+        "path": "/",
+        "pass": true
+      },
+      {
+        "name": "One main/h1 and zero animation-induced layout shifts",
+        "path": "/services",
+        "pass": true
+      },
+      {
+        "name": "One main/h1 and zero animation-induced layout shifts",
+        "path": "/research-support",
+        "pass": true
+      },
+      {
+        "name": "One main/h1 and zero animation-induced layout shifts",
+        "path": "/pre-consultation",
+        "pass": true
+      },
+      {
+        "name": "One main/h1 and zero animation-induced layout shifts",
+        "path": "/contact",
+        "pass": true
+      },
+      {
+        "name": "One main/h1 and zero animation-induced layout shifts",
+        "path": "/privacy-policy",
+        "pass": true
+      },
+      {
+        "name": "Visible content without observer API",
+        "pass": true
+      },
+      {
+        "name": "Visible content without animation API",
+        "pass": true
+      },
+      {
+        "name": "Populated project fixture reveals without fabricated app data",
+        "pass": true
+      },
+      {
+        "name": "Mobile navigation route dismisses menu",
+        "pass": true
+      },
+      {
+        "name": "Live reduced motion cancels menu and preserves dismissal",
+        "pass": true
+      },
+      {
+        "name": "Outside click closes mobile menu",
+        "pass": true
+      },
+      {
+        "name": "Desktop resize closes mobile menu",
+        "pass": true
+      }
+    ],
+    "errors": []
+  },
+  "buttons": {
+    "checks": [
+      {
+        "width": 390,
+        "motion": "no-preference",
+        "name": "Shared button keyboard focus and active press",
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "motion": "no-preference",
+        "name": "Shared button keyboard focus and active press",
+        "pass": true
+      },
+      {
+        "width": 390,
+        "motion": "reduce",
+        "name": "Shared button keyboard focus and active press",
+        "pass": true
+      },
+      {
+        "width": 1440,
+        "motion": "reduce",
+        "name": "Shared button keyboard focus and active press",
+        "pass": true
+      }
+    ],
+    "errors": []
+  }
+}

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Instagram, Mail, Phone } from "lucide-react";
 import { detailedServices } from "@/data/ServicesMock";
 
-const linkClass = "inline-flex min-h-11 items-center text-sm text-white/75 hover:text-white underline-offset-4 hover:underline";
+const linkClass = "inline-flex min-h-11 items-center text-sm text-white/75 hover:text-white underline-offset-4 hover:underline transition-colors duration-200";
 
 export default function Footer() {
   return (
@@ -14,7 +14,7 @@ export default function Footer() {
             <p className="max-w-sm text-sm text-white/75">UK technology consulting, software development and research support.</p>
             <p className="mt-4 text-sm text-white/75">Company No. 16910869<br />Registered in England &amp; Wales</p>
             <a href="https://www.instagram.com/accianltd/" className={`${linkClass} mt-3 gap-2`}>
-              <Instagram size={18} aria-hidden="true" /> Instagram
+              <Instagram className="footer-social" size={18} aria-hidden="true" /> Instagram
             </a>
           </div>
           <nav aria-label="Footer company and research">
@@ -41,7 +41,7 @@ export default function Footer() {
             <ul className="mt-3">
               <li><Link href="/contact" className={linkClass}>Contact ACCIAN</Link></li>
               <li><Link href="/privacy-policy" className={linkClass}>Privacy Policy</Link></li>
-              <li><Link href="/internal/quote-builder" className={linkClass}>Staff quote builder</Link></li>
+              <li><Link prefetch={false} href="/internal/quote-builder" className={linkClass}>Staff quote builder</Link></li>
             </ul>
           </div>
         </div>

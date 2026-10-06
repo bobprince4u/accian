@@ -19,6 +19,30 @@ export default function Navigation() {
   const open = openPath === pathname;
   const toggleRef = useRef<HTMLButtonElement>(null);
   const navRef = useRef<HTMLElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const hasOpened = useRef(false);
+
+  useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+    if (!open && !hasOpened.current) return;
+    if (open) hasOpened.current = true;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !menu.animate) {
+      menu.hidden = !open;
+      return;
+    }
+    // Keep the closing panel visible only for its exit; inert prevents interaction.
+    menu.hidden = false;
+    const animation = menu.animate(open
+      ? [{ opacity: 0, transform: "translateY(-8px)" }, { opacity: 1, transform: "none" }]
+      : [{ opacity: 1, transform: "none" }, { opacity: 0, transform: "translateY(-4px)" }],
+      { duration: open ? 180 : 120, easing: "ease-out" });
+    animation.onfinish = () => { menu.hidden = !open; };
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const finish = () => { animation.cancel(); menu.hidden = !open; };
+    preference.addEventListener("change", finish);
+    return () => { animation.cancel(); preference.removeEventListener("change", finish); };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -53,7 +77,7 @@ export default function Navigation() {
           <div className="hidden items-center gap-6 lg:flex">
             {links.map((link) => (
               <Link key={link.path} href={link.path} aria-current={pathname === link.path ? "page" : undefined}
-                className={`inline-flex min-h-11 items-center border-b-2 text-sm ${pathname === link.path ? "border-[#1B4FFF] font-semibold text-[#1B4FFF]" : "border-transparent text-[#555555] hover:text-[#0D0D0D]"}`}>
+                className={`inline-flex min-h-11 items-center border-b-2 text-sm transition-colors duration-200 ${pathname === link.path ? "border-[#1B4FFF] font-semibold text-[#1B4FFF]" : "border-transparent text-[#555555] hover:text-[#0D0D0D]"}`}>
                 {link.name}
               </Link>
             ))}
@@ -65,7 +89,7 @@ export default function Navigation() {
             {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
           </button>
         </div>
-        <div id="mobile-menu" hidden={!open} className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-[#E8E4DC] pb-5 pt-3 lg:hidden">
+        <div ref={menuRef} id="mobile-menu" hidden={!open} inert={!open} aria-hidden={!open} className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-[#E8E4DC] pb-5 pt-3 lg:hidden">
           <ul className="space-y-1">
             {links.map((link) => (
               <li key={link.path}>

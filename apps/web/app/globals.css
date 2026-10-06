@@ -177,8 +177,35 @@ summary::-webkit-details-marker { display: none; }
   color: white; background: #0d0d0d; transform: translateY(-200%);
 }
 .skip-link:focus { transform: translateY(0); }
-@keyframes content-enter { from { transform: translateY(6px); } to { transform: none; } }
-.content-reveal { animation: content-enter 220ms ease-out; }
+/* Finite entrances never gate server-rendered visibility. */
+@keyframes section-enter {
+  from { opacity: 0.4; transform: translateY(16px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .hero-stagger > * {
+    animation: section-enter 420ms ease-out;
+  }
+  .hero-stagger > :nth-child(2) { animation-delay: 60ms; }
+  .hero-stagger > :nth-child(3) { animation-delay: 120ms; }
+  .hero-stagger > :nth-child(4) { animation-delay: 180ms; }
+  details[open] > :not(summary) { animation: section-enter 180ms ease-out; }
+  .progress-fill { transition: transform 200ms ease-out; }
+  .service-card { transition: transform 200ms ease-out, box-shadow 200ms, border-color 200ms; }
+  .service-icon, .service-arrow, .footer-social { transition: transform 200ms ease-out; }
+  .service-card:focus-within .service-arrow { transform: translateX(3px); }
+  :is(.btn-primary, .btn-secondary, .btn-blue, .btn-outline-white) {
+    transition: color 200ms, background-color 200ms, border-color 200ms, opacity 200ms, transform 200ms;
+  }
+  :is(.btn-primary, .btn-secondary, .btn-blue, .btn-outline-white):active:not(:disabled) { transform: scale(0.98); }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .service-card:hover { transform: translateY(-3px); border-color: #1b4fff4d; box-shadow: 0 8px 20px #0d0d0d0a; }
+  .service-card:hover .service-icon { transform: scale(1.08); }
+  .service-card:hover .service-arrow { transform: translateX(3px); }
+  a:hover > .footer-social { transform: translateY(-2px); }
+  :is(.btn-primary, .btn-secondary, .btn-blue, .btn-outline-white):hover:not(:disabled):not(:active) { transform: translateY(-2px); }
+}
 
 @media (max-width: 639px) {
   main h1 { font-size: clamp(1.85rem, 7.5vw, 2.5rem); }
@@ -192,6 +219,8 @@ summary::-webkit-details-marker { display: none; }
     transition: none !important;
     scroll-behavior: auto !important;
   }
+  [class*="hover:translate"], [class*="group-hover:translate"] { translate: none !important; }
+  [class*="hover:scale"], [class*="group-hover:scale"] { scale: none !important; }
 }
 
 /* ── Marquee animation ───────────────────────────────────────────────────── */

@@ -234,7 +234,7 @@ export default function ResearchSupportPage() {
         <div className="pointer-events-none absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-blue-600/8 blur-[100px]" />
 
         <div className="relative container mx-auto">
-          <div className="max-w-3xl">
+          <div className="hero-stagger max-w-3xl">
             <div className="mb-5 inline-flex items-center gap-2">
               <span className="block h-0.5 w-7 rounded-full bg-blue-500" />
               <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">

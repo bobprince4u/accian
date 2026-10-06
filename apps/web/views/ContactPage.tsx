@@ -343,7 +343,7 @@ export default function ContactPage() {
         <div className="relative container mx-auto max-w-3xl">
           <div
             className="inline-flex items-center gap-2 mb-6"
-            style={{ animation: "fadeUp 0.6s 0.1s ease both" }}
+            style={{ animation: "fadeUp 0.42s 0s ease" }}
           >
             <span className="block w-7 h-0.5 bg-blue-500 rounded-full" />
             <span className="text-xs font-semibold tracking-widest uppercase text-blue-400">
@@ -353,13 +353,13 @@ export default function ContactPage() {
           </div>
           <h1
             className="text-4xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight mb-5"
-            style={{ animation: "fadeUp 0.7s 0.2s ease both" }}
+            style={{ animation: "fadeUp 0.42s 0.06s ease" }}
           >
             Contact <span className="text-blue-500">ACCIAN</span>
           </h1>
           <p
             className="text-sm lg:text-base font-light text-white/75 leading-relaxed max-w-xl mx-auto"
-            style={{ animation: "fadeUp 0.7s 0.35s ease both" }}
+            style={{ animation: "fadeUp 0.42s 0.12s ease" }}
           >
             Tell us about your project, ask a question or discuss a service. Send an enquiry below, or contact us directly by email or phone.
           </p>
@@ -387,7 +387,7 @@ export default function ContactPage() {
                   tabIndex={-1}
                   role="alert"
                   className="mb-6 flex flex-col gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3.5 text-sm text-red-700"
-                  style={{ animation: "scaleIn 0.3s ease both" }}
+                  style={{ animation: "scaleIn 0.3s ease" }}
                 >
                   <span className="mt-0.5 shrink-0">⚠</span>
                   <p>{rateLimitError}</p>
@@ -399,11 +399,11 @@ export default function ContactPage() {
                 <div
                   className="flex flex-col items-center justify-center py-16 text-center"
                   role="status"
-                  style={{ animation: "scaleIn 0.5s ease both" }}
+                  style={{ animation: "scaleIn 0.42s ease" }}
                 >
                   <div
                     className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center mb-4"
-                    style={{ animation: "scaleIn 0.5s 0.1s ease both" }}
+                    style={{ animation: "scaleIn 0.42s 0.1s ease" }}
                   >
                     <CheckCircle2 size={32} className="text-green-500" />
                   </div>
@@ -429,7 +429,7 @@ export default function ContactPage() {
                   {/* Row 1 */}
                   <div
                     className="grid grid-cols-1 sm:grid-cols-2 gap-5"
-                    style={{ animation: "fadeUp 0.5s 0.1s ease both" }}
+                    style={{ animation: "fadeUp 0.42s 0.1s ease" }}
                   >
                     <div>
                       <label htmlFor="fullName" className={labelCls}>
@@ -478,7 +478,7 @@ export default function ContactPage() {
                   {/* Row 2 */}
                   <div
                     className="grid grid-cols-1 sm:grid-cols-2 gap-5"
-                    style={{ animation: "fadeUp 0.5s 0.18s ease both" }}
+                    style={{ animation: "fadeUp 0.42s 0.18s ease" }}
                   >
                     <div>
                       <label htmlFor="companyName" className={labelCls}>
@@ -542,7 +542,7 @@ export default function ContactPage() {
                           id="phone-error"
                           role="alert"
                           className="mt-1.5 text-xs text-red-500"
-                          style={{ animation: "fadeUp 0.3s ease both" }}
+                          style={{ animation: "fadeUp 0.3s ease" }}
                         >
                           {phoneError}
                         </p>
@@ -553,7 +553,7 @@ export default function ContactPage() {
                   {/* Row 3 */}
                   <div
                     className="grid grid-cols-1 sm:grid-cols-2 gap-5"
-                    style={{ animation: "fadeUp 0.5s 0.26s ease both" }}
+                    style={{ animation: "fadeUp 0.42s 0.24s ease" }}
                   >
                     <div>
                       <label htmlFor="serviceInterest" className={labelCls}>
@@ -613,7 +613,7 @@ export default function ContactPage() {
                   {/* Row 4 */}
                   <div
                     className="grid grid-cols-1 sm:grid-cols-2 gap-5"
-                    style={{ animation: "fadeUp 0.5s 0.34s ease both" }}
+                    style={{ animation: "fadeUp 0.42s 0.24s ease" }}
                   >
                     <div>
                       <label htmlFor="projectTimeline" className={labelCls}>
@@ -661,7 +661,7 @@ export default function ContactPage() {
                   </div>
 
                   {/* Message */}
-                  <div style={{ animation: "fadeUp 0.5s 0.42s ease both" }}>
+                  <div style={{ animation: "fadeUp 0.42s 0.24s ease" }}>
                     <label htmlFor="message" className={labelCls}>
                       Message <span className="text-red-500">*</span>
                     </label>
@@ -686,13 +686,13 @@ export default function ContactPage() {
                   {/* Privacy */}
                   <p
                     className="text-sm text-[#555555] leading-relaxed"
-                    style={{ animation: "fadeUp 0.5s 0.5s ease both" }}
+                    style={{ animation: "fadeUp 0.42s 0.2s ease" }}
                   >
                     Read our <Link href="/privacy-policy" className="font-medium text-[#1B4FFF] underline underline-offset-4">Privacy Policy</Link> for information about how we use your enquiry details.
                   </p>
 
                   {/* Submit */}
-                  <div style={{ animation: "fadeUp 0.5s 0.55s ease both" }}>
+                  <div style={{ animation: "fadeUp 0.42s 0.24s ease" }}>
                     <button
                       type="submit"
                       disabled={submitting}
@@ -759,7 +759,7 @@ export default function ContactPage() {
                         key={label}
                         className="flex items-start gap-3.5 group"
                         style={{
-                          animation: `fadeUp 0.5s ${0.1 + i * 0.08}s ease both`,
+                          animation: `fadeUp 0.42s ${0.1 + i * 0.08}s ease`,
                         }}
                       >
                         <div className="w-10 h-10 rounded-xl bg-blue-600/10 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-blue-600 group-hover:scale-110 transition-all duration-300">

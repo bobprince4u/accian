@@ -50,9 +50,8 @@ export default function PrivacyPolicy() {
   return (
     <div className="bg-[#F5F3EE] min-h-screen">
       <style>{`
-        @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-        @keyframes barGrow { from { width:0%; } to { width:100%; } }
+
       `}</style>
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
@@ -65,7 +64,7 @@ export default function PrivacyPolicy() {
           <div className="max-w-2xl">
             <div
               className="inline-flex items-center gap-2 mb-6"
-              style={{ animation: "fadeUp 0.6s 0.1s ease both" }}
+              style={{ animation: "fadeIn 0.18s ease" }}
             >
               <span className="block w-7 h-0.5 bg-blue-500 rounded-full" />
               <span className="text-xs font-semibold tracking-widest uppercase text-blue-400">
@@ -75,7 +74,7 @@ export default function PrivacyPolicy() {
 
             <h1
               className="text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.04] mb-5"
-              style={{ animation: "fadeUp 0.7s 0.2s ease both" }}
+              style={{ animation: "fadeIn 0.18s ease" }}
             >
               Privacy
               <br />
@@ -84,7 +83,7 @@ export default function PrivacyPolicy() {
 
             <p
               className="text-sm font-light text-white/75 mb-8"
-              style={{ animation: "fadeUp 0.6s 0.35s ease both" }}
+              style={{ animation: "fadeIn 0.18s ease" }}
             >
               Last updated: 15 December 2025
             </p>
@@ -92,7 +91,7 @@ export default function PrivacyPolicy() {
             {/* Quick-jump nav */}
             <div
               className="flex flex-wrap gap-2"
-              style={{ animation: "fadeUp 0.6s 0.45s ease both" }}
+              style={{ animation: "fadeIn 0.18s ease" }}
             >
               {sections.map((s) => (
                 <a
@@ -111,7 +110,7 @@ export default function PrivacyPolicy() {
       {/* ── BLUE RULE ─────────────────────────────────────────────────────── */}
       <div
         className="h-1 bg-blue-600"
-        style={{ animation: "barGrow 1s 0.5s ease both", width: "0%" }}
+        aria-hidden="true"
       />
 
       {/* ── CONTENT ───────────────────────────────────────────────────────── */}
@@ -119,7 +118,7 @@ export default function PrivacyPolicy() {
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
             {/* ── LEFT — sticky summary ──────────────────────────────────── */}
-            <Reveal direction="left" className="lg:sticky lg:top-28">
+            <Reveal minimal direction="left" className="lg:sticky lg:top-28">
               <div className="bg-[#0D0D0D] rounded-2xl p-7 text-white">
                 <p className="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-3">
                   Summary
@@ -178,7 +177,7 @@ export default function PrivacyPolicy() {
             {/* ── RIGHT — policy sections ────────────────────────────────── */}
             <div className="lg:col-span-2 space-y-4">
               {sections.map((s, i) => (
-                <Reveal key={i} delay={i * 80}>
+                <Reveal minimal key={i} delay={i * 80}>
                   <div
                     id={s.title.toLowerCase().replace(/\s+/g, "-")}
                     className="bg-white border border-[#E8E4DC] rounded-2xl p-5 sm:p-8 group hover:border-blue-600/25 hover:shadow-lg hover:shadow-blue-600/5 hover:-translate-y-0.5 transition-all duration-300"
@@ -220,7 +219,7 @@ export default function PrivacyPolicy() {
               ))}
 
               {/* Contact section */}
-              <Reveal delay={sections.length * 80}>
+              <Reveal minimal delay={sections.length * 80}>
                 <div className="relative overflow-hidden bg-[#0D0D0D] rounded-2xl p-5 sm:p-8 group hover:shadow-2xl hover:shadow-black/30 transition-shadow duration-300">
                   <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-blue-600/15 pointer-events-none group-hover:bg-blue-600/25 transition-colors duration-300" />
                   <div className="absolute -bottom-6 -left-6 w-28 h-28 rounded-full bg-blue-600/6 pointer-events-none" />
@@ -261,7 +260,7 @@ export default function PrivacyPolicy() {
               </Reveal>
 
               {/* Back to site */}
-              <Reveal delay={sections.length * 80 + 80}>
+              <Reveal minimal delay={sections.length * 80 + 80}>
                 <div className="flex flex-col items-start gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
                   <p className="text-xs font-light text-gray-600">
                     This policy is reviewed regularly and updated as needed.

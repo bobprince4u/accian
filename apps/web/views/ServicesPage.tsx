@@ -54,7 +54,7 @@ export default function ServicesPage() {
         <div className="absolute top-0 right-0 w-125 h-125 rounded-full bg-blue-600/15 blur-[120px] pointer-events-none" />
 
         <div className="relative container mx-auto px-6 lg:px-12">
-          <div className="max-w-3xl">
+          <div className="hero-stagger max-w-3xl">
             <div className="inline-flex items-center gap-2 mb-5">
               <span className="block w-7 h-0.5 bg-blue-500 rounded-full" />
               <span className="text-xs font-semibold tracking-widest uppercase text-blue-400">

@@ -22,6 +22,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
 import { AlertCircle, ArrowLeft, ArrowRight, Loader2, Send } from "lucide-react";
 import {
   PRE_CONSULTATION_DECLARATION,
@@ -532,7 +533,7 @@ export default function PreConsultationForm() {
 
       {/* Intro */}
       <header className="border-b border-[#E8E4DC] bg-white">
-        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
+        <div className="hero-stagger mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
           <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#1B4FFF]">
             PhD Research Pathway
           </p>
@@ -570,7 +571,7 @@ export default function PreConsultationForm() {
             else continueForward();
           }}
         >
-          <div className="rounded-2xl border border-[#E8E4DC] bg-white p-5 sm:p-8">
+          <div className="form-panel rounded-2xl border border-[#E8E4DC] bg-white p-5 sm:p-8">
             <h2
               ref={headingRef}
               tabIndex={-1}
@@ -583,6 +584,7 @@ export default function PreConsultationForm() {
 
             <fieldset disabled={submitting} className="min-w-0">
             <legend className="sr-only">{onReview ? "Review your answers" : currentStep.title}</legend>
+            <Reveal minimal replayKey={onReview ? "review" : currentStep.id}>
             {onReview ? (
               <>
                 <p className="mb-6 text-sm font-light leading-relaxed text-[#666666]">
@@ -607,6 +609,7 @@ export default function PreConsultationForm() {
                 {currentStep.sections.map(renderSection)}
               </div>
             )}
+            </Reveal>
             </fieldset>
           </div>
 
