@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LazyImage } from "./LazyImage";
 import { Menu, X } from "lucide-react";
 
-const navLinks = [
+const links = [
   { name: "Home", path: "/" },
   { name: "Services", path: "/services" },
   { name: "Research Support", path: "/research-support" },
@@ -14,113 +14,71 @@ const navLinks = [
 ];
 
 export default function Navigation() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [openPath, setOpenPath] = useState<string | null>(null);
   const pathname = usePathname();
+  const open = openPath === pathname;
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
-  const isActive = (path: string) => pathname === path;
+  useEffect(() => {
+    if (!open) return;
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpenPath(null);
+        toggleRef.current?.focus();
+      }
+    };
+    const outside = (event: PointerEvent) => {
+      if (!navRef.current?.contains(event.target as Node)) setOpenPath(null);
+    };
+    const media = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => { if (media.matches) setOpenPath(null); };
+    document.addEventListener("keydown", escape);
+    document.addEventListener("pointerdown", outside);
+    media.addEventListener("change", closeOnDesktop);
+    return () => {
+      document.removeEventListener("keydown", escape);
+      document.removeEventListener("pointerdown", outside);
+      media.removeEventListener("change", closeOnDesktop);
+    };
+  }, [open]);
 
   return (
-    <nav
-      className="bg-white shadow-sm sticky top-0 z-50"
-      aria-label="Main navigation"
-    >
+    <nav ref={navRef} className="sticky top-0 z-50 border-b border-[#E8E4DC] bg-white" aria-label="Main navigation">
       <div className="container-custom">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center"
-            aria-label="ACCIAN home page"
-          >
-            <LazyImage
-              src="/Accian.png"
-              alt="ACCIAN Logo"
-              className="h-10 w-auto"
-            />
+        <div className="flex h-18 items-center justify-between gap-4">
+          <Link href="/" onClick={() => setOpenPath(null)} aria-label="ACCIAN home" className="shrink-0 rounded">
+            <Image src="/Accian.png" alt="ACCIAN" width={252} height={76} priority className="h-auto w-32 sm:w-36" />
           </Link>
-
-          {/* Desktop Navigation */}
-          <div
-            className="hidden md:flex items-center space-x-8"
-            role="navigation"
-            aria-label="Desktop navigation menu"
-          >
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.path}
-                className={`transition-colors duration-200 ${
-                  isActive(link.path)
-                    ? "text-[#1E40AF]"
-                    : "text-[#64748B] hover:text-[#1E40AF]"
-                }`}
-                aria-current={isActive(link.path) ? "page" : undefined}
-                aria-label={`Navigate to ${link.name} page`}
-              >
+          <div className="hidden items-center gap-6 lg:flex">
+            {links.map((link) => (
+              <Link key={link.path} href={link.path} aria-current={pathname === link.path ? "page" : undefined}
+                className={`inline-flex min-h-11 items-center border-b-2 text-sm ${pathname === link.path ? "border-[#1B4FFF] font-semibold text-[#1B4FFF]" : "border-transparent text-[#555555] hover:text-[#0D0D0D]"}`}>
                 {link.name}
               </Link>
             ))}
-            <Link
-              href="/contact"
-              className="btn-primary"
-              aria-label="Request consultation"
-            >
-              Request Consultation
-            </Link>
+            <Link href="/pre-consultation" className="btn-primary">Start pre-consultation</Link>
           </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 rounded-md text-[#64748B] hover:text-[#1E40AF] hover:bg-[#F8FAFC]"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label={
-              isMenuOpen ? "Close navigation menu" : "Open navigation menu"
-            }
-            aria-expanded={isMenuOpen}
-            aria-controls="mobile-menu"
-          >
-            {isMenuOpen ? (
-              <X size={24} aria-hidden="true" />
-            ) : (
-              <Menu size={24} aria-hidden="true" />
-            )}
+          <button ref={toggleRef} type="button" className="flex h-11 w-11 items-center justify-center rounded-lg border border-[#D8D3C9] lg:hidden"
+            onClick={() => setOpenPath(open ? null : pathname)} aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open} aria-controls="mobile-menu">
+            {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
           </button>
         </div>
-
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <div
-            id="mobile-menu"
-            className="md:hidden py-4 space-y-4"
-            role="navigation"
-            aria-label="Mobile navigation menu"
-          >
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.path}
-                className={`block py-2 transition-colors duration-200 ${
-                  isActive(link.path)
-                    ? "text-[#1E40AF]"
-                    : "text-[#64748B] hover:text-[#1E40AF]"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-                aria-current={isActive(link.path) ? "page" : undefined}
-                aria-label={`Navigate to ${link.name} page`}
-              >
-                {link.name}
-              </Link>
+        <div id="mobile-menu" hidden={!open} className="max-h-[calc(100dvh-4.5rem)] overflow-y-auto border-t border-[#E8E4DC] pb-5 pt-3 lg:hidden">
+          <ul className="space-y-1">
+            {links.map((link) => (
+              <li key={link.path}>
+                <Link href={link.path} onClick={() => setOpenPath(null)} aria-current={pathname === link.path ? "page" : undefined}
+                  className={`flex min-h-11 items-center rounded-lg px-3 text-sm ${pathname === link.path ? "bg-[#1B4FFF]/[0.06] font-semibold text-[#1B4FFF]" : "text-[#555555] hover:bg-[#F5F3EE]"}`}>
+                  {link.name}
+                </Link>
+              </li>
             ))}
-            <Link
-              href="/contact"
-              className="btn-primary inline-block"
-              aria-label="Request consultation"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Request Consultation
-            </Link>
-          </div>
-        )}
+          </ul>
+          <Link href="/pre-consultation" onClick={() => setOpenPath(null)} className="btn-primary mt-4 w-full">Start pre-consultation</Link>
+          <p className="mt-2 text-center text-xs text-[#666666]">For research enquiries. <Link href="/contact" onClick={() => setOpenPath(null)} className="underline underline-offset-4">Contact us about technology services</Link>.</p>
+        </div>
       </div>
     </nav>
   );

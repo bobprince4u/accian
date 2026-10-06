@@ -1,7 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
+import ServiceCard from "@/components/ServiceCard";
+import ProjectHighlights from "@/components/ProjectHighlights";
 import axios from "axios";
 import { Globe, Clock, Star } from "lucide-react";
 import type {
@@ -38,58 +41,6 @@ interface Testimonial {
 }
 
 // ─── Scroll reveal ────────────────────────────────────────────────────────────
-function useReveal(threshold = 0.1) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      },
-      { threshold },
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, visible };
-}
-
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-  direction = "up",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-  direction?: "up" | "left" | "right";
-}) {
-  const { ref, visible } = useReveal();
-  const t =
-    direction === "left"
-      ? "translateX(-32px)"
-      : direction === "right"
-        ? "translateX(32px)"
-        : "translateY(32px)";
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translate(0)" : t,
-        transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 // ─── Animated stat cell ───────────────────────────────────────────────────────
 function AnimatedStat({
   number,
@@ -100,23 +51,12 @@ function AnimatedStat({
   label: string;
   description: string;
 }) {
-  const { ref, visible } = useReveal();
   return (
-    <div
-      ref={ref}
-      className="py-10 px-6 lg:px-10"
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(20px)",
-        transition: "opacity 0.6s ease, transform 0.6s ease",
-      }}
-    >
-      <p className="text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-none">
-        {number}
-      </p>
+    <Reveal className="px-4 py-7 sm:px-6 lg:px-10">
+      <p className="text-3xl font-bold text-white">{number}</p>
       <p className="mt-2 text-sm font-semibold text-white">{label}</p>
-      <p className="mt-0.5 text-xs font-light text-white/30">{description}</p>
-    </div>
+      <p className="mt-1 text-xs text-white/75">{description}</p>
+    </Reveal>
   );
 }
 
@@ -148,20 +88,6 @@ const TestimonialSkeleton = () => (
   </div>
 );
 
-const MARQUEE_ITEMS = [
-  "Cyber security",
-  "Cloud Infrastructure",
-  "Digital Transformation",
-  "ISO 27001",
-  "Penetration Testing",
-  "Managed IT",
-  "GDPR Compliance",
-  "Incident Response",
-  "SOC 2",
-  "Cyber Essentials",
-  "AI Integration",
-];
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -174,9 +100,12 @@ export default function HomePage() {
   );
 
   const fetchServices = async () => {
+    setLoading(true);
+    setError(null);
     try {
       const res = await axios.get(`${API_URL}/api/services`);
       const data = res.data.data || res.data;
+      if (!Array.isArray(data)) throw new Error("Unexpected services response");
       setServices(
         Array.isArray(data)
           ? data.map((s: ServiceSummary) => ({
@@ -190,28 +119,31 @@ export default function HomePage() {
           : [],
       );
     } catch {
-      setError("Failed to fetch services");
+      setError("We couldn’t load our services. Please try again, or explore the services overview.");
     } finally {
       setLoading(false);
     }
   };
 
   const fetchTestimonials = async () => {
+    setTestimonialsLoading(true);
+    setTestimonialsError(null);
     try {
       const res = await axios.get(`${API_URL}/api/testimonials`);
       const data = res.data.data || res.data;
+      if (!Array.isArray(data)) throw new Error("Unexpected testimonials response");
       setTestimonials(
         Array.isArray(data)
           ? data.map((t: ApiTestimonial) => ({
               quote: t.message,
               author: t.name,
               position: t.position || "",
-              rating: t.rating || 5,
+              rating: t.rating ?? undefined,
             }))
           : [],
       );
     } catch {
-      setTestimonialsError("Failed to fetch testimonials");
+      setTestimonialsError("We couldn’t load client feedback. Please try again.");
     } finally {
       setTestimonialsLoading(false);
     }
@@ -223,40 +155,39 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main>
+    <div>
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
       `}</style>
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-screen overflow-hidden bg-[#F5F3EE]">
+      <section className="relative overflow-hidden bg-[#F5F3EE]">
         <div className="absolute top-0 right-0 w-150 h-150 rounded-full bg-blue-600/10 blur-[100px] pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-100 h-100 rounded-full bg-blue-400/8 blur-[80px] pointer-events-none" />
-        <div className="relative container mx-auto px-6 lg:px-12 min-h-screen grid lg:grid-cols-2 gap-12 items-center pt-24 pb-16">
+        <div className="relative container mx-auto px-6 lg:px-12 grid lg:grid-cols-2 gap-10 items-center py-12 sm:py-16 lg:py-20">
           <div>
             <div
               className="inline-flex items-center gap-2 mb-7"
               style={{ animation: "fadeUp 0.6s 0.1s ease both" }}
             >
               <span className="block w-7 h-0.5 bg-blue-600 rounded-full" />
-              <span className="text-xs font-semibold tracking-widest uppercase text-blue-600">
-                UK Technology &amp; Cyber security
+              <span className="text-xs font-semibold tracking-widest uppercase text-blue-700">
+                UK consulting &amp; technology
               </span>
             </div>
             <h1
-              className="text-5xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.08] tracking-tight text-[#0D0D0D]"
+              className="text-4xl lg:text-5xl xl:text-6xl font-extrabold leading-[1.08] tracking-tight text-[#0D0D0D]"
               style={{ animation: "fadeUp 0.7s 0.2s ease both" }}
             >
-              Global IT, <span className="text-blue-600">Cyber security</span>{" "}
-              &amp; Digital Solutions
+              Technology consulting &amp; <span className="text-blue-700">research support</span>
             </h1>
             <p
-              className="mt-6 text-base lg:text-lg font-light text-gray-500 leading-relaxed max-w-xl"
+              className="mt-6 text-base lg:text-lg font-light text-gray-600 leading-relaxed max-w-xl"
               style={{ animation: "fadeUp 0.7s 0.35s ease both" }}
             >
-              ACCIAN is a UK-registered technology and cyber security company
-              delivering secure, scalable, and intelligent digital solutions
-              that help businesses grow, automate, and stay protected.
+              Practical IT advice, software development and data solutions for
+              businesses. Research guidance for applicants preparing for an
+              MRes, MPhil or PhD. Based in the UK, working internationally.
             </p>
             <div
               className="flex flex-col sm:flex-row gap-3 mt-8"
@@ -266,17 +197,17 @@ export default function HomePage() {
                 href="/contact"
                 className="inline-block bg-[#0D0D0D] hover:bg-blue-600 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-600/25 text-white text-sm font-semibold px-7 py-3.5 rounded-lg transition-all duration-200"
               >
-                Request Consultation →
+                Contact ACCIAN →
               </Link>
               <Link
                 href="/services"
                 className="inline-block border border-gray-300 hover:border-[#0D0D0D] hover:-translate-y-0.5 text-[#0D0D0D] text-sm font-medium px-7 py-3.5 rounded-lg transition-all duration-200 text-center"
               >
-                Explore Our Services
+                Explore services
               </Link>
             </div>
             <p
-              className="mt-7 text-xs font-light text-gray-400"
+              className="mt-7 text-xs font-light text-gray-600"
               style={{ animation: "fadeUp 0.7s 0.65s ease both" }}
             >
               Accian Limited is an independent UK company and is not affiliated
@@ -284,183 +215,64 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div
-            className="hidden lg:flex flex-col gap-3"
-            style={{ animation: "fadeUp 0.9s 0.4s ease both" }}
-          >
-            <div className="relative overflow-hidden bg-[#0D0D0D] rounded-2xl p-10 hover:scale-[1.02] transition-transform duration-300">
-              <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-blue-600/15 pointer-events-none" />
-              <p className="text-xs font-semibold tracking-widest uppercase text-white/40 mb-2">
-                Clients protected
-              </p>
-              <p className="text-7xl font-extrabold text-white tracking-tight leading-none">
-                7<span className="text-blue-500">+</span>
-              </p>
-              <p className="mt-2 text-sm font-light text-white/40">
-                Organisations worldwide
-              </p>
+          <aside className="space-y-4" aria-label="Choose your pathway">
+            <div className="rounded-2xl bg-[#0D0D0D] p-6 text-white sm:p-8">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">For businesses &amp; organisations</p>
+              <h2 className="text-2xl font-semibold">Plan, build or improve your technology</h2>
+              <p className="mt-3 text-sm text-white/80">Explore IT consulting, software, training, social care and data services.</p>
+              <Link href="/services" className="mt-5 inline-flex min-h-11 items-center text-sm font-semibold text-white underline underline-offset-4">Explore technology services →</Link>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#EDE9E0] rounded-2xl p-7 hover:scale-[1.03] transition-transform duration-300">
-                <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-2">
-                  Uptime SLA
-                </p>
-                <p className="text-4xl font-extrabold text-[#0D0D0D] tracking-tight">
-                  92.9<span className="text-2xl">%</span>
-                </p>
-              </div>
-              <div className="bg-blue-600 rounded-2xl p-7 hover:scale-[1.03] transition-transform duration-300">
-                <p className="text-xs font-semibold tracking-widest uppercase text-white/50 mb-2">
-                  Monitoring
-                </p>
-                <p className="text-4xl font-extrabold text-white tracking-tight">
-                  24/7
-                </p>
-              </div>
+            <div className="rounded-2xl border border-[#D8D3C9] bg-white p-6 sm:p-8">
+              <p className="eyebrow mb-3">For research applicants</p>
+              <h2 className="text-2xl font-semibold">Shape your research application</h2>
+              <p className="mt-3 text-sm text-[#555555]">Get support with your topic, supervisor search, proposal and application.</p>
+              <Link href="/research-support" className="mt-5 inline-flex min-h-11 items-center text-sm font-semibold text-[#1B4FFF] underline underline-offset-4">Explore research support →</Link>
             </div>
-            <div className="bg-[#EDE9E0] rounded-2xl px-8 py-5 flex items-center justify-between hover:scale-[1.02] transition-transform duration-300">
-              <div>
-                <p className="text-xs font-semibold tracking-widest uppercase text-gray-400 mb-1">
-                  Experience
-                </p>
-                <p className="text-3xl font-extrabold text-[#0D0D0D] tracking-tight">
-                  4+ Years
-                </p>
-              </div>
-              <div className="flex gap-1.5">
-                {["ISO", "GDPR", "CE"].map((b) => (
-                  <span
-                    key={b}
-                    className="text-[10px] font-bold bg-[#0D0D0D] text-white px-2 py-1 rounded"
-                  >
-                    {b}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
+          </aside>
         </div>
       </section>
 
-      {/* ── MARQUEE ───────────────────────────────────────────────────────── */}
-      <div className="overflow-hidden border-y border-gray-200 bg-[#ECEAE3] py-3.5">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, i) => (
-            <span
-              key={i}
-              className="inline-flex items-center gap-6 mr-12 text-[11px] font-semibold tracking-widest uppercase text-[#333]"
-            >
-              {item}
-              <span className="w-1 h-1 rounded-full bg-blue-600 shrink-0" />
-            </span>
-          ))}
-        </div>
-      </div>
-
       {/* ── SERVICES ──────────────────────────────────────────────────────── */}
-      <section className="bg-[#F5F3EE] py-24 px-6 lg:px-12">
+      <section className="bg-[#F5F3EE] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-12">
             <div>
-              <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-2">
+              <p className="text-xs font-semibold tracking-widest uppercase text-blue-700 mb-2">
                 Core Services
               </p>
-              <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#0D0D0D] leading-tight">
-                Everything your business
-                <br />
-                needs to <span className="text-blue-600">thrive</span>
+              <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#0D0D0D] leading-tight">
+                Practical services for your needs
               </h2>
             </div>
-            <p className="text-sm font-light text-gray-500 leading-relaxed max-w-sm lg:text-right">
-              From securing your perimeter to transforming your digital
-              operations — end to end.
+            <p className="text-sm font-light text-gray-600 leading-relaxed max-w-sm lg:text-right">
+              Explore what each service includes, then tell us what you need help with.
             </p>
           </Reveal>
 
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div role="status" aria-label="Loading services" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(5)].map((_, i) => (
                 <ServiceCardSkeleton key={i} />
               ))}
             </div>
           ) : error ? (
             <div className="text-center py-12">
-              <p className="text-red-500 mb-4">{error}</p>
+              <p className="text-[#555555] mb-4" role="status">{error}</p>
               <button
                 onClick={fetchServices}
                 className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold"
               >
-                Retry
+                Try again
               </button>
             </div>
+          ) : services.length === 0 ? (
+            <p className="text-sm text-[#555555]">No services are currently listed. <Link href="/services" className="text-[#1B4FFF] underline">View our service overview</Link> or <Link href="/contact" className="text-[#1B4FFF] underline">contact ACCIAN</Link>.</p>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
-              {services[0] && (
-                <Reveal className="lg:col-span-4" delay={0}>
-                  <div className="relative overflow-hidden bg-[#0D0D0D] rounded-2xl p-10 h-full hover:scale-[1.01] hover:shadow-2xl hover:shadow-blue-600/15 transition-all duration-300 group">
-                    <div className="absolute -top-14 -right-14 w-56 h-56 rounded-full bg-blue-600/12 pointer-events-none group-hover:bg-blue-600/20 transition-colors duration-300" />
-                    <span className="inline-block text-[10px] font-semibold tracking-widest uppercase bg-blue-600/20 text-blue-300 px-2.5 py-1 rounded mb-4">
-                      Featured
-                    </span>
-                    <h3 className="text-3xl font-bold text-white leading-snug mb-3 max-w-sm">
-                      {services[0].title}
-                    </h3>
-                    <p className="text-sm font-light text-white/55 leading-relaxed max-w-lg">
-                      {services[0].description}
-                    </p>
-                    {services[0].features && (
-                      <ul className="mt-5 space-y-2">
-                        {services[0].features.map((f, i) => (
-                          <li
-                            key={i}
-                            className="flex items-center gap-2 text-sm text-white/45"
-                          >
-                            <span className="text-blue-400 font-bold">→</span>{" "}
-                            {f}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                    <Link
-                      href={services[0].link || "/services"}
-                      className="inline-flex items-center gap-1.5 mt-7 text-xs font-semibold text-white border-b border-white/30 pb-0.5 hover:border-white hover:gap-3 transition-all duration-200"
-                    >
-                      Learn more →
-                    </Link>
-                  </div>
-                </Reveal>
-              )}
-              {services[1] && (
-                <Reveal className="lg:col-span-2" delay={80}>
-                  <div className="bg-blue-600 rounded-2xl p-8 h-full hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-600/40 transition-all duration-300">
-                    <span className="inline-block text-[10px] font-semibold tracking-widest uppercase bg-white/15 text-white px-2.5 py-1 rounded mb-4">
-                      Cloud
-                    </span>
-                    <h3 className="text-xl font-semibold text-white leading-snug mb-3">
-                      {services[1].title}
-                    </h3>
-                    <p className="text-sm font-light text-white/60 leading-relaxed">
-                      {services[1].description}
-                    </p>
-                  </div>
-                </Reveal>
-              )}
-              {services.slice(2).map((svc, i) => (
-                <Reveal
-                  key={svc.id || svc.slug}
-                  className="lg:col-span-2"
-                  delay={(i + 2) * 80}
-                >
-                  <div className="bg-[#EDE9E0] border border-[#E0DBD2] rounded-2xl p-8 h-full hover:bg-[#0D0D0D] hover:text-white hover:-translate-y-2 hover:shadow-xl hover:border-transparent group transition-all duration-300">
-                    <h3 className="text-lg font-semibold text-[#0D0D0D] group-hover:text-white leading-snug mb-3 transition-colors">
-                      {svc.title}
-                    </h3>
-                    <p className="text-sm font-light text-gray-500 group-hover:text-white/55 leading-relaxed transition-colors">
-                      {svc.description}
-                    </p>
-                  </div>
-                </Reveal>
-              ))}
+            <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {services.map((service) => {
+                const anchors: Record<string, string> = { "it-consulting-advisory": "it-consulting", "it-consulting": "it-consulting", "software-development": "software-development", "education-training": "education-training", "social-care": "social-care", "social-care-community-support": "social-care", "data-science-ai": "data-science-ai" };
+                return <ServiceCard key={service.id || service.slug} {...service} features={service.features || []} link={anchors[service.slug] ? `/services#${anchors[service.slug]}` : "/services"} />;
+              })}
             </div>
           )}
         </div>
@@ -478,24 +290,24 @@ export default function HomePage() {
       </section>
 
       {/* ── GLOBAL PRESENCE ───────────────────────────────────────────────── */}
-      <section className="bg-[#F5F3EE] py-24 px-6 lg:px-12">
+      <section id="about" className="bg-[#F5F3EE] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
           <Reveal direction="left">
-            <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-3">
+            <p className="text-xs font-semibold tracking-widest uppercase text-blue-700 mb-3">
               Our Global Presence
             </p>
-            <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-5">
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-5">
               UK-registered.
               <br />
-              <span className="text-blue-600">Globally</span> delivered.
+              <span className="text-blue-700">Globally</span> delivered.
             </h2>
-            <p className="text-sm font-light text-gray-500 leading-relaxed mb-4">
+            <p className="text-sm font-light text-gray-600 leading-relaxed mb-4">
               ACCIAN operates as a UK-registered company, delivering
               high-quality digital solutions that meet international standards,
               while remaining agile, innovative, and focused on creating
               measurable value for clients.
             </p>
-            <p className="text-sm font-light text-gray-500 leading-relaxed mb-6">
+            <p className="text-sm font-light text-gray-600 leading-relaxed mb-6">
               We combine technical excellence with strategic thinking to provide
               comprehensive digital solutions that drive measurable business
               outcomes. Our approach is mission-driven, results-focused, and
@@ -529,36 +341,18 @@ export default function HomePage() {
                   </div>
                   <div>
                     <p className="font-bold text-base">ACCIAN Limited</p>
-                    <p className="text-xs font-light text-white/40">
+                    <p className="text-xs font-light text-white/75">
                       UK Registered Company
                     </p>
                   </div>
                 </div>
-                {[
-                  {
-                    label: "Threat Detection Rate",
-                    val: "99.7%",
-                    width: "99.7%",
-                  },
-                  { label: "Client Retention", val: "96%", width: "96%" },
-                ].map((m) => (
-                  <div key={m.label} className="mb-4">
-                    <div className="flex justify-between mb-1.5">
-                      <span className="text-xs font-light text-white/50">
-                        {m.label}
-                      </span>
-                      <span className="text-xs font-bold">{m.val}</span>
-                    </div>
-                    <div className="h-1 bg-white/8 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-blue-500 rounded-full"
-                        style={{ width: m.width }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                <dl className="space-y-4 text-sm">
+                  <div><dt className="text-white/75">Company number</dt><dd className="mt-1 font-semibold">16910869</dd></div>
+                  <div><dt className="text-white/75">Registered office</dt><dd className="mt-1">4 Lidgett Ln, Garforth, Leeds LS25 1EQ</dd></div>
+                  <div><dt className="text-white/75">Enquiries</dt><dd><a href="mailto:info@accian.co.uk" className="inline-flex min-h-11 items-center underline underline-offset-4">info@accian.co.uk</a></dd></div>
+                </dl>
                 <div className="mt-5 pt-4 border-t border-white/8">
-                  <p className="text-[10px] font-light text-white/25 italic">
+                  <p className="text-[10px] font-light text-white/75 italic">
                     Not affiliated with Accion or any similarly named
                     organisations
                   </p>
@@ -574,16 +368,16 @@ export default function HomePage() {
         <div className="container mx-auto px-6 lg:px-12">
           <Reveal className="py-16 border-b border-[#D8D3C9] flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div>
-              <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-2">
+              <p className="text-xs font-semibold tracking-widest uppercase text-blue-700 mb-2">
                 Why Partner With ACCIAN?
               </p>
-              <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#0D0D0D] leading-tight">
+              <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#0D0D0D] leading-tight">
                 Technology partners,
                 <br />
-                not just <span className="text-blue-600">vendors</span>
+                not just <span className="text-blue-700">vendors</span>
               </h2>
             </div>
-            <p className="text-sm font-light text-gray-500 leading-relaxed max-w-sm lg:text-right">
+            <p className="text-sm font-light text-gray-600 leading-relaxed max-w-sm lg:text-right">
               Your trusted technology partner for digital transformation and
               innovation — we become an extension of your team.
             </p>
@@ -592,21 +386,21 @@ export default function HomePage() {
             {trustIndicators.map((item, i) => (
               <Reveal key={i} delay={i * 80}>
                 <div className="py-10 px-2 lg:px-6 border-b border-[#D8D3C9] hover:bg-[#E3DED5] hover:pl-8 lg:hover:pl-10 transition-all duration-300 cursor-default group">
-                  <p className="text-4xl font-black text-[#CCC8BF] mb-3 leading-none group-hover:text-blue-600/20 transition-colors duration-300">
+                  <p className="text-4xl font-black text-gray-600 mb-3 leading-none group-hover:text-blue-700 transition-colors duration-300">
                     {String(i + 1).padStart(2, "0")}
                   </p>
                   <div className="flex items-start gap-3 mb-2">
                     <div className="w-9 h-9 rounded-lg bg-blue-600/10 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-blue-600 group-hover:scale-110 transition-all duration-300">
                       <item.icon
                         size={18}
-                        className="text-blue-600 group-hover:text-white transition-colors duration-300"
+                        className="text-blue-700 group-hover:text-white transition-colors duration-300"
                       />
                     </div>
-                    <h4 className="font-semibold text-[#0D0D0D] text-base leading-snug pt-1">
+                    <h3 className="font-semibold text-[#0D0D0D] text-base leading-snug pt-1">
                       {item.title}
-                    </h4>
+                    </h3>
                   </div>
-                  <p className="text-sm font-light text-gray-500 leading-relaxed pl-12">
+                  <p className="text-sm font-light text-gray-600 leading-relaxed pl-12">
                     {item.description}
                   </p>
                 </div>
@@ -616,16 +410,24 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="bg-white px-4 py-14 sm:px-6 sm:py-20 lg:px-12">
+        <div className="container mx-auto flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+          <div className="max-w-2xl"><p className="eyebrow mb-3">Research support</p><h2 className="text-3xl font-bold lg:text-4xl">Preparing a research application?</h2><p className="mt-4 text-sm text-[#555555]">Start with your academic background and interests. Our pre-consultation form helps the team understand where you need support before your consultation.</p></div>
+          <Link href="/pre-consultation" className="btn-primary shrink-0">Start pre-consultation →</Link>
+        </div>
+      </section>
+      <ProjectHighlights />
+
       {/* ── TESTIMONIALS ──────────────────────────────────────────────────── */}
-      <section className="bg-[#F5F3EE] py-24 px-6 lg:px-12">
+      <section className="bg-[#F5F3EE] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal>
-            <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-2">
+            <p className="text-xs font-semibold tracking-widest uppercase text-blue-700 mb-2">
               What Our Clients Say
             </p>
-            <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-12">
               Don&apos;t just take our{" "}
-              <span className="text-blue-600">word</span> for it
+              <span className="text-blue-700">word</span> for it
             </h2>
           </Reveal>
 
@@ -637,14 +439,16 @@ export default function HomePage() {
             </div>
           ) : testimonialsError ? (
             <div className="text-center py-12">
-              <p className="text-red-500 mb-4">{testimonialsError}</p>
+              <p className="text-[#555555] mb-4" role="status">{testimonialsError}</p>
               <button
                 onClick={fetchTestimonials}
                 className="bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold"
               >
-                Retry
+                Try again
               </button>
             </div>
+          ) : testimonials.length === 0 ? (
+            <p className="text-sm text-[#555555]">No client feedback is currently published.</p>
           ) : (
             <>
               {testimonials[0] && (
@@ -662,7 +466,7 @@ export default function HomePage() {
                         <p className="font-semibold text-white text-sm">
                           {testimonials[0].author}
                         </p>
-                        <p className="text-xs font-light text-white/40">
+                        <p className="text-xs font-light text-white/75">
                           {testimonials[0].position}
                         </p>
                       </div>
@@ -674,16 +478,17 @@ export default function HomePage() {
                 {testimonials.slice(1).map((t, i) => (
                   <Reveal key={i} delay={i * 100 + 120}>
                     <div className="bg-[#EDE9E0] border border-[#E0DBD2] rounded-2xl p-7 hover:border-blue-600/25 hover:-translate-y-1.5 hover:shadow-lg transition-all duration-300">
-                      <div className="flex gap-0.5 mb-4">
-                        {[...Array(5)].map((_, j) => (
+                      <div className="flex gap-0.5 mb-4" role={t.rating ? "img" : undefined} aria-label={t.rating ? `${t.rating} out of 5 stars` : undefined}>
+                        {Array.from({ length: Math.max(0, Math.min(5, Math.round(t.rating ?? 0))) }).map((_, j) => (
                           <Star
                             key={j}
                             size={14}
                             className="fill-amber-400 text-amber-400"
+                            aria-hidden="true"
                           />
                         ))}
                       </div>
-                      <p className="text-sm font-light italic text-gray-500 leading-relaxed mb-5">
+                      <p className="text-sm font-light italic text-gray-600 leading-relaxed mb-5">
                         &ldquo;{t.quote}&rdquo;
                       </p>
                       <div className="flex items-center gap-2.5">
@@ -694,7 +499,7 @@ export default function HomePage() {
                           <p className="font-semibold text-[#0D0D0D] text-sm">
                             {t.author}
                           </p>
-                          <p className="text-xs font-light text-gray-400">
+                          <p className="text-xs font-light text-gray-600">
                             {t.position}
                           </p>
                         </div>
@@ -711,7 +516,7 @@ export default function HomePage() {
       {/* ── CTA ───────────────────────────────────────────────────────────── */}
       <section
         id="contact"
-        className="relative overflow-hidden bg-[#0D0D0D] py-24 px-6 lg:px-12"
+        className="relative overflow-hidden bg-[#0D0D0D] py-14 sm:py-20 px-4 sm:px-6 lg:px-12"
       >
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-blue-600/10 pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-blue-600/6 pointer-events-none" />
@@ -720,22 +525,18 @@ export default function HomePage() {
             <p className="text-xs font-semibold tracking-widest uppercase text-blue-500 mb-4">
               Get in Touch
             </p>
-            <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-tight mb-5">
-              Ready to Transform
-              <br />
-              Your Business <span className="text-blue-500">Digitally?</span>
+            <h2 className="text-3xl lg:text-4xl xl:text-6xl font-bold tracking-tight text-white leading-tight mb-5">
+              Tell us what you need help with
             </h2>
-            <p className="text-sm font-light text-white/50 leading-relaxed max-w-md mb-8">
-              Let&apos;s collaborate to build secure, scalable, and intelligent
-              systems that drive your business forward. Our expert team is ready
-              to transform your digital vision into reality.
+            <p className="text-sm font-light text-white/75 leading-relaxed max-w-md mb-8">
+              Share your goals, current challenges and any deadlines. We’ll help you identify the relevant service and the next step.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 href="/contact"
                 className="inline-block bg-blue-600 hover:opacity-85 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/30 text-white text-sm font-semibold px-7 py-3.5 rounded-lg transition-all duration-200 text-center"
               >
-                Request Consultation →
+                Contact ACCIAN →
               </Link>
               <Link
                 href="/services"
@@ -795,7 +596,7 @@ export default function HomePage() {
                     {c.icon}
                   </div>
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-widest text-white/30 mb-0.5">
+                    <p className="text-[10px] font-semibold uppercase tracking-widest text-white/75 mb-0.5">
                       {c.label}
                     </p>
                     <p className="text-sm text-white">{c.val}</p>
@@ -806,6 +607,6 @@ export default function HomePage() {
           </Reveal>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -14,6 +14,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://accian.co.uk"),
   title: "ACCIAN Limited — Technology & Cybersecurity Solutions",
   description:
     "ACCIAN is a UK-registered technology and cybersecurity company delivering secure, scalable, and intelligent digital solutions.",
@@ -26,10 +27,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={poppins.variable}>
-      <body className="`font-poppins min-h-screen flex flex-col bg-[#F5F3EE] antialiased">
+      <body className="font-poppins min-h-screen flex flex-col bg-[#F5F3EE] antialiased">
+        <a href="#main-content" className="skip-link">Skip to content</a>
         <CookieBanner />
         <Navigation />
-        <main className="grow">{children}</main>
+        <main id="main-content" tabIndex={-1} className="grow focus:outline-none">{children}</main>
         <Footer />
       </body>
     </html>

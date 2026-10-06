@@ -1,64 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import toast, { Toaster } from "react-hot-toast";
 import Cookies from "js-cookie";
 import { Phone, Mail, Clock, MapPin, Send, CheckCircle2 } from "lucide-react";
-import { API_URL } from "../config/api";
+import Link from "next/link";
+import Reveal from "@/components/Reveal";
+import { emptyContact, submitContact, validateContact, type ContactValues } from "@/lib/contact";
 
 // ─── Scroll reveal ────────────────────────────────────────────────────────────
-function useReveal(threshold = 0.1) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      },
-      { threshold },
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, visible };
-}
-
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-  direction = "up",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-  direction?: "up" | "left" | "right";
-}) {
-  const { ref, visible } = useReveal();
-  const t =
-    direction === "left"
-      ? "translateX(-28px)"
-      : direction === "right"
-        ? "translateX(28px)"
-        : "translateY(28px)";
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translate(0)" : t,
-        transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 // ─── Country codes ────────────────────────────────────────────────────────────
 const countryCodes = [
   {
@@ -248,36 +197,52 @@ const countryCodes = [
 ];
 
 const inputCls =
-  "w-full bg-[#F5F3EE] border border-[#D8D3C9] rounded-lg px-4 py-3 text-sm font-light text-[#0D0D0D] placeholder:text-gray-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all duration-200";
+  "w-full bg-[#F5F3EE] border border-[#D8D3C9] rounded-lg px-4 py-3 text-sm font-light text-[#0D0D0D] placeholder:text-gray-600 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10 transition-all duration-200";
 
 const labelCls =
   "block text-xs font-semibold tracking-wide uppercase text-[#0D0D0D] mb-2";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    companyName: "",
-    phone: "",
-    countryCode: "+44",
-    serviceInterest: "",
-    projectBudget: "",
-    projectTimeline: "",
-    message: "",
-    howHeard: "",
-  });
+  const [formData, setFormData] = useState<ContactValues>(emptyContact);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [phoneError, setPhoneError] = useState("");
   const [rateLimitError, setRateLimitError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [referenceNumber, setReferenceNumber] = useState("");
+  const errorRef = useRef<HTMLDivElement>(null);
+  const successRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => { if (formSubmitted) successRef.current?.focus(); }, [formSubmitted]);
+  useEffect(() => { if (rateLimitError) errorRef.current?.focus(); }, [rateLimitError]);
 
   useEffect(() => {
-    if (Cookies.get("cookie_consent") === "true") {
-      const saved = Cookies.get("contact_form");
-      if (saved) setFormData(JSON.parse(saved));
-    }
+    const frame = window.requestAnimationFrame(() => {
+      const restored = emptyContact();
+      try {
+        if (Cookies.get("cookie_consent") === "true") {
+          const saved = Cookies.get("contact_form");
+          const parsed = saved ? JSON.parse(saved) : null;
+          for (const key of Object.keys(restored) as (keyof ContactValues)[]) {
+            if (typeof parsed?.[key] === "string") restored[key] = parsed[key];
+          }
+        }
+      } catch { Cookies.remove("contact_form"); }
+      const service = new URLSearchParams(window.location.search).get("service");
+      const allowed = ["it-consulting-advisory", "software-development", "education-training", "social-care", "data-science-ai"];
+      if (service && allowed.includes(service)) restored.serviceInterest = service;
+      setFormData(restored);
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, []);
+
+  const readSubmissions = (): number[] => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("formSubmissions") || "[]");
+      return Array.isArray(stored) ? stored.filter((value) => typeof value === "number" && value > Date.now() - 3600000) : [];
+    } catch { return []; }
+  };
 
   const validatePhone = (phone: string, countryCode: string): boolean => {
     const country = countryCodes.find((c) => c.code === countryCode);
@@ -304,9 +269,7 @@ export default function ContactPage() {
   };
 
   const checkRateLimit = (): boolean => {
-    const s: number[] = JSON.parse(
-      localStorage.getItem("formSubmissions") || "[]",
-    );
+    const s = readSubmissions();
     if (s.filter((t) => t > Date.now() - 3600000).length >= 3) {
       setRateLimitError(
         "Too many submissions. Please wait an hour and try again.",
@@ -317,17 +280,9 @@ export default function ContactPage() {
   };
 
   const recordSubmission = () => {
-    const s: number[] = JSON.parse(
-      localStorage.getItem("formSubmissions") || "[]",
-    );
-    s.push(Date.now());
-    localStorage.setItem("formSubmissions", JSON.stringify(s));
+    try { localStorage.setItem("formSubmissions", JSON.stringify([...readSubmissions(), Date.now()])); }
+    catch { /* Server-side rate limiting remains authoritative. */ }
   };
-
-  const generateToken = (): string =>
-    Array.from(crypto.getRandomValues(new Uint8Array(32)))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -337,8 +292,9 @@ export default function ContactPage() {
     const { name, value } = e.target;
     const updated = { ...formData, [name]: value };
     setFormData(updated);
+    setFieldErrors((previous) => { const next = { ...previous }; delete next[name]; return next; });
     if (Cookies.get("cookie_consent") === "true")
-      Cookies.set("contact_form", JSON.stringify(updated), { expires: 7 });
+      Cookies.set("contact_form", JSON.stringify(updated), { expires: 7, sameSite: "Lax", secure: window.location.protocol === "https:" });
     if (name === "phone" || name === "countryCode")
       validatePhone(
         name === "phone" ? value : formData.phone,
@@ -346,90 +302,32 @@ export default function ContactPage() {
       );
   };
 
-  const sanitize = (s: string) => {
-    const d = document.createElement("div");
-    d.textContent = s;
-    return d.innerHTML;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!checkRateLimit()) return;
-    if (
-      !formData.fullName ||
-      !formData.email ||
-      !formData.serviceInterest ||
-      !formData.message
-    ) {
-      setRateLimitError("Please fill in all required fields.");
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (submitting || !checkRateLimit()) return;
+    const errors = validateContact(formData);
+    const phoneValid = !formData.phone || validatePhone(formData.phone, formData.countryCode);
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0 || !phoneValid) {
+      setRateLimitError("Please check the highlighted fields before sending.");
+      window.requestAnimationFrame(() => errorRef.current?.focus());
       return;
     }
-    if (formData.phone && !validatePhone(formData.phone, formData.countryCode))
-      return;
     setSubmitting(true);
     setRateLimitError("");
-    try {
-      const securityToken = generateToken();
-      const response = await fetch(`${API_URL}/api/contact`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Security-Token": securityToken,
-        },
-        body: JSON.stringify({
-          fullName: sanitize(formData.fullName),
-          email: sanitize(formData.email),
-          companyName: sanitize(formData.companyName),
-          phone: formData.phone
-            ? `${formData.countryCode}${formData.phone.replace(/\D/g, "")}`
-            : "",
-          serviceInterest: sanitize(formData.serviceInterest),
-          projectBudget: sanitize(formData.projectBudget),
-          projectTimeline: sanitize(formData.projectTimeline),
-          message: sanitize(formData.message),
-          howHeard: sanitize(formData.howHeard),
-          securityToken,
-          timestamp: Date.now(),
-          userAgent: navigator.userAgent,
-        }),
-      });
-      if (!response.ok) throw new Error("Failed");
-      toast.success("Message sent! We'll get back to you soon.", {
-        duration: 5000,
-        position: "top-center",
-      });
+    const outcome = await submitContact(formData);
+    setSubmitting(false);
+    if (outcome.ok) {
       recordSubmission();
+      setReferenceNumber(outcome.referenceNumber);
+      Cookies.remove("contact_form");
       setFormSubmitted(true);
-      setTimeout(() => {
-        setFormSubmitted(false);
-        setFormData({
-          fullName: "",
-          email: "",
-          companyName: "",
-          phone: "",
-          countryCode: "+44",
-          serviceInterest: "",
-          projectBudget: "",
-          projectTimeline: "",
-          message: "",
-          howHeard: "",
-        });
-        Cookies.remove("contact_form");
-        setSubmitting(false);
-      }, 3000);
-    } catch {
-      toast.error("Oops! Something went wrong. Please try again.", {
-        duration: 5000,
-        position: "top-center",
-      });
-      setRateLimitError("Something went wrong. Please try again.");
-      setSubmitting(false);
-    }
+    } else setRateLimitError(outcome.message);
   };
 
+
   return (
-    <main className="bg-[#F5F3EE]">
-      <Toaster />
+    <div className="bg-[#F5F3EE]">
 
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
@@ -438,7 +336,7 @@ export default function ContactPage() {
       `}</style>
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#0D0D0D] py-28 px-6 lg:px-12 text-center">
+      <section className="relative overflow-hidden bg-[#0D0D0D] py-12 sm:py-16 px-4 sm:px-6 lg:px-12 text-center">
         <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-blue-600/12 blur-[80px] pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-blue-600/8 blur-[70px] pointer-events-none" />
 
@@ -457,49 +355,50 @@ export default function ContactPage() {
             className="text-4xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight mb-5"
             style={{ animation: "fadeUp 0.7s 0.2s ease both" }}
           >
-            Let&apos;s Start Your
-            <br />
-            <span className="text-blue-500">Digital Transformation</span>
+            Contact <span className="text-blue-500">ACCIAN</span>
           </h1>
           <p
-            className="text-sm lg:text-base font-light text-white/50 leading-relaxed max-w-xl mx-auto"
+            className="text-sm lg:text-base font-light text-white/75 leading-relaxed max-w-xl mx-auto"
             style={{ animation: "fadeUp 0.7s 0.35s ease both" }}
           >
-            Ready to discuss your project? Our expert team is here to provide
-            tailored solutions for your business needs. Get in touch for a
-            complimentary consultation.
+            Tell us about your project, ask a question or discuss a service. Send an enquiry below, or contact us directly by email or phone.
           </p>
         </div>
       </section>
 
       {/* ── MAIN GRID ─────────────────────────────────────────────────────── */}
-      <section className="py-20 px-6 lg:px-12">
+      <section className="py-10 sm:py-16 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
           {/* ── FORM ──────────────────────────────────────────────────────── */}
           <Reveal className="lg:col-span-3" direction="left">
-            <div className="bg-white border border-[#E8E4DC] rounded-2xl p-8 lg:p-10 hover:shadow-xl hover:shadow-black/5 transition-shadow duration-300">
+            <div className="bg-white border border-[#E8E4DC] rounded-2xl p-5 sm:p-8 lg:p-10 hover:shadow-xl hover:shadow-black/5 transition-shadow duration-300">
               <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-2">
                 Get in Touch
               </p>
-              <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-[#0D0D0D] mb-7">
-                Send Us a Message
+              <h2 className="text-2xl lg:text-3xl font-bold tracking-tight text-[#0D0D0D] mb-3">
+                Send an enquiry
               </h2>
+
+              <p className="mb-6 text-sm text-[#555555]">Fields marked * are required. Optional details help us understand your needs.</p>
 
               {rateLimitError && (
                 <div
-                  className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3.5 text-sm text-red-700"
+                  ref={errorRef}
+                  tabIndex={-1}
+                  role="alert"
+                  className="mb-6 flex flex-col gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3.5 text-sm text-red-700"
                   style={{ animation: "scaleIn 0.3s ease both" }}
                 >
                   <span className="mt-0.5 shrink-0">⚠</span>
-                  {rateLimitError}
+                  <p>{rateLimitError}</p>
+                  {Object.keys(fieldErrors).length > 0 && <ul className="list-disc space-y-1 pl-5">{Object.entries(fieldErrors).map(([field, message]) => <li key={field}><a href={`#${field}`} onClick={() => document.getElementById(field)?.focus()} className="underline underline-offset-4">{message}</a></li>)}</ul>}
                 </div>
               )}
 
               {formSubmitted ? (
                 <div
                   className="flex flex-col items-center justify-center py-16 text-center"
-                  role="alert"
-                  aria-live="polite"
+                  role="status"
                   style={{ animation: "scaleIn 0.5s ease both" }}
                 >
                   <div
@@ -508,20 +407,25 @@ export default function ContactPage() {
                   >
                     <CheckCircle2 size={32} className="text-green-500" />
                   </div>
-                  <h3 className="text-xl font-bold text-[#0D0D0D] mb-2">
-                    Thank You!
+                  <h3 ref={successRef} tabIndex={-1} className="text-xl font-bold text-[#0D0D0D] mb-2">
+                    Enquiry received
                   </h3>
-                  <p className="text-sm font-light text-gray-500">
-                    We&apos;ve received your message and will get back to you
-                    within 48 hours.
+                  <p className="text-sm font-light text-gray-600">
+                    We’ve received your enquiry. Keep the reference below if you need to contact us about it.
                   </p>
+                  <p className="mt-5 rounded-lg bg-[#F5F3EE] px-5 py-4 text-sm">Your reference: <strong>{referenceNumber}</strong></p>
+                  <p className="mt-4 text-sm text-[#555555]">The team will review your message and contact you using the details you provided.</p>
+                  <button type="button" className="btn-secondary mt-6" onClick={() => { setFormData(emptyContact()); setReferenceNumber(""); setFormSubmitted(false); }}>Send another enquiry</button>
                 </div>
               ) : (
                 <form
+                  noValidate
                   onSubmit={handleSubmit}
                   className="space-y-5"
                   aria-label="Contact form"
                 >
+                  <fieldset disabled={submitting} className="min-w-0 space-y-5">
+                  <legend className="sr-only">Your enquiry details</legend>
                   {/* Row 1 */}
                   <div
                     className="grid grid-cols-1 sm:grid-cols-2 gap-5"
@@ -534,7 +438,10 @@ export default function ContactPage() {
                       <input
                         type="text"
                         id="fullName"
+                        autoComplete="name"
                         name="fullName"
+                        aria-invalid={fieldErrors.fullName ? true : undefined}
+                        aria-describedby={fieldErrors.fullName ? "fullName-error" : undefined}
                         value={formData.fullName}
                         onChange={handleChange}
                         maxLength={100}
@@ -543,15 +450,19 @@ export default function ContactPage() {
                         placeholder="Jane Smith"
                         className={inputCls}
                       />
+                      {fieldErrors.fullName && <p id="fullName-error" className="mt-2 text-sm text-red-700">{fieldErrors.fullName}</p>}
                     </div>
                     <div>
                       <label htmlFor="email" className={labelCls}>
-                        Business Email <span className="text-red-500">*</span>
+                        Email address <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="email"
                         id="email"
+                        autoComplete="email"
                         name="email"
+                        aria-invalid={fieldErrors.email ? true : undefined}
+                        aria-describedby={fieldErrors.email ? "email-error" : undefined}
                         value={formData.email}
                         onChange={handleChange}
                         maxLength={100}
@@ -560,6 +471,7 @@ export default function ContactPage() {
                         placeholder="jane@company.com"
                         className={inputCls}
                       />
+                      {fieldErrors.email && <p id="email-error" className="mt-2 text-sm text-red-700">{fieldErrors.email}</p>}
                     </div>
                   </div>
 
@@ -570,11 +482,12 @@ export default function ContactPage() {
                   >
                     <div>
                       <label htmlFor="companyName" className={labelCls}>
-                        Company Name
+                        Company name (optional)
                       </label>
                       <input
                         type="text"
                         id="companyName"
+                        autoComplete="organization"
                         name="companyName"
                         value={formData.companyName}
                         onChange={handleChange}
@@ -585,7 +498,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <label htmlFor="phone" className={labelCls}>
-                        Phone Number
+                        Phone number (optional)
                       </label>
                       {/*
                         Both controls need help to behave on a narrow screen. A
@@ -614,6 +527,7 @@ export default function ContactPage() {
                         <input
                           type="tel"
                           id="phone"
+                        autoComplete="tel-national"
                           name="phone"
                           value={formData.phone}
                           onChange={handleChange}
@@ -648,6 +562,8 @@ export default function ContactPage() {
                       <select
                         id="serviceInterest"
                         name="serviceInterest"
+                        aria-invalid={fieldErrors.serviceInterest ? true : undefined}
+                        aria-describedby={fieldErrors.serviceInterest ? "serviceInterest-error" : undefined}
                         value={formData.serviceInterest}
                         onChange={handleChange}
                         required
@@ -673,10 +589,11 @@ export default function ContactPage() {
                         <option value="multiple">Multiple Services</option>
                         <option value="not-sure">Not Sure Yet</option>
                       </select>
+                      {fieldErrors.serviceInterest && <p id="serviceInterest-error" className="mt-2 text-sm text-red-700">{fieldErrors.serviceInterest}</p>}
                     </div>
                     <div>
                       <label htmlFor="projectBudget" className={labelCls}>
-                        Project Budget
+                        Project budget (optional)
                       </label>
                       <select
                         id="projectBudget"
@@ -700,7 +617,7 @@ export default function ContactPage() {
                   >
                     <div>
                       <label htmlFor="projectTimeline" className={labelCls}>
-                        Project Timeline
+                        Project timeline (optional)
                       </label>
                       <select
                         id="projectTimeline"
@@ -723,7 +640,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <label htmlFor="howHeard" className={labelCls}>
-                        How did you hear about us?
+                        How did you hear about us? (optional)
                       </label>
                       <select
                         id="howHeard"
@@ -751,6 +668,8 @@ export default function ContactPage() {
                     <textarea
                       id="message"
                       name="message"
+                        aria-invalid={fieldErrors.message ? true : undefined}
+                        aria-describedby={fieldErrors.message ? "message-error" : undefined}
                       value={formData.message}
                       onChange={handleChange}
                       maxLength={1000}
@@ -758,18 +677,18 @@ export default function ContactPage() {
                       aria-required="true"
                       rows={5}
                       placeholder="Tell us about your project, challenges, or questions..."
-                      className={`${inputCls} resize-none`}
+                      className={`${inputCls} resize-y`}
                     />
+                      {fieldErrors.message && <p id="message-error" className="mt-2 text-sm text-red-700">{fieldErrors.message}</p>}
                   </div>
 
+                  </fieldset>
                   {/* Privacy */}
                   <p
-                    className="text-xs font-light text-gray-400 leading-relaxed"
+                    className="text-sm text-[#555555] leading-relaxed"
                     style={{ animation: "fadeUp 0.5s 0.5s ease both" }}
                   >
-                    By submitting this form, you agree to our Privacy Policy. We
-                    respect your privacy and will never share your information
-                    with third parties.
+                    Read our <Link href="/privacy-policy" className="font-medium text-[#1B4FFF] underline underline-offset-4">Privacy Policy</Link> for information about how we use your enquiry details.
                   </p>
 
                   {/* Submit */}
@@ -785,7 +704,7 @@ export default function ContactPage() {
                         className={submitting ? "animate-pulse" : ""}
                         aria-hidden="true"
                       />
-                      {submitting ? "Sending…" : "Send Message"}
+                      {submitting ? "Sending enquiry…" : "Send enquiry"}
                     </button>
                   </div>
                 </form>
@@ -810,12 +729,14 @@ export default function ContactPage() {
                     {
                       icon: Phone,
                       label: "Phone",
+                      href: "tel:+447749101623",
                       primary: "+44 7749 101623",
                       secondary: "Mon–Fri, 9AM–5PM GMT",
                     },
                     {
                       icon: Mail,
                       label: "Email",
+                      href: "mailto:info@accian.co.uk",
                       primary: "info@accian.co.uk",
                       secondary: "Response within 24 business hours",
                     },
@@ -833,7 +754,7 @@ export default function ContactPage() {
                       secondary: "Serving clients worldwide",
                     },
                   ].map(
-                    ({ icon: Icon, label, primary, secondary, extra }, i) => (
+                    ({ icon: Icon, label, primary, secondary, extra, href }, i) => (
                       <div
                         key={label}
                         className="flex items-start gap-3.5 group"
@@ -851,18 +772,16 @@ export default function ContactPage() {
                           <p className="text-xs font-semibold tracking-wide uppercase text-[#0D0D0D] mb-0.5">
                             {label}
                           </p>
-                          <p className="text-sm font-light text-gray-600">
-                            {primary}
-                          </p>
+                          {href ? <a href={href} className="inline-flex min-h-11 items-center break-all text-sm font-medium text-[#1B4FFF] underline underline-offset-4">{primary}</a> : <p className="text-sm text-gray-600">{primary}</p>}
                           {extra?.map((e) => (
                             <p
                               key={e}
-                              className="text-sm font-light text-gray-500"
+                              className="text-sm font-light text-gray-600"
                             >
                               {e}
                             </p>
                           ))}
-                          <p className="text-xs font-light text-gray-400 mt-0.5">
+                          <p className="text-xs font-light text-gray-600 mt-0.5">
                             {secondary}
                           </p>
                         </div>
@@ -873,33 +792,15 @@ export default function ContactPage() {
               </div>
             </Reveal>
 
-            {/* CTA card */}
-            <Reveal direction="right" delay={200}>
-              <div className="relative overflow-hidden bg-[#0D0D0D] rounded-2xl p-7 hover:shadow-2xl hover:shadow-black/30 transition-shadow duration-300 group">
-                <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-blue-600/15 pointer-events-none group-hover:bg-blue-600/25 transition-colors duration-300" />
-                <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-blue-600/8 pointer-events-none" />
-                <div className="relative">
-                  <p className="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-2">
-                    Free Consultation
-                  </p>
-                  <h4 className="text-lg font-bold text-white mb-3 leading-snug">
-                    Ready to Get Started?
-                  </h4>
-                  <p className="text-sm font-light text-white/50 leading-relaxed">
-                    Schedule a free consultation call to discuss your project
-                    requirements and explore how we can help — just fill in the
-                    form.
-                  </p>
-                  <div className="mt-5 flex items-center gap-2 text-xs font-semibold text-blue-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                    Typically responds within 24 hours
-                  </div>
-                </div>
-              </div>
-            </Reveal>
+            <aside className="rounded-2xl bg-[#0D0D0D] p-6 text-white">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-400">Research applicants</p>
+              <h3 className="text-lg font-semibold">Looking for research support?</h3>
+              <p className="mt-3 text-sm text-white/80">Use our pre-consultation form to share your background, research interests and documents before your consultation.</p>
+              <Link href="/pre-consultation" className="btn-outline-white mt-5 w-full">Start pre-consultation →</Link>
+            </aside>
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

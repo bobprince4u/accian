@@ -44,7 +44,7 @@ export default function CheckboxGroup({
   };
 
   return (
-    <fieldset
+    <fieldset id={ids.input} tabIndex={-1}
       aria-invalid={error ? true : undefined}
       aria-describedby={
         [help ? ids.help : null, error ? ids.error : null].filter(Boolean).join(" ") ||

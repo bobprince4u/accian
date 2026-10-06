@@ -171,7 +171,7 @@ export default function ReviewSection({
                   invalid
                     ? "font-medium text-red-700"
                     : blank
-                      ? "font-light italic text-[#999999]"
+                      ? "font-light italic text-[#666666]"
                       : "font-light text-[#0D0D0D]",
                 ].join(" ")}
               >

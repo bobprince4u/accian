@@ -1,8 +1,10 @@
-"use client";
-
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
+import BackgroundVideo from "@/components/BackgroundVideo";
+import { LazyImage } from "@/components/LazyImage";
 import Link from "next/link";
-import { CheckCircle2, ArrowRight, ChevronDown } from "lucide-react";
+import Reveal from "@/components/Reveal";
+import FaqItem from "@/components/FaqItem";
+import { CheckCircle2, ArrowRight } from "lucide-react";
 import {
   detailedServices,
   industries,
@@ -12,126 +14,12 @@ import {
 } from "../data/ServicesMock";
 
 // ─── Scroll reveal hook ───────────────────────────────────────────────────────
-function useReveal(threshold = 0.1) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      },
-      { threshold },
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, visible };
-}
-
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  const { ref, visible } = useReveal();
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(32px)",
-        transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 // ─── Image with pulse skeleton ────────────────────────────────────────────────
 function ServiceImage({ src, alt }: { src: string; alt: string }) {
-  const [loaded, setLoaded] = useState(false);
-  return (
-    <div className="relative w-full h-105 rounded-2xl overflow-hidden">
-      {/* Pulse skeleton shown until image loads */}
-      {!loaded && (
-        <div className="absolute inset-0 bg-gray-200 animate-pulse">
-          <div className="absolute inset-0 bg-linear-to-r from-gray-200 via-gray-100 to-gray-200 animate-[shimmer_1.5s_infinite]" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg
-              className="w-16 h-16 text-gray-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-          </div>
-        </div>
-      )}
-      <img
-        src={src}
-        alt={alt}
-        onLoad={() => setLoaded(true)}
-        className={`w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
-      />
-      {/* Overlay gradient */}
-      <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent pointer-events-none" />
-    </div>
-  );
+  return <LazyImage src={src} alt={alt} className="aspect-[4/3] w-full rounded-xl object-cover" />;
 }
 
 // ─── FAQ Item ─────────────────────────────────────────────────────────────────
-function FaqItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <div
-      className={`border rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 ${
-        open
-          ? "border-blue-600/40 bg-white shadow-sm shadow-blue-600/5"
-          : "border-[#D8D3C9] bg-white hover:border-blue-600/20"
-      }`}
-      onClick={() => setOpen(!open)}
-    >
-      <div className="flex items-center justify-between px-6 py-5 gap-4">
-        <h4 className="font-semibold text-[#0D0D0D] text-sm leading-snug">
-          {question}
-        </h4>
-        <ChevronDown
-          size={18}
-          className={`text-blue-600 shrink-0 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-        />
-      </div>
-      <div
-        style={{
-          maxHeight: open ? "400px" : "0px",
-          overflow: "hidden",
-          transition: "max-height 0.35s ease",
-        }}
-      >
-        <div className="px-6 pb-6 border-t border-gray-100">
-          <p className="text-sm font-light text-gray-500 leading-relaxed pt-4">
-            {answer}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Info checklist ───────────────────────────────────────────────────────────
 function InfoChecklist({ title, items }: { title: string; items: string[] }) {
   return (
@@ -143,9 +31,9 @@ function InfoChecklist({ title, items }: { title: string; items: string[] }) {
         {items.map((item, idx) => (
           <li
             key={idx}
-            className="flex items-start gap-2 text-sm font-light text-gray-500"
+            className="flex items-start gap-2 text-sm font-light text-gray-600"
           >
-            <CheckCircle2 size={14} className="text-blue-600 mt-0.5 shrink-0" />
+            <CheckCircle2 size={14} className="text-blue-700 mt-0.5 shrink-0" />
             <span>{item}</span>
           </li>
         ))}
@@ -156,24 +44,12 @@ function InfoChecklist({ title, items }: { title: string; items: string[] }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function ServicesPage() {
-  const [activeService, setActiveService] = useState(0);
 
   return (
-    <main className="bg-[#F5F3EE]">
+    <div className="bg-[#F5F3EE]">
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-[65vh] flex items-end overflow-hidden bg-[#0D0D0D] pb-16">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          poster="/images/hero-poster.jpg"
-          className="absolute inset-0 w-full h-full object-cover opacity-25"
-          aria-hidden="true"
-        >
-          <source src="/videos/hero.mp4" type="video/mp4" />
-        </video>
+      <section className="relative overflow-hidden bg-[#0D0D0D] py-12 sm:py-16 lg:py-20">
+        <BackgroundVideo />
         <div className="absolute inset-0 bg-linear-to-t from-[#0D0D0D] via-[#0D0D0D]/60 to-transparent" />
         <div className="absolute top-0 right-0 w-125 h-125 rounded-full bg-blue-600/15 blur-[120px] pointer-events-none" />
 
@@ -185,36 +61,26 @@ export default function ServicesPage() {
                 What We Offer
               </span>
             </div>
-            <h1 className="text-4xl lg:text-6xl xl:text-7xl font-extrabold text-white tracking-tight leading-[1.06] mb-5">
-              Comprehensive IT
-              <br />
-              <span className="text-blue-500">Solutions</span> for Modern
-              <br />
-              Businesses
+            <h1 className="text-4xl lg:text-6xl xl:text-6xl font-extrabold text-white tracking-tight leading-[1.06] mb-5">
+              Find the right <span className="text-blue-500">service</span>
             </h1>
-            <p className="text-sm lg:text-base font-light text-white/50 leading-relaxed max-w-xl">
-              End-to-end technology solutions across the UK and worldwide that
-              drive growth, enhance security, and optimise operations.
+            <p className="text-sm lg:text-base font-light text-white/75 leading-relaxed max-w-xl">
+              Explore what we do, who each service supports and what you can expect. Tell us your requirements when you’re ready to discuss the next step.
             </p>
           </div>
 
           {/* Service quick-nav pills */}
-          <div className="flex flex-wrap gap-2 mt-10">
-            {detailedServices.map((svc, i) => (
+          <nav aria-label="Services on this page" className="flex flex-wrap gap-2 mt-7">
+            {detailedServices.map((svc) => (
               <a
                 key={svc.id}
                 href={`#${svc.id}`}
-                onClick={() => setActiveService(i)}
-                className={`text-xs font-semibold px-4 py-2 rounded-full border transition-all duration-200 ${
-                  activeService === i
-                    ? "bg-blue-600 border-blue-600 text-white"
-                    : "bg-white/8 border-white/15 text-white/60 hover:text-white hover:border-white/30"
-                }`}
+                className="inline-flex min-h-11 items-center rounded-lg border border-white/25 bg-white/5 px-4 text-sm text-white/90 hover:bg-white/15"
               >
                 {svc.title}
               </a>
             ))}
-          </div>
+          </nav>
         </div>
       </section>
 
@@ -223,16 +89,16 @@ export default function ServicesPage() {
         <section
           key={service.id}
           id={service.id}
-          className={`py-24 px-6 lg:px-12 ${index % 2 === 0 ? "bg-[#F5F3EE]" : "bg-[#EDE9E0]"}`}
+          className={`py-14 sm:py-20 px-4 sm:px-6 lg:px-12 ${index % 2 === 0 ? "bg-[#F5F3EE]" : "bg-[#EDE9E0]"}`}
         >
           <div className="container mx-auto">
             {/* Section number + title bar */}
             <Reveal className="flex items-center gap-4 mb-14">
-              <span className="text-6xl font-black text-[#0D0D0D]/8 leading-none select-none">
+              <span className="text-6xl font-black text-gray-600 leading-none select-none">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <div className="flex-1 h-px bg-[#D8D3C9]" />
-              <span className="text-xs font-semibold tracking-widest uppercase text-blue-600">
+              <span className="text-xs font-semibold tracking-widest uppercase text-blue-700">
                 {service.title}
               </span>
             </Reveal>
@@ -253,10 +119,11 @@ export default function ServicesPage() {
                 <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-5">
                   {service.title}
                 </h2>
-                <p className="text-sm font-light text-gray-500 leading-relaxed mb-8">
+                <p className="text-sm font-light text-gray-600 leading-relaxed mb-8">
                   {service.overview}
                 </p>
 
+                <div className="mb-6 border-l-2 border-[#1B4FFF] pl-4"><p className="mb-1 text-xs font-semibold uppercase tracking-wide text-[#555555]">Who it’s for</p><p className="text-sm text-[#555555]">{comparisonData[index].bestFor}</p></div>
                 {/* Deliverables */}
                 <p className="text-xs font-semibold tracking-widest uppercase text-[#0D0D0D] mb-4">
                   What We Deliver
@@ -269,7 +136,7 @@ export default function ServicesPage() {
                     >
                       <div className="w-9 h-9 rounded-lg bg-blue-600/10 flex items-center justify-center shrink-0 mt-0.5">
                         {React.createElement(item.icon, {
-                          className: "text-blue-600",
+                          className: "text-blue-700",
                           size: 18,
                         })}
                       </div>
@@ -277,7 +144,7 @@ export default function ServicesPage() {
                         <p className="font-semibold text-[#0D0D0D] text-sm mb-0.5">
                           {item.name}
                         </p>
-                        <p className="text-sm font-light text-gray-500 leading-relaxed">
+                        <p className="text-sm font-light text-gray-600 leading-relaxed">
                           {item.description}
                         </p>
                       </div>
@@ -286,12 +153,13 @@ export default function ServicesPage() {
                 </div>
 
                 <Link
-                  href="/contact"
+                  href={`/contact?service=${service.id === "it-consulting" ? "it-consulting-advisory" : service.id}`}
                   className="inline-flex items-center gap-2 bg-[#0D0D0D] hover:bg-blue-600 text-white text-sm font-semibold px-6 py-3.5 rounded-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-blue-600/20"
                 >
-                  Discuss Your Project
-                  <ArrowRight size={16} />
+                  Discuss this service
+                  <ArrowRight size={16} aria-hidden="true" />
                 </Link>
+                <p className="mt-3 text-sm text-[#555555]">Share your goals and requirements. We’ll discuss the scope before agreeing the work.</p>
               </Reveal>
 
               {/* Visual side */}
@@ -318,7 +186,7 @@ export default function ServicesPage() {
                               <span className="font-semibold text-[#0D0D0D]">
                                 {key}:{" "}
                               </span>
-                              <span className="font-light text-gray-500">
+                              <span className="font-light text-gray-600">
                                 {Array.isArray(values)
                                   ? values.join(", ")
                                   : values != null
@@ -359,18 +227,18 @@ export default function ServicesPage() {
       ))}
 
       {/* ── INDUSTRIES ────────────────────────────────────────────────────── */}
-      <section className="bg-[#0D0D0D] py-24 px-6 lg:px-12">
+      <section className="bg-[#0D0D0D] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
             <div>
               <p className="text-xs font-semibold tracking-widest uppercase text-blue-500 mb-3">
                 Industries
               </p>
-              <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-white leading-tight">
+              <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-white leading-tight">
                 Industries We <span className="text-blue-500">Serve</span>
               </h2>
             </div>
-            <p className="text-sm font-light text-white/45 leading-relaxed max-w-sm lg:text-right">
+            <p className="text-sm font-light text-white/75 leading-relaxed max-w-sm lg:text-right">
               Specialised solutions tailored to the unique needs of your
               industry.
             </p>
@@ -383,10 +251,10 @@ export default function ServicesPage() {
                   <div className="text-4xl mb-4 group-hover:scale-110 transition-transform duration-300 inline-block">
                     {industry.icon}
                   </div>
-                  <h4 className="font-semibold text-white text-base mb-2 group-hover:text-blue-400 transition-colors duration-200">
+                  <h3 className="font-semibold text-white text-base mb-2 group-hover:text-blue-400 transition-colors duration-200">
                     {industry.name}
-                  </h4>
-                  <p className="text-sm font-light text-white/45 leading-relaxed">
+                  </h3>
+                  <p className="text-sm font-light text-white/75 leading-relaxed">
                     {industry.description}
                   </p>
                 </div>
@@ -397,24 +265,26 @@ export default function ServicesPage() {
       </section>
 
       {/* ── COMPARISON TABLE ──────────────────────────────────────────────── */}
-      <section className="bg-[#EDE9E0] py-24 px-6 lg:px-12">
+      <section className="bg-[#EDE9E0] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal className="mb-12">
-            <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-3">
+            <p className="text-xs font-semibold tracking-widest uppercase text-blue-700 mb-3">
               Comparison
             </p>
-            <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-3">
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-3">
               Choose the Right Service
               <br />
-              <span className="text-blue-600">for Your Needs</span>
+              <span className="text-blue-700">for Your Needs</span>
             </h2>
-            <p className="text-sm font-light text-gray-500 max-w-xl">
+            <p className="text-sm font-light text-gray-600 max-w-xl">
               A quick overview to help you identify the best solution.
             </p>
           </Reveal>
 
+          <div className="space-y-3 sm:hidden">{comparisonData.map((row) => <article key={row.service} className="rounded-xl border border-[#D8D3C9] bg-white p-5"><h3 className="font-semibold">{row.service}</h3><p className="mt-2 text-sm text-[#555555]">{row.bestFor}</p><p className="mt-3 text-sm"><span className="font-medium">Indicative timing:</span> {row.timeline}</p></article>)}</div>
+          <p className="mb-5 text-sm text-[#555555]">Timings depend on the agreed scope. Contact us to discuss requirements and a quote.</p>
           <Reveal delay={100}>
-            <div className="overflow-x-auto rounded-2xl border border-[#D8D3C9] shadow-sm">
+            <div className="hidden overflow-x-auto rounded-2xl border border-[#D8D3C9] shadow-sm sm:block">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-[#0D0D0D] text-white">
@@ -422,10 +292,11 @@ export default function ServicesPage() {
                       "Service",
                       "Best For",
                       "Timeline",
-                      "Investment Level",
+                      "Next step",
                     ].map((h) => (
                       <th
                         key={h}
+                        scope="col"
                         className="text-left px-6 py-4 font-semibold text-xs tracking-widest uppercase"
                       >
                         {h}
@@ -444,15 +315,15 @@ export default function ServicesPage() {
                       <td className="px-6 py-4 font-semibold text-[#0D0D0D]">
                         {row.service}
                       </td>
-                      <td className="px-6 py-4 font-light text-gray-500">
+                      <td className="px-6 py-4 font-light text-gray-600">
                         {row.bestFor}
                       </td>
-                      <td className="px-6 py-4 font-light text-gray-500">
+                      <td className="px-6 py-4 font-light text-gray-600">
                         {row.timeline}
                       </td>
                       <td className="px-6 py-4">
                         <span className="inline-block text-xs font-semibold bg-blue-600/10 text-blue-700 px-3 py-1 rounded-full">
-                          {row.investment}
+                          <Link href={`/contact?service=${detailedServices[index].id === "it-consulting" ? "it-consulting-advisory" : detailedServices[index].id}`}>Discuss requirements</Link>
                         </span>
                       </td>
                     </tr>
@@ -465,18 +336,18 @@ export default function ServicesPage() {
       </section>
 
       {/* ── HOW WE WORK — horizontal timeline ─────────────────────────────── */}
-      <section className="bg-[#F5F3EE] py-24 px-6 lg:px-12">
+      <section className="bg-[#F5F3EE] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
             <div>
-              <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-3">
+              <p className="text-xs font-semibold tracking-widest uppercase text-blue-700 mb-3">
                 Our Process
               </p>
-              <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#0D0D0D] leading-tight">
-                How We Work <span className="text-blue-600">With You</span>
+              <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#0D0D0D] leading-tight">
+                How We Work <span className="text-blue-700">With You</span>
               </h2>
             </div>
-            <p className="text-sm font-light text-gray-500 leading-relaxed max-w-sm lg:text-right">
+            <p className="text-sm font-light text-gray-600 leading-relaxed max-w-sm lg:text-right">
               Our proven process ensures successful delivery and exceptional
               results.
             </p>
@@ -493,15 +364,15 @@ export default function ServicesPage() {
                   <div className="group relative">
                     {/* Step indicator */}
                     <div className="relative z-10 w-16 h-16 rounded-2xl bg-white border-2 border-[#D8D3C9] group-hover:border-blue-600 group-hover:bg-blue-600 flex items-center justify-center mb-6 transition-all duration-300 shadow-sm">
-                      <span className="text-xl font-black text-[#0D0D0D]/20 group-hover:text-white transition-colors duration-300">
+                      <span className="text-xl font-black text-gray-600 group-hover:text-white transition-colors duration-300">
                         {step.number}
                       </span>
                     </div>
 
-                    <h4 className="font-semibold text-[#0D0D0D] text-base mb-2 group-hover:text-blue-600 transition-colors duration-200">
+                    <h3 className="font-semibold text-[#0D0D0D] text-base mb-2 group-hover:text-blue-700 transition-colors duration-200">
                       {step.title}
-                    </h4>
-                    <p className="text-sm font-light text-gray-500 leading-relaxed">
+                    </h3>
+                    <p className="text-sm font-light text-gray-600 leading-relaxed">
                       {step.description}
                     </p>
                   </div>
@@ -513,26 +384,26 @@ export default function ServicesPage() {
       </section>
 
       {/* ── FAQs ──────────────────────────────────────────────────────────── */}
-      <section className="bg-[#EDE9E0] py-24 px-6 lg:px-12">
+      <section className="bg-[#EDE9E0] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto grid lg:grid-cols-5 gap-16 items-start">
           {/* Left sticky label */}
           <Reveal className="lg:col-span-2 lg:sticky lg:top-28">
-            <p className="text-xs font-semibold tracking-widest uppercase text-blue-600 mb-3">
+            <p className="text-xs font-semibold tracking-widest uppercase text-blue-700 mb-3">
               FAQs
             </p>
-            <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-[#0D0D0D] leading-tight mb-4">
               Common
               <br />
               Questions
               <br />
-              <span className="text-blue-600">Answered</span>
+              <span className="text-blue-700">Answered</span>
             </h2>
-            <p className="text-sm font-light text-gray-500 leading-relaxed">
+            <p className="text-sm font-light text-gray-600 leading-relaxed">
               Can&apos;t find what you&apos;re looking for? Reach out directly.
             </p>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 mt-6 text-sm font-semibold text-blue-600 hover:gap-3 transition-all duration-200"
+              className="inline-flex items-center gap-2 mt-6 text-sm font-semibold text-blue-700 hover:gap-3 transition-all duration-200"
             >
               Ask us directly <ArrowRight size={15} />
             </Link>
@@ -557,14 +428,14 @@ export default function ServicesPage() {
         <div className="relative container mx-auto max-w-3xl text-center">
           <Reveal>
             <p className="text-xs font-semibold tracking-widest uppercase text-blue-500 mb-4">
-              Get Started
+              Next step
             </p>
-            <h2 className="text-4xl lg:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-tight mb-5">
+            <h2 className="text-3xl lg:text-4xl xl:text-6xl font-bold tracking-tight text-white leading-tight mb-5">
               Let&apos;s Discuss Your
               <br />
               <span className="text-blue-500">Technology Needs</span>
             </h2>
-            <p className="text-sm font-light text-white/50 leading-relaxed max-w-xl mx-auto mb-10">
+            <p className="text-sm font-light text-white/75 leading-relaxed max-w-xl mx-auto mb-10">
               Our expert team is ready to help you identify the right solutions
               for your business challenges. Schedule a complimentary
               consultation to explore how we can drive your digital success.
@@ -573,12 +444,12 @@ export default function ServicesPage() {
               href="/contact"
               className="inline-flex items-center gap-2 bg-blue-600 hover:opacity-85 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-blue-600/30 text-white text-sm font-semibold px-8 py-4 rounded-lg transition-all duration-200"
             >
-              Request Free Consultation
+              Contact ACCIAN
               <ArrowRight size={16} />
             </Link>
           </Reveal>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

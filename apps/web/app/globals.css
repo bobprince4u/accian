@@ -34,6 +34,7 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 6rem;
   }
 
   body {
@@ -78,6 +79,10 @@
   .btn-primary {
     @apply inline-block bg-[#0D0D0D] hover:bg-[#1B4FFF] text-white text-sm font-semibold
            px-7 py-3.5 rounded-lg transition-colors duration-200 text-center;
+  }
+
+  .btn-primary, .btn-secondary, .btn-blue, .btn-outline-white {
+    @apply inline-flex min-h-11 items-center justify-center gap-2;
   }
 
   .btn-secondary {
@@ -147,6 +152,45 @@
 
   .nav-link-active {
     @apply text-sm font-medium text-[#1B4FFF];
+  }
+}
+
+/* Shared interaction defaults apply to the existing design, including forms. */
+:where(a, button, input, select, textarea, summary):focus-visible {
+  outline: 3px solid #1b4fff;
+  outline-offset: 4px;
+}
+button:not(:disabled), summary { touch-action: manipulation; }
+button { min-height: 44px; }
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  min-width: 0;
+  font-size: 1rem;
+}
+input:not([type="checkbox"]):not([type="radio"]), select { min-height: 44px; }
+textarea { resize: vertical; }
+input:disabled, select:disabled, textarea:disabled { cursor: not-allowed; }
+section[id], div[id] { scroll-margin-top: 6rem; }
+summary::-webkit-details-marker { display: none; }
+.skip-link {
+  position: fixed; top: 0.75rem; left: 1rem; z-index: 100;
+  padding: 0.75rem 1.25rem; border-radius: 0.5rem;
+  color: white; background: #0d0d0d; transform: translateY(-200%);
+}
+.skip-link:focus { transform: translateY(0); }
+@keyframes content-enter { from { transform: translateY(6px); } to { transform: none; } }
+.content-reveal { animation: content-enter 220ms ease-out; }
+
+@media (max-width: 639px) {
+  main h1 { font-size: clamp(1.85rem, 7.5vw, 2.5rem); }
+  main h2 { font-size: clamp(1.5rem, 6vw, 2rem); }
+  .section-spacing { padding: 3rem 1rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
   }
 }
 

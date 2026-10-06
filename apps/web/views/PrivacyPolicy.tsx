@@ -1,7 +1,5 @@
-"use client";
-
-import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
 import {
   ArrowRight,
   Shield,
@@ -13,58 +11,6 @@ import {
 } from "lucide-react";
 
 // ─── Scroll reveal ────────────────────────────────────────────────────────────
-function useReveal(threshold = 0.1) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      },
-      { threshold },
-    );
-    if (ref.current) obs.observe(ref.current);
-    return () => obs.disconnect();
-  }, [threshold]);
-  return { ref, visible };
-}
-
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-  direction = "up",
-}: {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-  direction?: "up" | "left" | "right";
-}) {
-  const { ref, visible } = useReveal();
-  const t =
-    direction === "left"
-      ? "translateX(-28px)"
-      : direction === "right"
-        ? "translateX(28px)"
-        : "translateY(28px)";
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translate(0)" : t,
-        transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const sections = [
   {
@@ -102,7 +48,7 @@ const sections = [
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function PrivacyPolicy() {
   return (
-    <main className="bg-[#F5F3EE] min-h-screen">
+    <div className="bg-[#F5F3EE] min-h-screen">
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
@@ -110,7 +56,7 @@ export default function PrivacyPolicy() {
       `}</style>
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#0D0D0D] min-h-[55vh] flex items-end pb-16">
+      <section className="relative overflow-hidden bg-[#0D0D0D] py-12 sm:py-16">
         {/* Orbs */}
         <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-blue-600/12 blur-[100px] pointer-events-none" />
         <div className="absolute top-1/2 left-1/4 w-64 h-64 rounded-full bg-blue-600/8 blur-[80px] pointer-events-none" />
@@ -128,7 +74,7 @@ export default function PrivacyPolicy() {
             </div>
 
             <h1
-              className="text-5xl lg:text-7xl font-extrabold text-white tracking-tight leading-[1.04] mb-5"
+              className="text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.04] mb-5"
               style={{ animation: "fadeUp 0.7s 0.2s ease both" }}
             >
               Privacy
@@ -137,7 +83,7 @@ export default function PrivacyPolicy() {
             </h1>
 
             <p
-              className="text-sm font-light text-white/40 mb-8"
+              className="text-sm font-light text-white/75 mb-8"
               style={{ animation: "fadeUp 0.6s 0.35s ease both" }}
             >
               Last updated: 15 December 2025
@@ -152,7 +98,7 @@ export default function PrivacyPolicy() {
                 <a
                   key={s.title}
                   href={`#${s.title.toLowerCase().replace(/\s+/g, "-")}`}
-                  className="text-xs font-medium bg-white/8 border border-white/10 hover:bg-blue-600 hover:border-blue-600 text-white/60 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200"
+                  className="inline-flex min-h-11 items-center text-xs font-medium bg-white/8 border border-white/10 hover:bg-blue-600 hover:border-blue-600 text-white/75 hover:text-white px-3 py-1.5 rounded-full transition-all duration-200"
                 >
                   {s.title}
                 </a>
@@ -194,13 +140,13 @@ export default function PrivacyPolicy() {
                       <div className="w-5 h-5 rounded-full bg-blue-600/20 border border-blue-600/30 flex items-center justify-center shrink-0">
                         <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
                       </div>
-                      <p className="text-sm font-light text-white/60">{item}</p>
+                      <p className="text-sm font-light text-white/75">{item}</p>
                     </div>
                   ))}
                 </div>
 
                 <div className="mt-7 pt-6 border-t border-white/8">
-                  <p className="text-xs font-light text-white/30 mb-3">
+                  <p className="text-xs font-light text-white/75 mb-3">
                     Questions?
                   </p>
                   <a
@@ -218,7 +164,7 @@ export default function PrivacyPolicy() {
                 <p className="text-xs font-semibold tracking-widest uppercase text-[#0D0D0D] mb-3">
                   About ACCIAN
                 </p>
-                <p className="text-sm font-light text-gray-500 leading-relaxed mb-2">
+                <p className="text-sm font-light text-gray-600 leading-relaxed mb-2">
                   ACCIAN Limited is committed to protecting and respecting your
                   privacy. This policy explains how we collect, use, and protect
                   personal data.
@@ -235,14 +181,14 @@ export default function PrivacyPolicy() {
                 <Reveal key={i} delay={i * 80}>
                   <div
                     id={s.title.toLowerCase().replace(/\s+/g, "-")}
-                    className="bg-white border border-[#E8E4DC] rounded-2xl p-8 group hover:border-blue-600/25 hover:shadow-lg hover:shadow-blue-600/5 hover:-translate-y-0.5 transition-all duration-300"
+                    className="bg-white border border-[#E8E4DC] rounded-2xl p-5 sm:p-8 group hover:border-blue-600/25 hover:shadow-lg hover:shadow-blue-600/5 hover:-translate-y-0.5 transition-all duration-300"
                   >
-                    <div className="flex items-start gap-5">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
                       {/* Icon */}
                       <div className="w-11 h-11 rounded-xl bg-blue-600/8 border border-blue-600/15 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-blue-600 group-hover:border-blue-600 group-hover:scale-110 transition-all duration-300">
                         <s.icon
                           size={20}
-                          className="text-blue-600 group-hover:text-white transition-colors duration-300"
+                          className="text-blue-700 group-hover:text-white transition-colors duration-300"
                         />
                       </div>
 
@@ -251,19 +197,19 @@ export default function PrivacyPolicy() {
                           <h2 className="text-base font-semibold text-[#0D0D0D]">
                             {s.title}
                           </h2>
-                          <span className="text-2xl font-black text-[#0D0D0D]/6 leading-none shrink-0 select-none">
+                          <span className="text-2xl font-black text-gray-600 leading-none shrink-0 select-none">
                             {String(i + 1).padStart(2, "0")}
                           </span>
                         </div>
 
-                        <p className="text-sm font-light text-gray-500 leading-relaxed mb-4">
+                        <p className="text-sm font-light text-gray-600 leading-relaxed mb-4">
                           {s.body}
                         </p>
 
                         {/* Highlight pill */}
                         <div className="inline-flex items-center gap-1.5 bg-[#F5F3EE] border border-[#E8E4DC] rounded-full px-3 py-1">
                           <div className="w-1 h-1 rounded-full bg-blue-500 shrink-0" />
-                          <span className="text-xs font-medium text-gray-500">
+                          <span className="text-xs font-medium text-gray-600">
                             {s.highlight}
                           </span>
                         </div>
@@ -275,11 +221,11 @@ export default function PrivacyPolicy() {
 
               {/* Contact section */}
               <Reveal delay={sections.length * 80}>
-                <div className="relative overflow-hidden bg-[#0D0D0D] rounded-2xl p-8 group hover:shadow-2xl hover:shadow-black/30 transition-shadow duration-300">
+                <div className="relative overflow-hidden bg-[#0D0D0D] rounded-2xl p-5 sm:p-8 group hover:shadow-2xl hover:shadow-black/30 transition-shadow duration-300">
                   <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-blue-600/15 pointer-events-none group-hover:bg-blue-600/25 transition-colors duration-300" />
                   <div className="absolute -bottom-6 -left-6 w-28 h-28 rounded-full bg-blue-600/6 pointer-events-none" />
 
-                  <div className="relative flex items-start gap-5">
+                  <div className="relative flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-5">
                     <div className="w-11 h-11 rounded-xl bg-blue-600/20 border border-blue-600/30 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-blue-600 transition-colors duration-300">
                       <Mail
                         size={20}
@@ -292,12 +238,12 @@ export default function PrivacyPolicy() {
                         <h2 className="text-base font-semibold text-white">
                           Contact
                         </h2>
-                        <span className="text-2xl font-black text-white/6 leading-none shrink-0 select-none">
+                        <span className="text-2xl font-black text-white/75 leading-none shrink-0 select-none">
                           {String(sections.length + 1).padStart(2, "0")}
                         </span>
                       </div>
 
-                      <p className="text-sm font-light text-white/50 leading-relaxed mb-4">
+                      <p className="text-sm font-light text-white/75 leading-relaxed mb-4">
                         If you have questions about this Privacy Policy, please
                         contact us at any time.
                       </p>
@@ -316,13 +262,13 @@ export default function PrivacyPolicy() {
 
               {/* Back to site */}
               <Reveal delay={sections.length * 80 + 80}>
-                <div className="flex items-center justify-between pt-2">
-                  <p className="text-xs font-light text-gray-400">
+                <div className="flex flex-col items-start gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs font-light text-gray-600">
                     This policy is reviewed regularly and updated as needed.
                   </p>
                   <Link
                     href="/"
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 hover:gap-2.5 transition-all duration-200"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 hover:gap-2.5 transition-all duration-200"
                   >
                     Back to home <ArrowRight size={13} />
                   </Link>
@@ -332,6 +278,6 @@ export default function PrivacyPolicy() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

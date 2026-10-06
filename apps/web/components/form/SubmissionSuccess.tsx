@@ -116,7 +116,7 @@ export default function SubmissionSuccess({
         The Accian team will review your information before your consultation.
       </p>
 
-      <p className="mt-2 text-xs font-light leading-relaxed text-[#999999]">
+      <p className="mt-2 text-xs font-light leading-relaxed text-[#666666]">
         Please keep your reference number — quote it if you need to send us
         anything else.
       </p>

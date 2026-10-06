@@ -41,7 +41,7 @@ export default function RadioGroup({
   const ids = fieldIds(name);
 
   return (
-    <fieldset
+    <fieldset id={ids.input} tabIndex={-1}
       aria-invalid={error ? true : undefined}
       aria-describedby={
         [help ? ids.help : null, error ? ids.error : null].filter(Boolean).join(" ") ||
@@ -50,6 +50,7 @@ export default function RadioGroup({
     >
       <legend className="block text-xs font-semibold tracking-wide uppercase text-[#0D0D0D] mb-3">
         {label}
+        {!required && <span className="font-normal normal-case text-[#666666]"> (optional)</span>}
         {required && (
           <>
             <span aria-hidden="true" className="text-[#1B4FFF]">
@@ -97,6 +98,8 @@ export default function RadioGroup({
           );
         })}
       </div>
+
+      {!required && value && <button type="button" onClick={() => onChange("")} className="mt-2 text-sm text-[#1B4FFF] underline underline-offset-4">Clear selection<span className="sr-only"> for {label}</span></button>}
 
       {help && (
         <p id={ids.help} className={helpClass}>

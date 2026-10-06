@@ -632,6 +632,16 @@ describe("submitting the form", () => {
     assert.match(result.ok === false ? result.message : "", /try again/i);
   });
 
+  test("raw provider errors in JSON cannot reach the applicant", async () => {
+    const { result } = await withStubbedFetch(
+      async () => jsonResponse(502, { message: "Resend SECRET rejected /private/path", errors: [{ path: "cv", msg: "SECRET provider failure" }] }),
+      () => submitPreConsultation(completeState()),
+    );
+    assert.equal(result.ok, false);
+    assert.ok(result.ok === false && !result.message.includes("SECRET"));
+    assert.equal(result.ok === false && result.fieldErrors, undefined);
+  });
+
   test("a dead network is explained, not thrown", async () => {
     const { result } = await withStubbedFetch(
       async () => {

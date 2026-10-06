@@ -1,5 +1,3 @@
-"use client";
-
 /**
  * Research Support — the page that leads into the pre-consultation form.
  *
@@ -21,13 +19,14 @@
  * cannot promise something the form would refuse.
  */
 
-import { useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
+import { type ComponentType } from "react";
 import Link from "next/link";
+import Reveal from "@/components/Reveal";
+import FaqItem from "@/components/FaqItem";
 import {
   ArrowRight,
   BadgeCheck,
-  ChevronDown,
-  ClipboardList,
+    ClipboardList,
   Clock,
   Compass,
   FileText,
@@ -72,60 +71,6 @@ interface Faq {
 
 // ── Scroll reveal ────────────────────────────────────────────────────────────
 
-function useReveal(threshold = 0.12) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting) return;
-        setVisible(true);
-        observer.disconnect();
-      },
-      { threshold },
-    );
-
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [threshold]);
-
-  return { ref, visible };
-}
-
-/**
- * Fades content up as it scrolls into view.
- *
- * The `motion-reduce:` utilities come after the unprefixed ones in Tailwind's
- * output, so someone who has asked their system for reduced motion sees the
- * content at rest immediately rather than a shorter animation.
- */
-function Reveal({
-  children,
-  delay = 0,
-  className = "",
-}: {
-  children: ReactNode;
-  delay?: number;
-  className?: string;
-}) {
-  const { ref, visible } = useReveal();
-  return (
-    <div
-      ref={ref}
-      style={{ transitionDelay: `${delay}ms` }}
-      className={`transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none motion-reduce:opacity-100 motion-reduce:translate-y-0 ${
-        visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
-      } ${className}`}
-    >
-      {children}
-    </div>
-  );
-}
-
 // ── Content ──────────────────────────────────────────────────────────────────
 
 /** The four phases named in the Research Pathway package, in order. */
@@ -166,7 +111,7 @@ const steps: Step[] = [
     number: "01",
     title: "Complete the form online",
     description:
-      "Thirteen short sections covering your background, interests and intentions. Move back and forward freely — nothing you have typed is lost, and you see everything again on a review screen before you submit.",
+      "About fifteen minutes, with seven steps covering your background, interests and documents, followed by review. Move back and forward freely — nothing you have typed is lost, and you see everything again on a review screen before you submit.",
     icon: ClipboardList,
   },
   {
@@ -278,70 +223,13 @@ const faqs: Faq[] = [
 
 // ── FAQ item ─────────────────────────────────────────────────────────────────
 
-function FaqItem({ id, question, answer }: { id: string } & Faq) {
-  const [open, setOpen] = useState(false);
-  const panelId = `${id}-panel`;
-  const buttonId = `${id}-button`;
-
-  return (
-    <div
-      className={`rounded-2xl bg-white border transition-colors duration-300 ${
-        open
-          ? "border-[#1B4FFF]/40 shadow-sm"
-          : "border-[#D8D3C9] hover:border-[#1B4FFF]/25"
-      }`}
-    >
-      <h3>
-        <button
-          type="button"
-          id={buttonId}
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={() => setOpen((previous) => !previous)}
-          className="flex w-full items-center justify-between gap-4 rounded-2xl px-6 py-5 text-left cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4FFF] focus-visible:ring-offset-2 focus-visible:ring-offset-[#EDE9E0]"
-        >
-          <span className="text-sm font-semibold leading-snug text-[#0D0D0D]">
-            {question}
-          </span>
-          <ChevronDown
-            size={18}
-            aria-hidden="true"
-            className={`shrink-0 text-[#1B4FFF] transition-transform duration-300 motion-reduce:transition-none ${
-              open ? "rotate-180" : ""
-            }`}
-          />
-        </button>
-      </h3>
-
-      {/*
-        A 0fr → 1fr grid row animates to the answer's natural height, so a long
-        answer is never clipped the way a guessed `max-height` clips it.
-      */}
-      <div
-        id={panelId}
-        role="region"
-        aria-labelledby={buttonId}
-        aria-hidden={!open}
-        style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
-        className="grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none"
-      >
-        <div className="overflow-hidden">
-          <p className="mx-6 mb-6 border-t border-[#E8E4DC] pt-4 text-sm font-light leading-relaxed text-gray-500">
-            {answer}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ResearchSupportPage() {
   return (
-    <main className="bg-[#F5F3EE]">
+    <div className="bg-[#F5F3EE]">
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#0D0D0D] py-24 lg:py-32 px-6 lg:px-12">
+      <section className="relative overflow-hidden bg-[#0D0D0D] py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-12">
         <div className="pointer-events-none absolute -top-32 right-0 h-125 w-125 rounded-full bg-blue-600/15 blur-[120px]" />
         <div className="pointer-events-none absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-blue-600/8 blur-[100px]" />
 
@@ -354,13 +242,11 @@ export default function ResearchSupportPage() {
               </span>
             </div>
 
-            <h1 className="mb-6 text-4xl lg:text-6xl xl:text-7xl font-extrabold leading-[1.06] tracking-tight text-white">
-              Your research journey,
-              <br />
-              <span className="text-blue-500">expertly guided.</span>
+            <h1 className="mb-6 text-4xl lg:text-6xl xl:text-6xl font-extrabold leading-[1.06] tracking-tight text-white">
+              Support for your <span className="text-blue-500">research application</span>
             </h1>
 
-            <p className="mb-10 max-w-xl text-sm lg:text-base font-light leading-relaxed text-white/55">
+            <p className="mb-10 max-w-xl text-sm lg:text-base font-light leading-relaxed text-white/75">
               Struggling to settle on a research topic, find the right
               supervisor, or write a proposal that holds up? Accian pairs you
               with consultants who take you from a rough interest to a
@@ -406,7 +292,7 @@ export default function ResearchSupportPage() {
                   aria-hidden="true"
                   className="mt-0.5 shrink-0 text-blue-400"
                 />
-                <span className="text-xs font-light leading-relaxed text-white/60">
+                <span className="text-xs font-light leading-relaxed text-white/75">
                   {text}
                 </span>
               </li>
@@ -416,16 +302,16 @@ export default function ResearchSupportPage() {
       </section>
 
       {/* ── THE PATHWAY ──────────────────────────────────────────────────── */}
-      <section className="bg-[#F5F3EE] py-24 px-6 lg:px-12">
+      <section className="bg-[#F5F3EE] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal className="mb-16 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="eyebrow mb-3">The Pathway</p>
-              <h2 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
+              <h2 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
                 Four phases, <span className="text-[#1B4FFF]">one route</span>
               </h2>
             </div>
-            <p className="max-w-sm text-sm font-light leading-relaxed text-gray-500 lg:text-right">
+            <p className="max-w-sm text-sm font-light leading-relaxed text-gray-600 lg:text-right">
               Join at whichever phase you need. Most people start at the first
               and stay to the last.
             </p>
@@ -452,13 +338,13 @@ export default function ResearchSupportPage() {
                         />
                       </div>
 
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-gray-600">
                         Phase {phase.number}
                       </p>
                       <h3 className="mb-2 text-base font-semibold text-[#0D0D0D] transition-colors duration-200 group-hover:text-[#1B4FFF] motion-reduce:transition-none">
                         {phase.title}
                       </h3>
-                      <p className="text-sm font-light leading-relaxed text-gray-500">
+                      <p className="text-sm font-light leading-relaxed text-gray-600">
                         {phase.description}
                       </p>
                     </Reveal>
@@ -471,14 +357,14 @@ export default function ResearchSupportPage() {
       </section>
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────────── */}
-      <section className="bg-[#EDE9E0] py-24 px-6 lg:px-12">
+      <section className="bg-[#EDE9E0] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal className="mb-14 max-w-2xl">
             <p className="eyebrow mb-3">Getting Started</p>
-            <h2 className="mb-4 text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
-              Three steps, <span className="text-[#1B4FFF]">no paperwork</span>
+            <h2 className="mb-4 text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
+              From your background to a consultation
             </h2>
-            <p className="text-sm font-light leading-relaxed text-gray-500">
+            <p className="text-sm font-light leading-relaxed text-gray-600">
               There is no form to download and nothing to email. Everything
               happens in your browser, and your documents travel with your
               answers.
@@ -502,7 +388,7 @@ export default function ResearchSupportPage() {
                         </div>
                         <span
                           aria-hidden="true"
-                          className="select-none text-4xl font-black leading-none text-[#0D0D0D]/8"
+                          className="select-none text-4xl font-black leading-none text-gray-600"
                         >
                           {step.number}
                         </span>
@@ -511,7 +397,7 @@ export default function ResearchSupportPage() {
                       <h3 className="mb-3 text-base font-semibold text-[#0D0D0D]">
                         {step.title}
                       </h3>
-                      <p className="text-sm font-light leading-relaxed text-gray-500">
+                      <p className="text-sm font-light leading-relaxed text-gray-600">
                         {step.description}
                       </p>
                     </div>
@@ -534,18 +420,17 @@ export default function ResearchSupportPage() {
       </section>
 
       {/* ── WHAT WE HELP WITH ────────────────────────────────────────────── */}
-      <section className="bg-[#F5F3EE] py-24 px-6 lg:px-12">
+      <section className="bg-[#F5F3EE] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal className="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="eyebrow mb-3">Our Support</p>
-              <h2 className="text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
+              <h2 className="text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
                 What we help <span className="text-[#1B4FFF]">with</span>
               </h2>
             </div>
-            <p className="max-w-sm text-sm font-light leading-relaxed text-gray-500 lg:text-right">
-              These are the same options you will be asked to tick on the form,
-              so tell us there which of them you want.
+            <p className="max-w-sm text-sm font-light leading-relaxed text-gray-600 lg:text-right">
+              Choose the support relevant to your research. You can tell us which areas you need in the pre-consultation form.
             </p>
           </Reveal>
 
@@ -568,7 +453,7 @@ export default function ResearchSupportPage() {
                         {area.label}
                       </h3>
                       {detail && (
-                        <p className="text-sm font-light leading-relaxed text-gray-500">
+                        <p className="text-sm font-light leading-relaxed text-gray-600">
                           {detail.description}
                         </p>
                       )}
@@ -582,16 +467,16 @@ export default function ResearchSupportPage() {
       </section>
 
       {/* ── DOCUMENTS TO HAVE READY ──────────────────────────────────────── */}
-      <section className="bg-[#0D0D0D] py-24 px-6 lg:px-12">
+      <section className="bg-[#0D0D0D] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto">
           <Reveal className="mb-14 max-w-2xl">
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-500">
               Before You Begin
             </p>
-            <h2 className="mb-4 text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-white">
+            <h2 className="mb-4 text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-white">
               What to have <span className="text-blue-500">to hand</span>
             </h2>
-            <p className="text-sm font-light leading-relaxed text-white/50">
+            <p className="text-sm font-light leading-relaxed text-white/75">
               Only your CV is required. Everything else helps us prepare, but
               nothing is held up waiting for it — send what you have.{" "}
               {ACCEPT_HINT}.
@@ -613,7 +498,7 @@ export default function ResearchSupportPage() {
                         className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider ${
                           slot.required
                             ? "bg-blue-600 text-white"
-                            : "border border-white/15 text-white/45"
+                            : "border border-white/15 text-white/75"
                         }`}
                       >
                         {slot.required ? "Required" : "Optional"}
@@ -622,7 +507,7 @@ export default function ResearchSupportPage() {
                     <h3 className="mb-1.5 text-sm font-semibold text-white">
                       {slot.label}
                     </h3>
-                    <p className="text-sm font-light leading-relaxed text-white/45">
+                    <p className="text-sm font-light leading-relaxed text-white/75">
                       {slot.help ?? documentNotes[slot.field]}
                     </p>
                   </div>
@@ -634,16 +519,16 @@ export default function ResearchSupportPage() {
       </section>
 
       {/* ── FAQs ─────────────────────────────────────────────────────────── */}
-      <section className="bg-[#EDE9E0] py-24 px-6 lg:px-12">
+      <section className="bg-[#EDE9E0] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
         <div className="container mx-auto grid items-start gap-16 lg:grid-cols-5">
           <Reveal className="lg:col-span-2 lg:sticky lg:top-28">
             <p className="eyebrow mb-3">FAQs</p>
-            <h2 className="mb-4 text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
+            <h2 className="mb-4 text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
               Questions,
               <br />
               <span className="text-[#1B4FFF]">answered</span>
             </h2>
-            <p className="text-sm font-light leading-relaxed text-gray-500">
+            <p className="text-sm font-light leading-relaxed text-gray-600">
               If something here is not covered, ask us before you fill anything
               in.
             </p>
@@ -659,7 +544,6 @@ export default function ResearchSupportPage() {
             {faqs.map((faq, index) => (
               <Reveal key={faq.question} delay={index * 50}>
                 <FaqItem
-                  id={`rs-faq-${index}`}
                   question={faq.question}
                   answer={faq.answer}
                 />
@@ -677,14 +561,14 @@ export default function ResearchSupportPage() {
         <div className="relative container mx-auto max-w-3xl text-center">
           <Reveal>
             <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-blue-500">
-              Get Started
+              Next step
             </p>
-            <h2 className="mb-5 text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight tracking-tight text-white">
+            <h2 className="mb-5 text-3xl lg:text-4xl xl:text-6xl font-bold leading-tight tracking-tight text-white">
               Tell us where you are
               <br />
               <span className="text-blue-500">in the process</span>
             </h2>
-            <p className="mx-auto mb-10 max-w-xl text-sm font-light leading-relaxed text-white/50">
+            <p className="mx-auto mb-10 max-w-xl text-sm font-light leading-relaxed text-white/75">
               The pre-consultation form is how we get to know your background
               and ambitions before we speak. Complete it at your own pace, and
               we will come back to you within 48–72 hours.
@@ -696,12 +580,12 @@ export default function ResearchSupportPage() {
               Start your pre-consultation
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
-            <p className="mt-5 text-xs font-light text-white/35">
+            <p className="mt-5 text-xs font-light text-white/75">
               You will need your CV to hand.
             </p>
           </Reveal>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

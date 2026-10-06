@@ -1,9 +1,10 @@
 import { Metadata } from "next";
 import ContactPage from "@/views/ContactPage";
 export const metadata: Metadata = {
-  title: "ACCIAN Limited — Global IT, Cybersecurity & Digital Solutions",
-  description:
-    "ACCIAN is a UK-registered technology and cybersecurity company delivering secure, scalable, and intelligent",
+  title: "Contact ACCIAN — Enquiries & Consultation",
+  description: "Contact ACCIAN about technology services or research support. Send an enquiry, email info@accian.co.uk or call our UK team.",
+  alternates: { canonical: "/contact" },
+  openGraph: { title: "Contact ACCIAN — Enquiries & Consultation", description: "Contact ACCIAN about technology services or research support. Send an enquiry, email info@accian.co.uk or call our UK team.", url: "/contact", type: "website" },
 };
 
 export default function Page() {

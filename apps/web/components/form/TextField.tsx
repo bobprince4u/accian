@@ -57,6 +57,7 @@ export default function TextField({
     <div>
       <label htmlFor={ids.input} className={labelClass}>
         {label}
+        {!required && <span className="font-normal normal-case text-[#666666]"> (optional)</span>}
         {required && (
           <>
             <span aria-hidden="true" className="text-[#1B4FFF]">

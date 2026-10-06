@@ -1,0 +1,732 @@
+{
+  "date": "2026-10-06",
+  "baseline": "02401c24",
+  "tests": {
+    "web": 81,
+    "admin": 19,
+    "api": 189,
+    "failures": 0,
+    "skipped": 0
+  },
+  "checks": {
+    "typescript": [
+      "web",
+      "admin",
+      "api"
+    ],
+    "lint": [
+      "web",
+      "admin"
+    ],
+    "productionBuilds": [
+      "web",
+      "api"
+    ],
+    "architectureGuards": 11,
+    "internalLinkInstances": 200,
+    "invalidInternalLinks": 0
+  },
+  "productionLayouts": [
+    {
+      "route": "/",
+      "width": 320,
+      "status": 200,
+      "scrollWidth": 320,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 320,
+      "status": 200,
+      "scrollWidth": 320,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 320,
+      "status": 200,
+      "scrollWidth": 320,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 320,
+      "status": 200,
+      "scrollWidth": 320,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/contact",
+      "width": 320,
+      "status": 200,
+      "scrollWidth": 320,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 320,
+      "status": 200,
+      "scrollWidth": 320,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/",
+      "width": 360,
+      "status": 200,
+      "scrollWidth": 360,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 360,
+      "status": 200,
+      "scrollWidth": 360,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 360,
+      "status": 200,
+      "scrollWidth": 360,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 360,
+      "status": 200,
+      "scrollWidth": 360,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/contact",
+      "width": 360,
+      "status": 200,
+      "scrollWidth": 360,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 360,
+      "status": 200,
+      "scrollWidth": 360,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/",
+      "width": 375,
+      "status": 200,
+      "scrollWidth": 375,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 375,
+      "status": 200,
+      "scrollWidth": 375,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 375,
+      "status": 200,
+      "scrollWidth": 375,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 375,
+      "status": 200,
+      "scrollWidth": 375,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/contact",
+      "width": 375,
+      "status": 200,
+      "scrollWidth": 375,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 375,
+      "status": 200,
+      "scrollWidth": 375,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/",
+      "width": 390,
+      "status": 200,
+      "scrollWidth": 390,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 390,
+      "status": 200,
+      "scrollWidth": 390,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 390,
+      "status": 200,
+      "scrollWidth": 390,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 390,
+      "status": 200,
+      "scrollWidth": 390,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/contact",
+      "width": 390,
+      "status": 200,
+      "scrollWidth": 390,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 390,
+      "status": 200,
+      "scrollWidth": 390,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/",
+      "width": 430,
+      "status": 200,
+      "scrollWidth": 430,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 430,
+      "status": 200,
+      "scrollWidth": 430,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 430,
+      "status": 200,
+      "scrollWidth": 430,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 430,
+      "status": 200,
+      "scrollWidth": 430,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/contact",
+      "width": 430,
+      "status": 200,
+      "scrollWidth": 430,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 430,
+      "status": 200,
+      "scrollWidth": 430,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/",
+      "width": 768,
+      "status": 200,
+      "scrollWidth": 768,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 768,
+      "status": 200,
+      "scrollWidth": 768,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 768,
+      "status": 200,
+      "scrollWidth": 768,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 768,
+      "status": 200,
+      "scrollWidth": 768,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": [
+        {
+          "tag": "LI",
+          "class": "shrink-0"
+        },
+        {
+          "tag": "BUTTON",
+          "class": "inline-flex min-h-11 items-center gap-2 rounded-lg border px-3 text-xs font-semibold disabled:cursor-not-allowed border-[#D8D3C9] bg-white text-[#666666]"
+        },
+        {
+          "tag": "LI",
+          "class": "shrink-0"
+        },
+        {
+          "tag": "BUTTON",
+          "class": "inline-flex min-h-11 items-center gap-2 rounded-lg border px-3 text-xs font-semibold disabled:cursor-not-allowed border-[#D8D3C9] bg-white text-[#666666]"
+        },
+        {
+          "tag": "SPAN",
+          "class": ""
+        }
+      ]
+    },
+    {
+      "route": "/contact",
+      "width": 768,
+      "status": 200,
+      "scrollWidth": 768,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 768,
+      "status": 200,
+      "scrollWidth": 768,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/",
+      "width": 1024,
+      "status": 200,
+      "scrollWidth": 1024,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 1024,
+      "status": 200,
+      "scrollWidth": 1024,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 1024,
+      "status": 200,
+      "scrollWidth": 1024,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 1024,
+      "status": 200,
+      "scrollWidth": 1024,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/contact",
+      "width": 1024,
+      "status": 200,
+      "scrollWidth": 1024,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 1024,
+      "status": 200,
+      "scrollWidth": 1024,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/",
+      "width": 1280,
+      "status": 200,
+      "scrollWidth": 1280,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 1280,
+      "status": 200,
+      "scrollWidth": 1280,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 1280,
+      "status": 200,
+      "scrollWidth": 1280,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 1280,
+      "status": 200,
+      "scrollWidth": 1280,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/contact",
+      "width": 1280,
+      "status": 200,
+      "scrollWidth": 1280,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 1280,
+      "status": 200,
+      "scrollWidth": 1280,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "status": 200,
+      "scrollWidth": 1440,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/services",
+      "width": 1440,
+      "status": 200,
+      "scrollWidth": 1440,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/research-support",
+      "width": 1440,
+      "status": 200,
+      "scrollWidth": 1440,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 1440,
+      "status": 200,
+      "scrollWidth": 1440,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/contact",
+      "width": 1440,
+      "status": 200,
+      "scrollWidth": 1440,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 1440,
+      "status": 200,
+      "scrollWidth": 1440,
+      "main": 1,
+      "h1": 1,
+      "brokenImages": [],
+      "overflow": []
+    }
+  ],
+  "accessibility": [
+    {
+      "route": "/",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "route": "/services",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "route": "/research-support",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "route": "/contact",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 390,
+      "violations": []
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "route": "/services",
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "route": "/research-support",
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "route": "/pre-consultation",
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "route": "/contact",
+      "width": 1440,
+      "violations": []
+    },
+    {
+      "route": "/privacy-policy",
+      "width": 1440,
+      "violations": []
+    }
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "interactions": [
+    "menu Escape closes and restores focus",
+    "menu closes outside",
+    "menu navigation closes",
+    "FAQ keyboard disclosure",
+    "service enquiry preselects existing option",
+    "contact validation summary and labels",
+    "contact failure retains answers and hides provider details",
+    "pending contact disabled and confirmation persists",
+    "pre-consultation required fields",
+    "upload validation appears immediately",
+    "attachments survive back and forward",
+    "declaration and review",
+    "pre-consultation failure retains review and documents",
+    "pending pre-consultation navigation disabled and success reference shown",
+    "services retry replaces error with content",
+    "empty service/testimonial states"
+  ],
+  "reviewAccessibility": [],
+  "focusedChecks": [
+    "320px cookie preferences accessible and decline works",
+    "keyboard skip link reaches main content",
+    "reduced motion stops automatic video and reveal animation",
+    "malformed optional contact draft safely discarded",
+    "all seven research sections and review fit 320px",
+    "mobile section selector retains earlier answers"
+  ],
+  "cookieAccessibility": [],
+  "research320px": [
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    },
+    {
+      "width": 320,
+      "scrollWidth": 320
+    }
+  ],
+  "productionSubmissions": 0,
+  "mockedSubmissions": 4,
+  "lazyMedia": [
+    {
+      "width": 390,
+      "imagesLoaded": 6,
+      "failures": 0
+    },
+    {
+      "width": 1440,
+      "imagesLoaded": 6,
+      "failures": 0
+    }
+  ]
+}

@@ -144,15 +144,14 @@ export const submitPreConsultation = async (
   }
 
   if (!response.ok) {
-    const apiMessage =
-      payload && typeof payload === "object"
-        ? (payload as { message?: unknown }).message
-        : undefined;
-
     return {
       ok: false,
-      message: typeof apiMessage === "string" && apiMessage ? apiMessage : GENERIC_MESSAGE,
-      fieldErrors: readFieldErrors(payload),
+      message: response.status === 429
+        ? "Too many submissions. Please wait before trying again. Your answers and attachments are still here."
+        : response.status === 400 || response.status === 422
+          ? "Some of your answers need attention. Please check the fields below."
+          : GENERIC_MESSAGE,
+      fieldErrors: response.status === 400 || response.status === 422 ? readFieldErrors(payload) : undefined,
     };
   }
 
@@ -161,7 +160,7 @@ export const submitPreConsultation = async (
       ? (payload as { data?: { referenceId?: unknown; submittedAt?: unknown } }).data
       : undefined;
 
-  if (!data || typeof data.referenceId !== "string") {
+  if (!data || typeof data.referenceId !== "string" || !data.referenceId.trim()) {
     return { ok: false, message: GENERIC_MESSAGE };
   }
 

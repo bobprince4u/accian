@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import PreConsultationForm from "@/views/PreConsultationForm";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/pre-consultation" },
   title: "Pre-Consultation Form — PhD Research Pathway | ACCIAN Limited",
   description:
     "Complete your PhD Research Pathway pre-consultation form. Share your academic background, research interests and documents so your Accian consultant can prepare before your call.",

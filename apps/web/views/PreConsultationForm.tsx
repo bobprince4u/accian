@@ -21,6 +21,7 @@
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import Link from "next/link";
 import { AlertCircle, ArrowLeft, ArrowRight, Loader2, Send } from "lucide-react";
 import {
   PRE_CONSULTATION_DECLARATION,
@@ -61,7 +62,7 @@ import {
   submitPreConsultation,
   type SubmissionSuccess as SubmissionResult,
 } from "@/lib/preConsultation/payload";
-import { documentCount, totalDocumentBytes, formatBytes } from "@/lib/preConsultation/files";
+import { documentCount, totalDocumentBytes, formatBytes, validateDocuments } from "@/lib/preConsultation/files";
 
 /** Today as `YYYY-MM-DD`, in the applicant's own timezone. */
 const todayISO = (): string => {
@@ -130,7 +131,7 @@ export default function PreConsultationForm() {
       mounted.current = true;
       return;
     }
-    topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    topRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
     headingRef.current?.focus();
   }, [step]);
 
@@ -196,6 +197,7 @@ export default function PreConsultationForm() {
   };
 
   const goTo = (index: number) => {
+    if (submitting) return;
     setFormError(null);
     setStep(index);
   };
@@ -215,6 +217,7 @@ export default function PreConsultationForm() {
   };
 
   const submit = async () => {
+    if (submitting) return;
     const found = validateAll(state);
     if (Object.keys(found).length > 0) {
       setErrors(found);
@@ -368,7 +371,7 @@ export default function PreConsultationForm() {
     const bytes = totalDocumentBytes(state.documents);
 
     return (
-      <div className="space-y-5">
+      <div id={fieldIds("documents").input} tabIndex={-1} className="space-y-5">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           {PRE_CONSULTATION_DOCUMENTS.map((slot) => (
             <div key={slot.field} className="min-w-0">
@@ -376,7 +379,18 @@ export default function PreConsultationForm() {
                 name={slot.field}
                 label={slot.label}
                 files={state.documents[slot.field] ?? []}
-                onChange={(files) => setDocuments(slot.field, files)}
+                onChange={(files) => {
+                  setDocuments(slot.field, files);
+                  const found = validateDocuments({ ...state.documents, [slot.field]: files });
+                  setErrors((previous) => {
+                    const next = { ...previous };
+                    delete next[slot.field];
+                    delete next.documents;
+                    if (found[slot.field]) next[slot.field] = found[slot.field];
+                    if (found.documents) next.documents = found.documents;
+                    return next;
+                  });
+                }}
                 required={slot.required}
                 maxFiles={slot.maxFiles}
                 help={slot.help}
@@ -518,7 +532,7 @@ export default function PreConsultationForm() {
 
       {/* Intro */}
       <header className="border-b border-[#E8E4DC] bg-white">
-        <div className="mx-auto max-w-4xl px-5 py-12 sm:px-8 sm:py-16">
+        <div className="mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
           <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#1B4FFF]">
             PhD Research Pathway
           </p>
@@ -526,15 +540,13 @@ export default function PreConsultationForm() {
             Pre-consultation form
           </h1>
           <p className="mt-4 max-w-2xl text-sm font-light leading-relaxed text-[#666666] sm:text-base">
-            This form gives your consultant the background they need before your
-            call, so the time is spent on your research rather than on
-            paperwork. It takes around fifteen minutes.
+            Share your background and research interests so your consultant can
+            prepare for your call.
           </p>
+          <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#555555]" aria-label="Before you begin"><li>About 15 minutes</li><li>Have your CV ready</li><li>Review before sending</li></ul>
           <p className="mt-3 max-w-2xl text-sm font-light leading-relaxed text-[#666666]">
-            Only your name, email, CV and the declaration are required.
-            Everything else is optional — leave anything blank if you are not
-            sure, and say so on the call. Half-formed ideas are genuinely useful
-            to us.
+            Your name, email, CV and dated declaration are required.
+            Other answers are optional. Review everything before sending.
           </p>
         </div>
       </header>
@@ -546,6 +558,7 @@ export default function PreConsultationForm() {
             current={step}
             furthest={furthest}
             onJump={goTo}
+            disabled={submitting}
           />
         </div>
 
@@ -568,6 +581,8 @@ export default function PreConsultationForm() {
 
             {errorSummary}
 
+            <fieldset disabled={submitting} className="min-w-0">
+            <legend className="sr-only">{onReview ? "Review your answers" : currentStep.title}</legend>
             {onReview ? (
               <>
                 <p className="mb-6 text-sm font-light leading-relaxed text-[#666666]">
@@ -592,6 +607,7 @@ export default function PreConsultationForm() {
                 {currentStep.sections.map(renderSection)}
               </div>
             )}
+            </fieldset>
           </div>
 
           {/* Back / Continue / Submit */}
@@ -634,9 +650,9 @@ export default function PreConsultationForm() {
             {submitting ? "Submitting your form. Please wait." : ""}
           </p>
 
-          <p className="mt-6 text-xs font-light leading-relaxed text-[#999999]">
+          <p className="mt-6 text-sm leading-relaxed text-[#666666]">
             Your answers stay in this browser until you submit. Nothing is sent
-            to us before you press Submit application.
+            to us before you press Submit application. Keep this tab open: answers and attachments are not saved after you close it. <Link href="/privacy-policy" className="text-[#1B4FFF] underline underline-offset-4">Privacy Policy</Link>.
           </p>
         </form>
       </div>

@@ -47,16 +47,19 @@ export default function FileUpload({
   const ids = fieldIds(name);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragging, setDragging] = useState(false);
+  const [selectionNotice, setSelectionNotice] = useState("");
 
   const accept = (incoming: FileList | null) => {
     if (!incoming || incoming.length === 0) return;
-    const next = maxFiles === 1 ? Array.from(incoming).slice(0, 1) : [...files, ...Array.from(incoming)];
+    const next = maxFiles === 1 ? Array.from(incoming) : [...files, ...Array.from(incoming)];
+    setSelectionNotice(next.length > maxFiles ? `This section accepts up to ${maxFiles} ${maxFiles === 1 ? "file" : "files"}. Only the first ${maxFiles} ${maxFiles === 1 ? "was" : "were"} attached; remove a file to choose another.` : "");
     onChange(next.slice(0, maxFiles));
     // See the note above: without this, re-selecting the same file is silent.
     if (inputRef.current) inputRef.current.value = "";
   };
 
   const remove = (index: number) => {
+    setSelectionNotice("");
     onChange(files.filter((_, position) => position !== index));
   };
 
@@ -66,6 +69,7 @@ export default function FileUpload({
     <div>
       <label htmlFor={ids.input} className="block text-xs font-semibold tracking-wide uppercase text-[#0D0D0D] mb-2">
         {label}
+        {!required && <span className="font-normal normal-case text-[#666666]"> (optional)</span>}
         {required && (
           <>
             <span aria-hidden="true" className="text-[#1B4FFF]">
@@ -112,7 +116,7 @@ export default function FileUpload({
           aria-describedby={[ids.help, error ? ids.error : null].filter(Boolean).join(" ")}
           className={[
             "block w-full text-xs font-light text-[#666666] cursor-pointer",
-            "file:mr-3 file:rounded-lg file:border-0 file:bg-[#0D0D0D] file:px-4 file:py-2",
+            "file:mr-3 file:rounded-lg file:border-0 file:bg-[#0D0D0D] file:px-4 file:py-3",
             "file:text-xs file:font-semibold file:text-white file:cursor-pointer",
             "hover:file:bg-[#1B4FFF] file:transition-colors",
             "disabled:cursor-not-allowed disabled:opacity-50",
@@ -128,6 +132,8 @@ export default function FileUpload({
             : "or drag and drop"}
         </p>
       </div>
+
+      {selectionNotice && <p role="status" className="mt-2 text-sm text-[#666666]">{selectionNotice}</p>}
 
       {files.length > 0 && (
         <ul className="mt-2.5 space-y-2" aria-label={`${label} — attached files`}>
@@ -147,7 +153,7 @@ export default function FileUpload({
                 type="button"
                 onClick={() => remove(index)}
                 aria-label={`Remove ${file.name}`}
-                className="shrink-0 rounded p-1 text-[#666666] transition-colors hover:bg-red-50 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-[#1B4FFF]/40"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded p-1 text-[#666666] transition-colors hover:bg-red-50 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-[#1B4FFF]/40"
               >
                 <X size={14} aria-hidden="true" />
               </button>

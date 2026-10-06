@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /internal/
 
-Sitemap: https://www.accian.co.uk/sitemap.xml
+Sitemap: https://accian.co.uk/sitemap.xml
