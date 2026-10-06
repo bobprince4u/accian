@@ -17,11 +17,8 @@
 # different values, the dashboard is authoritative about what production does
 # today -- reconcile before relying on this file. See docs/deployment.md.
 #
-# Note what is NOT here: this app sends no security headers, because it never
-# has. Adding a Content-Security-Policy would be a change to how the deployed
-# product behaves, it is not required to make the monorepo work, and its effects
-# could not be verified without a production deploy. It is recorded instead as a
-# follow-up in docs/known-issues.md.
+# Phase 4 adds baseline security headers. CSP starts in report-only mode until
+# an authenticated browser session verifies the policy on a deploy preview.
 #
 # This is a SEPARATE Netlify site from the public one. Both build from this
 # repository but publish different directories, so they must not share a
@@ -45,6 +42,22 @@
   command = "npm run build:admin"
   publish = "apps/admin/dist"
 
+[build.environment]
+  NODE_VERSION = "22"
+
+[context.production.environment]
+  VITE_API_URL = "https://api.accian.co.uk"
+
 # The SPA fallback that makes client-side routing work is unchanged and still
 # lives in apps/admin/public/_redirects, which Vite copies into dist/. It is
 # not restated here: one source of truth per rule.
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), camera=(), microphone=()"
+    Content-Security-Policy-Report-Only = "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; font-src 'self' data:; connect-src 'self' https://api.accian.co.uk; frame-ancestors 'none'; form-action 'self';"

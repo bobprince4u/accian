@@ -1,456 +1,253 @@
 # ACCIAN — Deployment
 
-How the three applications in this repository are built and deployed, what must
-be configured outside version control, and what could not be verified from
-source.
+Verified on 6 October 2026 (Africa/Lagos). Phase 4 is **BLOCKED** pending
+hosting access, credential rotation, a controlled delivery test, and authenticated
+business-flow verification. Source configuration and live production observations
+are different evidence: no deployment was performed during this verification.
+See [the Phase 4 report](phase4-production-report.md) for results and limitations.
 
-This document records the state after Phase 2 (monorepo consolidation). It
-describes deployments that have **not yet been performed** from this layout —
-see [What has not been verified](#what-has-not-been-verified).
+## Repository and topology
 
----
+Repository: `github.com/bobprince4u/accian`; local directory:
+`~/Desktop/ACCIAN-PROJECT/accian`. Current branch: `master`.
 
-## 1. The shape of the deployment
+| Application | Workspace | Provider observed | Production URL |
+|---|---|---|---|
+| Web | `apps/web` (`accian`) | Netlify response headers | https://accian.co.uk |
+| Admin | `apps/admin` (`admin`) | Netlify response headers | https://admin.accian.co.uk |
+| API | `apps/api` (`accian-backend`) | Render origin, Cloudflare response headers | https://api.accian.co.uk |
+| Shared types | `packages/types` (`@accian/types`) | Built dependency; no runtime | — |
 
-One repository, three independently deployable applications. They do not share
-a build, a process, or a runtime.
+Web/admin communicate with the API over HTTPS. Only the API connects to
+PostgreSQL and Resend. There are three independent deployments and runtimes.
+Node must be 22, as specified by root and application `.nvmrc` files and engines.
+Verification used Node 22.21.1 and npm 11.8.0.
 
-| Application | Path | Hosting | Public URL | Framework |
-|---|---|---|---|---|
-| Public site | `apps/web` | Netlify | `https://accian.co.uk` | Next.js 16 (SSR via `@netlify/plugin-nextjs`) |
-| Admin | `apps/admin` | Netlify | `https://admin.accian.co.uk` | Vite + React (static SPA) |
-| API | `apps/api` | **Unknown — see §5** | `https://api.accian.co.uk` | Express 5 (Node, CommonJS) |
+## Netlify settings
 
-The two Netlify applications are **separate Netlify sites**, both connected to
-this same repository. That is why there is deliberately **no `netlify.toml` at
-the repository root**: Netlify applies a root configuration file to every site
-connected to the repo, which would make the public site and the admin fight
-over the same build settings. Each app carries its own instead:
+These are the prepared source settings. Project IDs, deployment SHAs, repository
+links, deployed branch, dashboard values, and environment scopes have not been
+read from either account. Confirm them before deploying.
 
-- `apps/web/netlify.toml`
-- `apps/admin/netlify.toml`
+| Setting | Web | Admin |
+|---|---|---|
+| Config file | `apps/web/netlify.toml` | `apps/admin/netlify.toml` |
+| Package directory (dashboard) | `apps/web` | `apps/admin` |
+| Base directory | Empty: repository root | Empty: repository root |
+| Build command | `npm run build:web` | `npm run build:admin` |
+| Publish directory | `apps/web/.next` | `apps/admin/dist` |
+| Node | 22 | 22 |
+| Public API variable | `NEXT_PUBLIC_API_URL` | `VITE_API_URL` |
 
-Netlify looks for configuration in this order: **package directory → base
-directory → repository root.**
+Both API URL variables must target `https://api.accian.co.uk`. They are public
+build-time values, not credentials. Production contexts in the TOML files set
+these URLs; preview contexts must also configure the required public API URL.
+The root lockfile and workspace types must be available during installation.
+There is no root `netlify.toml`, because each site has its own configuration.
 
----
+Netlify's [monorepo documentation](https://docs.netlify.com/build/configure-builds/monorepos/)
+describes the package-directory setup. Package directory is a dashboard setting.
+Keep the base at the workspace root; use the application package directory to
+select its configuration file. Verify the resolved settings in the deploy log.
 
-## 2. Required dashboard changes
+The web uses Next.js 16 and `@netlify/plugin-nextjs`. `.next` is adapter input,
+not a directory to serve as an ordinary static site. Next headers come from
+`apps/web/config/securityHeaders.ts`; CDN headers repeat them in Netlify TOML.
+`npm run guards` checks that both declarations agree. Local `next start` now
+serves them, but live HTML still lacks CSP and X-Frame-Options until deployment.
+Existing HTTP redirects remain in place. `/internal/*` is protected by the
+server-side proxy, independently of the existing Netlify role redirect.
 
-**Neither Netlify site will build until these are changed.** Before
-consolidation, each app was the root of its own repository, so no base or
-package directory was needed. The apps have moved, and a Netlify site cannot
-discover that on its own.
+Admin SPA fallback lives in `apps/admin/public/_redirects` and is copied by
+Vite. `/AdminDashboard` currently returns HTTP 200. Prepared admin headers add
+HSTS, frame protection, content-type protection, referrer and permissions policies.
+CSP is report-only pending an authenticated browser check; it does not yet enforce
+resource restrictions. Do not describe it as an enforcing CSP.
 
-In each site: **Project configuration → Build & deploy → Continuous deployment
-→ Build settings → Configure.**
+## Render API configuration
 
-### Public site (`accian.co.uk`)
+Production responses include `x-render-origin-server: Render` and `rndr-id`.
+The service name/ID, region, plan, source repository, deployed SHA, branch,
+commands, environment, and proxy topology still require dashboard confirmation.
+No existing Render manifest was found, and none has been invented.
 
-| Setting | Value |
+**Use the repository root as Render's Root Directory (empty), with the API
+workspace selected by commands.** Although the application is in `apps/api`,
+setting Render Root Directory to that path is incompatible with this workspace:
+Render makes files outside that directory unavailable, including root
+`package-lock.json` and `packages/types`. This restriction is explicit in
+[Render's monorepo documentation](https://render.com/docs/monorepo-support).
+
+| Setting to confirm/configure | Prepared value |
 |---|---|
-| Package directory | `apps/web` |
-| Base directory | *(empty — the repository root)* |
-| Build command | `npm run build:web` |
-| Publish directory | `apps/web/.next` |
+| Repository | `https://github.com/bobprince4u/accian` |
+| Branch | `master`, subject to confirmation of the deployment branch |
+| Root Directory | Empty: repository root |
+| Build command | `npm ci --include=dev && npm run build:api` |
+| Start command | `npm start --workspace accian-backend` |
+| Health check path | `/health` |
+| Runtime | Node 22 |
+| Listen port | Render-provided `PORT` |
 
-### Admin (`admin.accian.co.uk`)
+Dev dependencies are required at build time for TypeScript and shared types.
+The API reads the provided port and listens successfully; its existing local
+fallback is 2025. `/health` reports process health, not an active database probe.
+There is no separate readiness endpoint. Startup checks database connectivity.
+Combined request logging is enabled outside development; inspect logs after deploy.
+The code trusts one proxy hop; confirm the actual chain before adjusting it.
 
-| Setting | Value |
-|---|---|
-| Package directory | `apps/admin` |
-| Base directory | *(empty — the repository root)* |
-| Build command | `npm run build:admin` |
-| Publish directory | `apps/admin/dist` |
+**Startup runs migrations twice:** the start script runs the CLI, then the server
+calls the same idempotent runner. Both check migration records. Before any deploy
+or restart, inspect current schema/history and confirm a provider backup or
+restorable snapshot. Do not use the migration test suite on production: it drops
+and recreates the public schema. Do not run `migrate:down` as an application
+rollback; it targets only migration 001 and is not a general rollback command.
 
-### Why base directory stays at the repository root
+## Production environment matrix
 
-npm workspaces keep a **single lockfile at the workspace root**, and Netlify
-installs dependencies from the **base directory**. Pointing base at `apps/web`
-would leave npm looking for a `package-lock.json` that is not there, and it
-would fall back to an unpinned `npm install`.
+Values for secrets belong in host environments only. Use placeholders in any
+handoff document. Neither `NEXT_PUBLIC_*` nor `VITE_*` may contain secrets.
 
-The **package directory** tells Netlify which application a site builds without
-moving the install away from the workspace root. It can **only be set in the
-Netlify UI** — there is no `netlify.toml` key for it. This is the one piece of
-each site's configuration that cannot be reproduced from source.
-
-### Build scoping (optional, recommended)
-
-With base at the repository root, **a change anywhere in the repo triggers a
-build of both sites.** To stop the admin rebuilding when only the public site
-changed, add an [ignore command](https://docs.netlify.com/build/configure-builds/ignore-builds/)
-to each site. This was not configured as part of Phase 2 because it changes
-deploy behaviour and should be verified against a real deploy first.
-
----
-
-## 3. Environment variables
-
-**No secret values appear in this document or anywhere in this repository.**
-Variable names and their purpose only. The values live in each host's dashboard.
-
-### `apps/web` — public site (Netlify)
-
-| Variable | Required | Purpose |
+| Host | Variable | Requirement |
 |---|---|---|
-| `NEXT_PUBLIC_API_URL` | Yes | API base URL. `NEXT_PUBLIC_`-prefixed, so it is **embedded in the client bundle** and is not a secret. |
-| `INTERNAL_AREA_USER` | Yes | Basic-auth username for the `/internal/*` gate added in Phase 1. **Secret.** |
-| `INTERNAL_AREA_PASSWORD` | Yes | Basic-auth password for the same gate. **Secret.** |
+| Web | `NEXT_PUBLIC_API_URL` | Public API origin, build time |
+| Web | `INTERNAL_AREA_USER` | Server-only Basic-auth username, runtime |
+| Web | `INTERNAL_AREA_PASSWORD` | New random server-only password, runtime |
+| Admin | `VITE_API_URL` | Public API origin, build time |
+| API | `NODE_ENV` | Production mode |
+| API | `PORT` | Supplied by host |
+| API | `DATABASE_URL` | Secret PostgreSQL connection string |
+| API | `JWT_ACCESS_SECRET` | Secret access-token signing key |
+| API | `JWT_REFRESH_SECRET` | Separate secret refresh-token signing key |
+| API | `FRONTEND_URL` | Comma-separated trusted origins |
+| API | `RESEND_API_KEY` | Secret sending key |
+| API | `RESEND_FROM_EMAIL` | Sender on the verified Resend domain |
+| API | `ADMIN_EMAIL` | Controlled business notification recipient |
+| API | `PRE_CONSULTATION_RECIPIENT` | Submission recipient; falls back to `ADMIN_EMAIL` |
 
-If `INTERNAL_AREA_USER` / `INTERNAL_AREA_PASSWORD` are unset, the gate in
-`apps/web/proxy.ts` **fails closed**: `/internal/*` returns `503` with an empty
-body rather than serving the page. That is deliberate — an unconfigured gate
-must not expose the content it guards.
+Actual code uses `RESEND_FROM_EMAIL`, not `EMAIL_FROM`, and two JWT signing
+variables rather than `JWT_SECRET`. The internal credentials belong to the web
+runtime, not the API. `DB_PASSWORD` is not required by the active database pool.
+`TEST_DATABASE_URL` is only for an isolated disposable test database.
 
-### `apps/admin` — admin SPA (Netlify)
+Set `FRONTEND_URL` to `https://accian.co.uk,https://admin.accian.co.uk` and add
+`https://www.accian.co.uk` only if it is an intended browser origin. The current
+parser trims whitespace. Production startup rejects a missing/empty allowlist.
+Both primary origins and their preflights passed live; unrelated origins returned
+403 without an allow-origin header. Credentialed requests use explicit origins,
+never a wildcard.
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `VITE_API_URL` | Yes, for production builds | API base URL. |
+Remove `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL`, and obsolete SMTP variables
+from the host after verifying the Resend sender. The code still accepts legacy
+sender fallbacks (`SENDGRID_FROM_EMAIL`, `EMAIL_USER`); this is compatibility,
+not an active SendGrid transport. Do not rely on these fallbacks in production.
+The host environment has not yet been inspected, so removal is unverified.
+No private environment files are tracked; `.gitignore` excludes `.env.*` while
+allowing `.env.example`. Local ignored files are not evidence of host values.
 
-`VITE_`-prefixed variables are **compiled into the JavaScript bundle at build
-time** and are readable by anyone who loads the site. Never put a secret here.
+## Internal credential rotation
 
-`apps/admin/.env` is **tracked in git**, which is normally a mistake. It is kept
-because it holds exactly one variable — `VITE_API_URL`, pointing at
-`api.accian.co.uk` — which is public by construction: it ships inside the bundle
-either way. It is how the admin has been getting its production API URL.
-Removing it would change the build. **No credential is stored in it.** If a
-secret is ever needed by the admin, it must not go in this file.
+The old browser-shipped password remains compromised in Git history. Generate a
+new high-entropy password in a password manager and store it directly in Netlify's
+server environment with `INTERNAL_AREA_USER`. Do not place it in a public variable,
+source, log, terminal output, or documentation. Deploy with the runtime values
+available, then verify unauthenticated/wrong/malformed credentials return 401
+and valid credentials return 200. Also verify `Cache-Control: no-store` on denials.
 
-In a production build, `resolveAdminApiBase()`
-(`apps/admin/src/services/apiConfig.ts`) **throws** if `VITE_API_URL` is unset,
-rather than silently falling back to a development origin.
+Current live responses are 503 for all three negative cases: the gate fails
+closed because it is unconfigured. Rotation has not been performed. Local
+production-server checks with throwaway credentials returned 401/401/401/200.
+Do not substitute these local results for production rotation verification.
 
-### `apps/api` — Express API
+## PostgreSQL
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `DATABASE_URL` | Yes | PostgreSQL connection string. **Secret.** |
-| `DB_PASSWORD` | Yes | Database password. **Secret.** |
-| `JWT_ACCESS_SECRET` | Yes | Signing key for access tokens. **Secret.** |
-| `JWT_REFRESH_SECRET` | Yes | Signing key for refresh tokens. **Secret.** |
-| `RESEND_API_KEY` | Yes | Resend credential. **Secret.** Belongs to `apps/api` only — never to `apps/web` or `apps/admin`. |
-| `RESEND_FROM_EMAIL` | Yes | Verified sender address. Must be on a domain verified in Resend (§ below). |
-| `ADMIN_EMAIL` | Yes | Recipient for contact-form notifications. Without it, admin notifications fail and say so by name. |
-| `PRE_CONSULTATION_RECIPIENT` | Yes | Recipient for PhD pre-consultation submissions and their attachments — `info@accian.co.uk` in production. Falls back to `ADMIN_EMAIL`; with neither set, `POST /api/pre-consultation` answers with a delivery failure instead of telling an applicant their form arrived. |
-| `SENDGRID_API_KEY` | **Remove** | Former provider. No longer read by any code. Delete it from the host. |
-| `SENDGRID_FROM_EMAIL` | Deprecated | Still honoured as a fallback sender so a half-renamed environment keeps working. Rename to `RESEND_FROM_EMAIL`; the API logs a warning while it is in use. |
-| `EMAIL_USER` | — | Legacy sender address; see `docs/known-issues.md`. |
-| `FRONTEND_URL` | **Should be set** | Comma-separated CORS allowlist. See the warning below. |
-| `NODE_ENV` | Yes | Must be `production` in production. |
-| `PORT` | Host-dependent | Listen port. |
-| `TEST_DATABASE_URL` | Tests only | Database for the migration test suite. Never a production database. |
+The ignored local connection points to a Neon hostname. This supports a provider
+inference only; the Render connection and Neon project/branch must be confirmed.
+A read-only transaction verified the nine expected tables, relevant columns,
+and all six migration records in that configured database. No rows were exposed,
+written, deleted, or migrated. Backup availability is unconfirmed.
 
-`apps/api/.env` is **not** tracked. `apps/api/.env.example` is tracked and
-contains no values.
+For a deployment: compare migration registry with `schema_migrations`; inspect
+SQL and current columns; confirm a restorable backup and rollback implications;
+only then run the existing startup process. Use `scripts/phase4-db-readonly.cjs`
+for explicit read-only auditing. It prints schema metadata and aggregate counts,
+never connection details. Connection errors are suppressed. It uses the existing
+PostgreSQL TLS configuration; confirm provider TLS/certificate requirements.
 
-> **`FRONTEND_URL` warning.** If it is unset, the API falls back to a hardcoded
-> production allowlist (`accian.co.uk`, `www.accian.co.uk`,
-> `admin.accian.co.uk`). CORS keeps working, so **a missing variable is
-> invisible until someone needs to change an origin.** The value is also split
-> on `,` **without trimming whitespace**: `"a.com, b.com"` yields `" b.com"`,
-> which will never match an `Origin` header. Do not put spaces after the commas.
+## Resend
 
-### Email provider: SendGrid → Resend
+The actual sending domain, key permissions, production sender, host configuration,
+and delivery are unverified. Intended domain: `accian.co.uk`. Sender format:
+`ACCIAN <notifications@verified-domain.example>` or a bare verified-domain address.
+The real address is set with `RESEND_FROM_EMAIL`.
 
-The API sends two emails per contact-form submission: a confirmation to the
-person who submitted, and a notification to `ADMIN_EMAIL`. It sends a third
-kind of message, unrelated to the contact form: one pre-consultation submission
-to `PRE_CONSULTATION_RECIPIENT`, carrying the applicant's documents as
-attachments. Phase 3 replaced SendGrid with Resend. `@sendgrid/mail` is no
-longer a dependency.
+Use Resend's dashboard-generated DNS records; do not invent or duplicate SPF
+records. Verify the domain before sending. Use a sending-only API key where
+possible, scoped to the intended domain. Rotation: create replacement, store
+it in the API host, redeploy, perform the agreed single controlled delivery test,
+then revoke the former key after success. Never expose a key to browser builds.
 
-The provider sits behind `apps/api/src/services/emailProvider.ts`. Templates,
-placeholder substitution, HTML escaping and `email_logs` are unchanged — the
-migration changed only how a message leaves the process.
+A contact submission sends two messages: submitter confirmation and business
+notification. Plan one controlled submission with both recipient mailboxes under
+control, and verify provider acceptance and actual inbox receipt of both messages.
+Record message IDs privately, sender/subject, rendered HTML, escaped user content,
+and persisted contact/email-log status. Do not submit repeatedly. Local tests
+stub the transport and verify escaping, persistence, and failure contracts;
+they do not establish production delivery. Do not disable production email or
+break its provider to test failure. Pre-consultation delivery and attachment limits
+also need verification before declaring that production flow complete.
 
-**Attachment budget.** A pre-consultation message can carry up to 20 MB of
-documents (`PRE_CONSULTATION_FILE_LIMITS.maxTotalBytes`), and base64 encoding
-inflates that by roughly a third on the way to the provider. Resend's own
-message-size ceiling therefore has to be above that figure, or a submission
-with a full set of documents is rejected at send time and the applicant is
-correctly told their form was not received. If the limits in
-`packages/types/src/preConsultation.ts` are ever raised, check the provider's
-ceiling in the same change.
+## Reproducible commands
 
-**Cutover, in order:**
-
-1. Verify the sending domain in Resend (below). Nothing sends until this is done.
-2. Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` on the API host.
-3. Deploy.
-4. Confirm a real submission produces both emails and two `sent` rows in
-   `email_logs`.
-5. Only then remove `SENDGRID_API_KEY` and `SENDGRID_FROM_EMAIL` from the host.
-
-Step 5 is last on purpose: while `SENDGRID_FROM_EMAIL` is still set, it acts as
-a fallback sender, so a partially-renamed environment keeps sending from the
-right address instead of silently falling back to the hardcoded
-`noreply@accian.co.uk`.
-
-**Domain verification (DNS).** Resend will not deliver from a domain it has not
-verified. The records are generated per-domain in the Resend dashboard —
-**they are not reproduced here, because they are account-specific and inventing
-them would produce a domain that silently fails to send.** Retrieve them from
-Resend → Domains → add `accian.co.uk` → follow the records it displays.
-
-Expect to add, at the registrar that holds `accian.co.uk` DNS:
-
-- a **DKIM** record (a `TXT` or `CNAME` record on a Resend-provided selector
-  subdomain), and
-- an **SPF** record (a `TXT` record on the sending subdomain), and
-- optionally a **DMARC** policy record on `_dmarc.accian.co.uk`.
-
-If `accian.co.uk` already publishes an SPF record for another sender, it must
-be **merged**, not duplicated — a domain with two `TXT` SPF records fails SPF
-outright. No DNS change has been made as part of this phase.
-
-`RESEND_FROM_EMAIL` must be an address on the verified domain. A verified
-domain plus an unverified `From` address is the most common cause of a
-`validation_error` from the provider.
-
-**Key handling.** `RESEND_API_KEY` is read only inside `emailProvider.ts`, at
-send time. It is never logged, never returned to an API client, and never
-placed in an error message: provider errors pass through `redactProviderMessage`,
-which strips key- and address-shaped substrings before anything is written to
-stdout or to `email_logs.error_message`. It must not be added to `apps/web` or
-`apps/admin` in any form — a `VITE_`-prefixed copy would ship inside the browser
-bundle.
-
-**Tests never send.** `setEmailTransport` replaces the transport in the suite,
-and the real transport refuses to construct a client at all under
-`NODE_ENV=test`, so the suite cannot reach the provider even if a real key is
-present in the environment.
-
----
-
-## 4. Node version
-
-**Node 22.** Verified, not assumed — all three applications already agreed
-before consolidation:
-
-- `apps/web/package.json`, `apps/api/package.json`, `apps/admin/package.json`
-  each declare `"engines": { "node": ">=22.0.0 <23" }`.
-- Each app tracks a `.nvmrc` containing `22`, and the repository root now does
-  too.
-
-There is **no conflict** between the three, so no version had to be chosen.
-
-Netlify reads `.nvmrc` from the **base directory** — the repository root — which
-is why the root `.nvmrc` matters. The per-app files are kept so each app still
-declares its own requirement.
-
----
-
-## 5. The API deployment is not reproducible from source
-
-**This is the single largest gap in this document, and it predates Phase 2.**
-
-The API has **no deployment configuration in version control** — no
-`Dockerfile`, no `Procfile`, no `render.yaml`, no `fly.toml`, no `vercel.json`,
-no `app.yaml`, no CI workflow. This was confirmed by searching all three
-repositories, tracked and untracked, before and after consolidation.
-
-`api.accian.co.uk` demonstrably serves traffic, so something hosts it. What that
-is, and how it is configured, exists **only in a hosting dashboard that cannot
-be read from this repository.**
-
-Before the first deploy from this layout, a human must record here:
-
-- [ ] Hosting provider and region
-- [ ] Repository and branch the deploy tracks
-- [ ] **Root/base directory** — this **must** be updated to `apps/api`
-- [ ] Build command — expected: `npm run build:api` (or `npm run build` inside `apps/api`)
-- [ ] Start command — expected: `npm start` inside `apps/api`, which runs
-      `node dist/migrations/cli.js && node dist/server.js`
-- [ ] Node version configured on the host
-- [ ] Environment variables set there (names only — never values)
-- [ ] PostgreSQL host, and whether it is reachable only from the app's network
-- [ ] Whether TLS terminates at a proxy in front of the app
-
-> **The API runs database migrations on every start.** `npm start` is
-> `node dist/migrations/cli.js && node dist/server.js`. A deploy is therefore
-> also a migration. Know what the pending migrations do before deploying.
-
-### `apps/api/dist/` is committed
-
-39 build artifacts are tracked. They were left in place during Phase 2 —
-removing them is a behavioural risk, because **if the host does not run a build
-step, the committed `dist/` is what actually runs.** Until §5 is answered, that
-cannot be ruled out. See `docs/known-issues.md`.
-
----
-
-## 6. Building locally
-
-From the repository root:
+From a fresh repository root, with Node 22:
 
 ```bash
-nvm use            # Node 22, per .nvmrc
-npm install        # installs all workspaces from the single root lockfile
-
-npm run build:web      # Next.js production build
-npm run build:admin    # tsc -b && vite build
-npm run build:api      # tsc, then copy templates and .sql migrations into dist/
-
-npm run lint:web
-npm run lint:admin
-npm run test:api       # requires TEST_DATABASE_URL for the migration suite
-npm run test:admin
-
-npm run guards         # structural checks on the monorepo layout
+npm ci
+npm test
+npm run lint
+npm run guards
+NEXT_PUBLIC_API_URL=https://api.accian.co.uk npm run build:web
+VITE_API_URL=https://api.accian.co.uk npm run build:admin
+npm run build:api
 ```
 
-Every one of these commands is wired to a script that already exists in the
-corresponding application. None were invented for the sake of a tidy README.
+Set `TEST_DATABASE_URL` only to a disposable database to include real migration
+tests. Existing tests refuse real email under test mode. Web build downloads
+Google Fonts, so it needs network access. No dependency versions were changed;
+root lockfile hash was unchanged after installation. The audit reports 19
+advisories in the final clean-install audit, including two critical; dependency remediation requires separate,
+scoped assessment rather than broad upgrades in this phase.
 
-Development servers (`npm run dev:web`, `npm run dev:admin`) run the app's own
-`dev` script. **`apps/api` has no working `dev` script** — it points at a file
-that does not exist, a bug that predates Phase 2 and was left alone because
-fixing it is out of scope. Run the API with `npm run build:api` then
-`npm start --workspace accian-backend`. See `docs/known-issues.md`.
+## Deployment procedure
 
----
+1. Review changes and obtain explicit commit/push instructions. No commit or push
+   was made during this run. Record current deploy IDs/SHAs and backups first.
+2. Merge/push only when instructed; verify auto-deploy effects for all three hosts.
+3. Deploy web with the package-directory settings and rotated runtime credentials;
+   verify headers, gate, public routes, assets, and browser API requests.
+4. Deploy admin with its package-directory settings; verify SPA routing, API target,
+   login/refresh/logout, protected lists, and security headers.
+5. Deploy API using root workspace commands after migration/backup review;
+   verify `/health`, CORS, public endpoints, logs, and authenticated requests.
+6. Run smoke tests and compare dashboard counts with the confirmed production DB.
+7. Perform the single controlled contact/email test and verify actual receipt.
+8. Verify reversible project/testimonial test records through admin/API/DB/web,
+   and record cleanup. Verify services and relevant pre-consultation behavior.
+9. Update the production report with observed results, deployment IDs, and remaining
+   conditions. Never mark an unperformed test PASS.
 
-## 7. Dependencies and the lockfile
+Local tests of unavailable/invalid API responses cover error contracts without
+interrupting production. Authenticated invalid-record tests must use a controlled
+session and safe records. An HTTP 200 document is not proof of browser rendering
+or successful authenticated business flows.
 
-There is **one lockfile**, at the repository root. The three per-app lockfiles
-were removed — npm workspaces resolves the whole tree into a single file, and a
-stray lockfile inside a workspace silently overrides that. `npm run guards`
-checks this.
+## Rollback
 
-Consolidating the lockfiles **re-resolved 37 direct dependencies** to newer
-versions within their declared `^` ranges — among them `react 19.2.4 → 19.3.0`,
-`next 16.2.0 → 16.3.5` and `pg 8.16.3 → 8.23.0`. Deleting a lockfile makes npm
-resolve every range from scratch, which is exactly what a committed lockfile
-exists to prevent.
-
-Those upgrades were **reverted.** Every direct dependency now resolves to the
-version it had before the move, and the declared ranges in each `package.json`
-are unchanged. Verified mechanically: a comparison against the three original
-lockfiles reports **zero** direct-dependency differences. Phase 2 moved files; it
-did not upgrade anything.
-
-The root `package.json` carries one `overrides` entry:
-
-```json
-"overrides": { "framer-motion": { "motion-dom": "12.23.23", "motion-utils": "12.23.6" } }
-```
-
-This is not a preference — it is a correctness fix. `framer-motion@12.23.26`
-imports `activeAnimations` from `motion-dom`, declaring the range `^12.23.23`. A
-fresh resolve satisfies that range with `12.43.0`, which **no longer exports that
-symbol**, and the admin's Vite build fails. The original lockfile had pinned
-`motion-dom` to `12.23.23`. Pinning direct dependencies alone does not reach it,
-and an `overrides` block inside `apps/admin/package.json` is **ignored** — npm
-only honours overrides from the workspace root. Hence the nested form above.
-
-> **Platform-specific binaries.** Some packages (Next's SWC compiler, Tailwind's
-> oxide, Vite's rollup, lightningcss) ship a separate prebuilt binary per
-> OS/architecture as optional dependencies. An *incremental* `npm install`
-> records only the current platform's, which prunes the others from the lockfile
-> and makes Next.js attempt a self-patch that fails inside a workspace
-> (`ENOWORKSPACES`). The committed lockfile was generated by a **clean** install
-> and contains all 8 `@next/swc-*` entries, so Linux, macOS and Windows all
-> install correctly. If they ever go missing, restore with
-> `rm -rf node_modules package-lock.json && npm install` — and note that
-> `npm install --package-lock-only --include=optional` makes it worse, removing
-> them entirely. See `docs/known-issues.md`.
-
-`npm ci` was verified to be **idempotent** against this lockfile: it installs
-without rewriting the file, byte for byte.
-
-### `@accian/types` is a compile-time-only dependency of `apps/api`
-
-`packages/types` holds the shared API contract. `apps/api` consumes it, but
-**only as types** — every import of it in the API is a type-only import, so
-TypeScript erases it during compilation and the name appears nowhere in
-`apps/api/dist/`.
-
-This is deliberate, and it is why the package is declared in the API's
-**`devDependencies`** rather than its `dependencies`:
-
-- §5 records that the API's root directory must be `apps/api`, and **which host
-  runs it is not known from this repository.**
-- If that host runs `npm install` inside `apps/api` alone, rather than from the
-  repository root, there is no workspace symlink and `@accian/types` does not
-  resolve at all.
-- Because the dependency is erased at compile time, that install still produces
-  a working API. A runtime import would crash the process on boot.
-
-Verified, not assumed: after a production build, `@accian/types` is absent from
-the API's `require` graph, and its runtime exports appear **zero** times in the
-admin's browser bundle.
-
-The practical rule: **never add a value import of `@accian/types` to
-`apps/api`** — no enums, no constants, no runtime helpers, only `import type`.
-Doing so would turn a compile-time dependency into a runtime one and break a
-host that installs inside `apps/api`.
-
-The same applies to `resend`, in the opposite direction: it *is* a genuine
-runtime dependency of `apps/api` and is declared in `dependencies`. It must
-never be added to `apps/web` or `apps/admin`.
-
-> **Platform-specific binaries.** See §7 — the committed lockfile contains all
-> 8 `@next/swc-*` platform entries, so Netlify (Linux x64), macOS and Windows
-> all install correctly.
-
----
-
-## 8. What has not been verified
-
-Stated plainly, because the difference matters:
-
-| Checked | How |
-|---|---|
-| All three apps build from the monorepo | Run locally — `build:web` (7 routes + middleware), `build:admin`, `build:api` |
-| API test suite — 109 pass, 0 fail, 0 cancelled, 0 skipped | Run locally against a real PostgreSQL database |
-| Admin test suite — 19 pass, 0 fail, 0 cancelled, 0 skipped | Run locally |
-| Lint clean for web and admin | `lint:web` and `lint:admin`, both 0 errors 0 warnings |
-| Migration files resolve after relocation | The migration suite ran against a live database, not skipped |
-| Monorepo structure invariants | `npm run guards` — 9 checks |
-| No secrets in the Phase 2 change set | Pattern scan over every added/modified file |
-| `npm ci` reproduces the lockfile exactly | Compared byte for byte before and after |
-
-| **Not checked** | **Why** |
-|---|---|
-| That either Netlify site deploys from this layout | Requires a deploy. The dashboard changes in §2 have not been made. |
-| That the API deploys from this layout | Requires §5 to be answered first. |
-| That production URLs still serve correctly | Requires a deploy. |
-| That the `/internal/*` gate works in production | Netlify-level headers are not applied by a local `next start`. |
-| Response headers in production | `netlify.toml` is not involved locally. Verify with `curl -sI <deploy-preview-url>`. |
-| Anything about the production database | Deliberately untouched. |
-
-**Nothing in this repository has been deployed.** No commit has been pushed.
-
-### Verifying after the first deploy
-
-```bash
-# Response headers actually served (deploy preview, not localhost)
-curl -sI https://<deploy-preview>.netlify.app | grep -iE 'content-security-policy|strict-transport'
-
-# The internal gate: expect 401 without credentials
-curl -si https://<deploy-preview>.netlify.app/internal/quote-builder | head -1
-
-# API reachability and CORS
-curl -si https://api.accian.co.uk/api/services -H 'Origin: https://accian.co.uk' | head -20
-```
-
----
-
-## 9. Rollback
-
-The three original repositories still exist and are **unchanged**:
-
-- `bobprince4u/accian` — the public site, now this repository's root
-- `bobprince4u/accian-backend`
-- `bobprince4u/admin`
-
-None has been pushed to. Their last commits before consolidation were
-`e40c0fc`, `be5e464` and `a877ba2` respectively, and **all three remain
-reachable in this repository's history** — the consolidation preserved all 157
-commits rather than starting fresh.
-
-**Do not delete or archive the two source repositories** until a full deploy and
-verification cycle has completed for all three applications.
+Netlify: identify each site's previous known-good deploy ID, then use its deploy
+history to publish that deployment independently; restore compatible environment
+values if they changed. Render: identify the previous successful deploy and use
+the service's rollback/redeploy mechanism; verify health, CORS, and DB compatibility.
+Record target IDs before deployment. Dashboard availability and target IDs have
+not been verified, so these are procedures awaiting confirmation, not a tested
+rollback path. Application rollback does not undo database migrations or rotate
+secrets back to compromised values. Confirm backup/restore capability separately.

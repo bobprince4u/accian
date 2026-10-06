@@ -33,6 +33,12 @@
   command = "npm run build:web"
   publish = "apps/web/.next"
 
+[build.environment]
+  NODE_VERSION = "22"
+
+[context.production.environment]
+  NEXT_PUBLIC_API_URL = "https://api.accian.co.uk"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
@@ -48,42 +54,40 @@
   status = 301
   force = true
 
-# This file is the single source of truth for response headers.
+# These headers cover files served straight from the Netlify CDN. They are NOT
+# the whole story, and this block used to claim otherwise.
 #
-# The same headers were previously also declared in `next.config.ts`, and the
-# two copies had drifted: different HSTS max-age values, and a `frame-src`
-# that existed in only one of them. Netlify's own guidance is to pick one
-# source of truth per header, and to keep security headers here rather than in
-# framework config, because these apply uniformly to static assets *and* to
-# function (SSR) responses. The duplicate block in `next.config.ts` has been
-# removed; see the note there.
+# The same headers were once declared in `next.config.ts` too, and the two
+# copies had drifted: different HSTS max-age values, and a `frame-src` that
+# existed in only one of them. The duplicate was removed and this file was made
+# the single source of truth, on the stated premise that headers here "apply
+# uniformly to static assets *and* to function (SSR) responses".
 #
-# Trade-off worth knowing: headers declared here do not apply to `next dev` or
-# a local `next start`, so a CSP violation will not surface locally. Verify
-# against a deploy preview:
-#   curl -sI https://<deploy-preview>.netlify.app/ | grep -i content-security-policy
+# That premise is wrong, and production disproved it on 2026-09-25. With
+# `@netlify/plugin-nextjs`, every HTML document is rendered by the Next runtime,
+# and this layer decorates CDN-served files only:
+#
+#   curl -sI https://accian.co.uk/sitemap.xml   -> CSP present, X-Frame-Options: DENY
+#   curl -sI https://accian.co.uk/              -> no CSP, no X-Frame-Options
+#
+# Every page on the site was serving without a CSP, including /contact and
+# /pre-consultation. The HSTS on those responses was Netlify's own default
+# (max-age=31536000), not the value declared below — the same value
+# admin.accian.co.uk returns while declaring no headers at all, which is what
+# identifies it as the platform default rather than this file.
+#
+# The values are therefore declared in `apps/web/config/securityHeaders.ts` and
+# read from there by `next.config.ts`, which covers the documents. The copies
+# below cover the CDN. `npm run guards` fails if the two disagree, so the drift
+# that caused the original consolidation cannot come back silently.
+#
+# CHANGE BOTH OR NEITHER: edit `config/securityHeaders.ts`, then mirror it here.
 [[headers]]
   for = "/*"
   [headers.values]
     Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
-    # Directive notes, all verified against the current source:
-    #   style-src   fonts.googleapis.com is REQUIRED. `app/internal/quote-builder/page.tsx`
-    #               loads a stylesheet with `@import url('https://fonts.googleapis.com/...')`.
-    #               An @import is governed by style-src, and 'unsafe-inline' does not
-    #               cover it, so the policy previously blocked that font load outright.
-    #               `views/ResearchSupport.tsx` did the same until it was rebuilt on the
-    #               site's own palette and Poppins; quote-builder is now the only caller,
-    #               and this directive can go when that page follows.
-    #   font-src    fonts.gstatic.com is the host those stylesheets then pull the
-    #               font files from. Everything else is self-hosted by `next/font`,
-    #               so this no longer needs a blanket `https:`.
-    #   connect-src google-analytics.com removed: there is no analytics, gtag or
-    #               external script anywhere in the source.
-    #   frame-src   omitted deliberately. There is no iframe, embed or object in the
-    #               source, and default-src 'self' already covers the directive.
-    #   script-src  'unsafe-inline' and 'unsafe-eval' are retained as-is. Tightening
-    #               them needs a nonce/hash strategy and a deploy to verify, which is
-    #               beyond a stabilization fix — flagged as follow-up work.
+    # Why each directive is what it is: `config/securityHeaders.ts`. The string
+    # below must match the one that module builds, character for character.
     Content-Security-Policy = "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.accian.co.uk; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests;"
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"

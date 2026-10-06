@@ -127,6 +127,61 @@ console.log("Architecture guards\n");
   check(strays.length === 0, "no lockfiles inside workspaces", `found: ${strays.join(", ")}`);
 }
 
+// 7. The web app's security headers are declared twice by necessity, and the
+//    two copies must agree. `config/securityHeaders.ts` covers HTML documents,
+//    which `@netlify/plugin-nextjs` renders through the Next runtime;
+//    `netlify.toml` covers files served straight from the CDN, which never
+//    reach Next. Neither layer can cover both.
+//
+//    The copies drifted once before — different HSTS max-age, a `frame-src` in
+//    only one — and because a browser enforces every CSP it receives and takes
+//    the intersection, the policy actually in force matched neither file. That
+//    is what this guard exists to prevent.
+{
+  const tsPath = join(ROOT, "apps", "web", "config", "securityHeaders.ts");
+  const tomlPath = join(ROOT, "apps", "web", "netlify.toml");
+
+  if (!existsSync(tsPath) || !existsSync(tomlPath)) {
+    check(false, "web security headers are declared in both layers",
+      `missing: ${[tsPath, tomlPath].filter((p) => !existsSync(p)).map((p) => relative(ROOT, p)).join(", ")}`);
+  } else {
+    // { key: "Name", value: "..." } — the value may be a bare string or a
+    // reference to the CSP constant declared above it in the same file.
+    const ts = readFileSync(tsPath, "utf8");
+    const csp = ts.match(/CONTENT_SECURITY_POLICY\s*=\s*\n?\s*"([^"]+)"/)?.[1];
+    const declared = new Map(
+      [...ts.matchAll(/key:\s*"([^"]+)",\s*(?:\/\/[^\n]*\n\s*)*value:\s*(?:"([^"]+)"|CONTENT_SECURITY_POLICY)/g)]
+        .map((m) => [m[1], m[2] ?? csp]),
+    );
+
+    // Only the `for = "/*"` block; `/internal/*` sets X-Robots-Tag and is not
+    // part of the shared set.
+    const toml = readFileSync(tomlPath, "utf8");
+    const block = toml.split(/^\[\[headers\]\]$/m)
+      .find((s) => /^\s*for\s*=\s*"\/\*"/m.test(s)) ?? "";
+    const mirrored = new Map(
+      [...block.matchAll(/^\s{4}([A-Za-z-]+)\s*=\s*"([^"]*)"/gm)].map((m) => [m[1], m[2]]),
+    );
+
+    const names = new Set([...declared.keys(), ...mirrored.keys()]);
+    const mismatches = [...names].flatMap((name) => {
+      const a = declared.get(name);
+      const b = mirrored.get(name);
+      if (a === b) return [];
+      if (a === undefined) return [`${name}: in netlify.toml only`];
+      if (b === undefined) return [`${name}: in securityHeaders.ts only`];
+      return [`${name}:\n  securityHeaders.ts: ${a}\n  netlify.toml:       ${b}`];
+    });
+
+    check(declared.size > 0, "securityHeaders.ts declares headers", "none parsed — has the file's shape changed?");
+    check(
+      mismatches.length === 0,
+      "web security headers agree between securityHeaders.ts and netlify.toml",
+      mismatches.join("\n"),
+    );
+  }
+}
+
 console.log();
 if (failures.length) {
   console.error(`${failures.length} guard(s) failed.`);

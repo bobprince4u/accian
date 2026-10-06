@@ -22,13 +22,10 @@ pnpm-debug.log*
 lerna-debug.log*
 
 # Environment files. Never commit real credentials; .env.example is the
-# tracked, value-free template. apps/admin/.env is a pre-existing tracked
-# exception documented in docs/deployment.md: it holds only VITE_API_URL,
-# which is a public, client-bundled value, not a secret.
+# tracked template. Production values belong in the hosting dashboards.
 .env
-.env.local
-.env.production
-.env.*.local
+.env.*
+!.env.example
 
 # Build output, by framework. Repeated here so a stray build at the root or in
 # a new workspace is ignored before it can be committed.

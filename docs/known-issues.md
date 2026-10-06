@@ -8,63 +8,24 @@ repositories into one; it did not set out to change how the applications behave,
 so pre-existing bugs were documented rather than quietly fixed. Where an issue
 *was* introduced or changed by the consolidation, it says so.
 
-Nothing in this list blocks a build. All three applications build and lint clean
-from this repository, and all test suites pass.
+Phase 4 verification on 6 October 2026 found production blockers despite passing
+local builds, lint, and tests. See [the production report](phase4-production-report.md)
+for live findings; historical Phase 2 statements below describe their original date.
 
 ---
 
-## 1. `apps/api` has no working `dev` script
+## 1. API development script — resolved in current source
 
-**Severity: low — affects developers, not production.**
-
-```
-"dev": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' server.ts"
-```
-
-It targets `server.ts` at the package root. That file does not exist; the real
-entry point is `src/server.ts`. The script has therefore never worked, and this
-is why the root `package.json` provides `dev:web` and `dev:admin` but no
-`dev:api` — §7 of the Phase 2 brief forbids documenting commands that do not
-work.
-
-**Workaround.** Build and run:
-
-```bash
-npm run build:api
-npm start --workspace accian-backend
-```
-
-Note that `npm start` also runs migrations — see [§4](#4-the-api-runs-migrations-on-every-start).
-
-**Fix.** Change `server.ts` to `src/server.ts`. It is a one-word edit, left out
-of Phase 2 only because it changes a script rather than a path, and no
-verification of it was possible beyond "nodemon starts".
+The current script targets `src/server.ts`. The previous package-root target is
+no longer present. Phase 4 did not change this script.
 
 ---
 
-## 2. `apps/api/dist/` is committed — 39 tracked build artifacts
+## 2. API compiled output tracking — resolved in current repository
 
-**Severity: medium — this may be what actually runs in production.**
-
-The compiled output is tracked in git. Normally that is just noise, but here it
-carries real risk in both directions:
-
-- If the host runs a build step, the committed `dist/` is dead weight that will
-  drift out of sync with `src/` and mislead anyone reading the repository.
-- **If the host does *not* run a build step, the committed `dist/` is the
-  application.** Deleting it would break production.
-
-Which of those is true cannot be determined from this repository, because the
-API has no deployment configuration in version control at all — see
-[`deployment.md` §5](./deployment.md#5-the-api-deployment-is-not-reproducible-from-source).
-
-**Left in place deliberately.** Removing 39 tracked files whose role is unknown
-is not a cleanup, it is an untested production change.
-
-**Fix.** Answer `deployment.md` §5 first. Once the host is known to run
-`npm run build`, add `apps/api/dist/` to `.gitignore` and `git rm -r --cached`
-it — and deploy immediately afterwards, while the previous release is still
-rollback-able.
+`git ls-files apps/api/dist` returns no tracked files. Builds produce ignored
+output. Render must run the documented root workspace build before starting;
+actual dashboard commands remain unverified. See [deployment.md](deployment.md).
 
 ---
 
@@ -107,50 +68,21 @@ rather than a code one. Recorded so nobody is surprised.
 
 ---
 
-## 5. `apps/admin` sends no security headers
+## 5. Admin production security headers — prepared, awaiting deployment
 
-**Severity: medium for a site behind a login.**
-
-The admin SPA sets no `Content-Security-Policy`, `Strict-Transport-Security`,
-`X-Frame-Options` or `X-Content-Type-Options`. The public site got a
-consolidated CSP in Phase 1; the admin did not, because it was a separate
-repository at the time.
-
-`apps/admin/netlify.toml` was created during Phase 2 for the build settings the
-relocation required. It deliberately **does not** add headers: that would change
-how the deployed product behaves, is not needed to make the monorepo work, and
-could not be verified without a production deploy. A CSP that is wrong is worse
-than none — it breaks the app for real users after the deploy, not during it.
-
-**Fix.** Add a `[[headers]]` block to `apps/admin/netlify.toml`, then verify
-against a Netlify **deploy preview** before promoting:
-
-```bash
-curl -sI https://<deploy-preview>.netlify.app | grep -i content-security-policy
-```
-
-Start report-only (`Content-Security-Policy-Report-Only`) and watch for
-violations before enforcing.
+Live HTTP responses on 6 October 2026 lack frame/content-type protection and CSP.
+Phase 4 prepares baseline headers and report-only CSP in `apps/admin/netlify.toml`.
+Deployment and an authenticated browser check are still required. Report-only CSP
+does not enforce resource restrictions. See [the report](phase4-production-report.md).
 
 ---
 
-## 6. `apps/admin/.env` is tracked in git
+## 6. Environment-file tracking — resolved; host settings still unverified
 
-**Severity: none as it stands — but it is a trap.**
-
-Tracking a `.env` file is normally a mistake. This one holds exactly one
-variable, `VITE_API_URL`, and `VITE_`-prefixed values are **compiled into the
-JavaScript bundle** — so its value is public by construction and readable by
-anyone who loads the site. No credential is in it, and it is how the admin has
-been getting its production API URL. Removing it would change the build.
-
-The root `.gitignore` ignores `.env*` and carries a comment recording this file
-as a deliberate, documented exception. Note that **gitignore never untracks an
-already-tracked file**, so the file continues to be tracked either way.
-
-**The trap:** the next person to add a variable to this file may add a real
-secret, which would then be committed *and* shipped in the bundle. Any secret the
-admin needs must live in the Netlify dashboard, not here.
+No private `.env` files are currently tracked. The ignored local admin environment
+contains its public API URL. Production frontend URL settings are declared in the
+Netlify production contexts. Root ignore rules exclude `.env.*` while allowing the
+API `.env.example`. Never place secrets in public frontend variables.
 
 ---
 
@@ -236,22 +168,14 @@ by a drift test.
 
 ---
 
-## 10. Both Netlify sites need dashboard changes before they will build
+## 10. Hosting dashboard settings and production deployment remain unverified
 
-**Severity: high, but expected and unavoidable.**
-
-Each app used to be the root of its own repository. They are now in `apps/`, and
-a Netlify site cannot discover that on its own. **Until the dashboard settings in
-[`deployment.md` §2](./deployment.md#2-required-dashboard-changes) are updated,
-both sites will fail to build.**
-
-This is inherent to consolidation, not a defect in it. The required values are
-recorded in `deployment.md` and repeated in comments at the top of each
-`netlify.toml`.
-
-Related: the **package directory** setting can only be set in the Netlify UI —
-there is no `netlify.toml` key for it — so that one piece of each site's
-configuration cannot be reproduced from source.
+Both public sites currently serve HTTP 200, but live responses cannot prove their
+package directory, branch, repository link, environment scopes, or build commands.
+Confirm the Netlify settings and Render workspace-root configuration in
+[deployment.md](deployment.md). Render must retain repository-root access because
+its `apps/api` root setting would exclude shared types and the root lockfile.
+No deployment was performed in this Phase 4 verification run.
 
 ---
 
@@ -345,3 +269,20 @@ inert) rather than claiming a job it no longer does.
 the admin SPA, then change the template, then this test. Doing it in the other
 order ships a broken button.
 
+
+---
+
+## 14. Phase 4 production blockers and dependency audit
+
+The internal web gate returns 503 because its runtime credentials are unconfigured.
+The previously exposed password still requires rotation. Live web documents lack
+CSP/frame protection; local corrections await deployment. Resend sending/domain
+status, inbox receipt, authenticated admin flows, production database identity,
+backup, and rollback targets are unverified. No controlled recipient or hosting
+access was available for completion.
+
+The pinned dependency audit reports 19 advisories in the final clean-install audit (2 critical, 15 high,
+1 moderate, 1 low). Affected direct packages include Next, axios, express-rate-limit, js-cookie,
+morgan, nodemon, react-router-dom, and Vite. No dependency upgrades were performed;
+assess applicability and targeted remediation separately. Full verification scope
+and the remaining business flows are in [the report](phase4-production-report.md).
