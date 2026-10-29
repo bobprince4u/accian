@@ -1,23 +1,14 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 import CookieBanner from "@/components/CookieBanner";
 import "./globals.css";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
-  variable: "--font-poppins",
-  display: "swap",
-});
-
 export const metadata: Metadata = {
   metadataBase: new URL("https://accian.co.uk"),
-  title: "ACCIAN Limited — Technology & Cybersecurity Solutions",
+  title: "ACCIAN Limited — Technology Consulting & Research Support",
   description:
-    "ACCIAN is a UK-registered technology and cybersecurity company delivering secure, scalable, and intelligent digital solutions.",
+    "UK-based technology consulting, software development, data solutions and postgraduate research application guidance.",
 };
 
 export default function RootLayout({
@@ -26,8 +17,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={poppins.variable}>
-      <body className="font-poppins min-h-screen flex flex-col bg-[#F5F3EE] antialiased">
+    <html lang="en-GB">
+      <body className="min-h-screen flex flex-col bg-[#F5F3EE] antialiased">
         <a href="#main-content" className="skip-link">Skip to content</a>
         <CookieBanner />
         <Navigation />

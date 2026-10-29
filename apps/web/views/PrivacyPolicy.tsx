@@ -48,7 +48,7 @@ const sections = [
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function PrivacyPolicy() {
   return (
-    <div className="bg-[#F5F3EE] min-h-screen">
+    <div className="content-page bg-[#F5F3EE] min-h-screen">
       <style>{`
         @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
@@ -56,9 +56,6 @@ export default function PrivacyPolicy() {
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-[#0D0D0D] py-12 sm:py-16">
-        {/* Orbs */}
-        <div className="absolute -top-20 -right-20 w-96 h-96 rounded-full bg-blue-600/12 blur-[100px] pointer-events-none" />
-        <div className="absolute top-1/2 left-1/4 w-64 h-64 rounded-full bg-blue-600/8 blur-[80px] pointer-events-none" />
 
         <div className="relative container mx-auto px-6 lg:px-12">
           <div className="max-w-2xl">

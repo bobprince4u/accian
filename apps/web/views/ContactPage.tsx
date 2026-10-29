@@ -327,7 +327,7 @@ export default function ContactPage() {
 
 
   return (
-    <div className="bg-[#F5F3EE]">
+    <div className="content-page bg-[#F5F3EE]">
 
       <style>{`
         @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
@@ -337,10 +337,8 @@ export default function ContactPage() {
 
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-[#0D0D0D] py-12 sm:py-16 px-4 sm:px-6 lg:px-12 text-center">
-        <div className="absolute -top-20 -right-20 w-80 h-80 rounded-full bg-blue-600/12 blur-[80px] pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-64 h-64 rounded-full bg-blue-600/8 blur-[70px] pointer-events-none" />
 
-        <div className="relative container mx-auto max-w-3xl">
+        <div className="relative container-custom max-w-3xl">
           <div
             className="inline-flex items-center gap-2 mb-6"
             style={{ animation: "fadeUp 0.42s 0s ease" }}
@@ -355,10 +353,10 @@ export default function ContactPage() {
             className="text-4xl lg:text-6xl font-extrabold text-white tracking-tight leading-tight mb-5"
             style={{ animation: "fadeUp 0.42s 0.06s ease" }}
           >
-            Contact <span className="text-blue-500">ACCIAN</span>
+            Let’s discuss <span className="text-blue-500">your next step.</span>
           </h1>
           <p
-            className="text-sm lg:text-base font-light text-white/75 leading-relaxed max-w-xl mx-auto"
+            className="text-sm lg:text-base font-light text-white/75 leading-relaxed max-w-xl"
             style={{ animation: "fadeUp 0.42s 0.12s ease" }}
           >
             Tell us about your project, ask a question or discuss a service. Send an enquiry below, or contact us directly by email or phone.
@@ -368,7 +366,7 @@ export default function ContactPage() {
 
       {/* ── MAIN GRID ─────────────────────────────────────────────────────── */}
       <section className="py-10 sm:py-16 px-4 sm:px-6 lg:px-12">
-        <div className="container mx-auto grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
+        <div className="container-custom grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
           {/* ── FORM ──────────────────────────────────────────────────────── */}
           <Reveal className="lg:col-span-3" direction="left">
             <div className="bg-white border border-[#E8E4DC] rounded-2xl p-5 sm:p-8 lg:p-10 hover:shadow-xl hover:shadow-black/5 transition-shadow duration-300">
@@ -750,7 +748,7 @@ export default function ContactPage() {
                     {
                       icon: MapPin,
                       label: "Location",
-                      primary: "🇬🇧 United Kingdom",
+                      primary: "United Kingdom",
                       secondary: "Serving clients worldwide",
                     },
                   ].map(

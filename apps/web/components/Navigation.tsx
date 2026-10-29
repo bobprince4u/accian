@@ -8,8 +8,9 @@ import { Menu, X } from "lucide-react";
 
 const links = [
   { name: "Home", path: "/" },
-  { name: "Services", path: "/services" },
+  { name: "Business Technology", path: "/services" },
   { name: "Research Support", path: "/research-support" },
+  { name: "About", path: "/#about" },
   { name: "Contact", path: "/contact" },
 ];
 
@@ -81,7 +82,7 @@ export default function Navigation() {
                 {link.name}
               </Link>
             ))}
-            <Link href="/pre-consultation" className="btn-primary">Start pre-consultation</Link>
+            <Link href="/contact" className="btn-primary">Let’s talk</Link>
           </div>
           <button ref={toggleRef} type="button" className="flex h-11 w-11 items-center justify-center rounded-lg border border-[#D8D3C9] lg:hidden"
             onClick={() => setOpenPath(open ? null : pathname)} aria-label={open ? "Close navigation menu" : "Open navigation menu"}
@@ -100,8 +101,8 @@ export default function Navigation() {
               </li>
             ))}
           </ul>
-          <Link href="/pre-consultation" onClick={() => setOpenPath(null)} className="btn-primary mt-4 w-full">Start pre-consultation</Link>
-          <p className="mt-2 text-center text-xs text-[#666666]">For research enquiries. <Link href="/contact" onClick={() => setOpenPath(null)} className="underline underline-offset-4">Contact us about technology services</Link>.</p>
+          <Link href="/contact" onClick={() => setOpenPath(null)} className="btn-primary mt-4 w-full">Let’s talk</Link>
+          <p className="mt-2 text-center text-xs text-[#666666]">Preparing for research? <Link href="/pre-consultation" onClick={() => setOpenPath(null)} className="underline underline-offset-4">Start your pre-consultation</Link>.</p>
         </div>
       </div>
     </nav>

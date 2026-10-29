@@ -1,22 +1,5 @@
-/**
- * Research Support — the page that leads into the pre-consultation form.
- *
- * Rewritten in two respects.
- *
- *  - It used to carry its own design system: a Google Fonts `@import`, a
- *    navy-and-gold palette and roughly 180 lines of scoped CSS that matched no
- *    other page on the site. It now uses the cream / ink / blue palette,
- *    Poppins and Tailwind utilities the rest of `apps/web` uses, so the page
- *    reads as part of the site rather than as a visitor to it.
- *
- *  - The journey it described was "download a .docx, fill it in, email it
- *    back". That flow is replaced by `/pre-consultation`, so every call to
- *    action points there. Nothing on this page downloads a form or opens a
- *    mail client.
- *
- * The support areas, the document list and the file rules are read from the
- * same constants the form renders and the API validates against, so this page
- * cannot promise something the form would refuse.
+/** Research guidance and the entry point to the existing pre-consultation flow.
+ * Support areas, documents and file rules share the form/API contract.
  */
 
 import { type ComponentType } from "react";
@@ -79,7 +62,7 @@ const phases: Phase[] = [
     number: "01",
     title: "Topic identification",
     description:
-      "We start from what genuinely interests you and narrow it to a question that is specific, original and answerable — one a supervisor will want to take on.",
+      "We start from what genuinely interests you and narrow it to a question that is specific, original and answerable — suited to further discussion with potential supervisors.",
     icon: Compass,
   },
   {
@@ -93,7 +76,7 @@ const phases: Phase[] = [
     number: "03",
     title: "Proposal development",
     description:
-      "Aims, research questions, methodology, contribution and timeline — drafted with you until the argument holds together on the page.",
+      "Aims, research questions, methodology, contribution and timeline — guidance and feedback to help you develop a coherent proposal in your own words.",
     icon: PenLine,
   },
   {
@@ -141,7 +124,7 @@ const supportDetail: Record<string, { icon: IconComponent; description: string }
     "topic-identification": {
       icon: Search,
       description:
-        "You know the field but not the question. We narrow it to something viable and fundable.",
+        "You know the field but not the question. We narrow it to something focused and viable.",
     },
     "idea-refinement": {
       icon: Lightbulb,
@@ -156,7 +139,7 @@ const supportDetail: Record<string, { icon: IconComponent; description: string }
     "proposal-development": {
       icon: FileText,
       description:
-        "End-to-end drafting, from aims and methodology through to your timeline.",
+        "Guidance on structure, aims, methodology and timeline as you develop your own proposal.",
     },
     "application-guidance": {
       icon: Target,
@@ -207,7 +190,7 @@ const faqs: Faq[] = [
   {
     question: "How long does the process take?",
     answer:
-      "It depends on the scope of support, but most clients have a complete proposal ready within two to four weeks of engaging with us.",
+      "Timing depends on your starting point, the support you need and your application deadlines. We discuss a suitable schedule before agreeing the work.",
   },
   {
     question: "What if I have to stop partway through the form?",
@@ -227,18 +210,16 @@ const faqs: Faq[] = [
 
 export default function ResearchSupportPage() {
   return (
-    <div className="bg-[#F5F3EE]">
+    <div className="content-page bg-[#F5F3EE]">
       {/* ── HERO ─────────────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-[#0D0D0D] py-12 sm:py-16 lg:py-20 px-4 sm:px-6 lg:px-12">
-        <div className="pointer-events-none absolute -top-32 right-0 h-125 w-125 rounded-full bg-blue-600/15 blur-[120px]" />
-        <div className="pointer-events-none absolute -bottom-40 -left-24 h-96 w-96 rounded-full bg-blue-600/8 blur-[100px]" />
 
-        <div className="relative container mx-auto">
+        <div className="relative container-custom">
           <div className="hero-stagger max-w-3xl">
             <div className="mb-5 inline-flex items-center gap-2">
               <span className="block h-0.5 w-7 rounded-full bg-blue-500" />
               <span className="text-xs font-semibold uppercase tracking-widest text-blue-400">
-                PhD Research Pathway
+                MRes / MPhil / PhD
               </span>
             </div>
 
@@ -301,9 +282,11 @@ export default function ResearchSupportPage() {
         </div>
       </section>
 
+      <div className="container-custom py-6 text-sm text-[#555555]">ACCIAN provides independent guidance for your own work. Universities make admissions decisions and award degrees; admission is not guaranteed.</div>
+
       {/* ── THE PATHWAY ──────────────────────────────────────────────────── */}
       <section className="bg-[#F5F3EE] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
-        <div className="container mx-auto">
+        <div className="container-custom">
           <Reveal className="mb-16 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="eyebrow mb-3">The Pathway</p>
@@ -358,7 +341,7 @@ export default function ResearchSupportPage() {
 
       {/* ── HOW IT WORKS ─────────────────────────────────────────────────── */}
       <section className="bg-[#EDE9E0] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
-        <div className="container mx-auto">
+        <div className="container-custom">
           <Reveal className="mb-14 max-w-2xl">
             <p className="eyebrow mb-3">Getting Started</p>
             <h2 className="mb-4 text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
@@ -421,7 +404,7 @@ export default function ResearchSupportPage() {
 
       {/* ── WHAT WE HELP WITH ────────────────────────────────────────────── */}
       <section className="bg-[#F5F3EE] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
-        <div className="container mx-auto">
+        <div className="container-custom">
           <Reveal className="mb-14 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="eyebrow mb-3">Our Support</p>
@@ -468,7 +451,7 @@ export default function ResearchSupportPage() {
 
       {/* ── DOCUMENTS TO HAVE READY ──────────────────────────────────────── */}
       <section className="bg-[#0D0D0D] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
-        <div className="container mx-auto">
+        <div className="container-custom">
           <Reveal className="mb-14 max-w-2xl">
             <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-blue-500">
               Before You Begin
@@ -520,7 +503,7 @@ export default function ResearchSupportPage() {
 
       {/* ── FAQs ─────────────────────────────────────────────────────────── */}
       <section className="bg-[#EDE9E0] py-14 sm:py-20 px-4 sm:px-6 lg:px-12">
-        <div className="container mx-auto grid items-start gap-16 lg:grid-cols-5">
+        <div className="container-custom grid items-start gap-16 lg:grid-cols-5">
           <Reveal className="lg:col-span-2 lg:sticky lg:top-28">
             <p className="eyebrow mb-3">FAQs</p>
             <h2 className="mb-4 text-3xl lg:text-4xl font-bold leading-tight tracking-tight text-[#0D0D0D]">
@@ -558,7 +541,7 @@ export default function ResearchSupportPage() {
         <div className="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-blue-600/10" />
         <div className="pointer-events-none absolute -bottom-20 -left-20 h-72 w-72 rounded-full bg-blue-600/6" />
 
-        <div className="relative container mx-auto max-w-3xl text-center">
+        <div className="relative container-custom max-w-3xl text-center">
           <Reveal>
             <p className="mb-4 text-xs font-semibold uppercase tracking-widest text-blue-500">
               Next step

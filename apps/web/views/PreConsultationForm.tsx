@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The PhD Research Pathway pre-consultation form.
+ * The MRes / MPhil / PhD pre-consultation form.
  *
  * Replaces the download-fill-email flow the Research Support page used to
  * describe: the applicant completes this, attaches their documents, and the
@@ -528,14 +528,14 @@ export default function PreConsultationForm() {
   const furthest = furthestAllowedStep(state);
 
   return (
-    <div className="bg-[#F5F3EE]">
+    <div className="content-page bg-[#F5F3EE]">
       <div ref={topRef} className="scroll-mt-24" />
 
       {/* Intro */}
       <header className="border-b border-[#E8E4DC] bg-white">
         <div className="hero-stagger mx-auto max-w-4xl px-5 py-8 sm:px-8 sm:py-12">
           <p className="text-xs font-semibold tracking-[0.2em] uppercase text-[#1B4FFF]">
-            PhD Research Pathway
+            MRes / MPhil / PhD
           </p>
           <h1 className="mt-3 text-3xl font-bold leading-tight tracking-tight text-[#0D0D0D] sm:text-4xl">
             Pre-consultation form

@@ -27,7 +27,7 @@ export default function ProjectHighlights() {
 
   return (
     <section id="projects" className="bg-[#EDE9E0] px-4 py-14 sm:px-6 sm:py-20 lg:px-12" aria-labelledby="projects-heading">
-      <div className="container mx-auto">
+      <div className="container-custom">
         <Reveal><p className="eyebrow mb-3">Our work</p>
         <h2 id="projects-heading" className="text-3xl font-bold lg:text-4xl">Projects &amp; outcomes</h2></Reveal>
         {loading ? <p role="status" className="mt-6 text-sm text-[#555555]">Loading projects…</p>

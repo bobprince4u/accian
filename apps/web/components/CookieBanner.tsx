@@ -29,7 +29,7 @@ export default function CookieBanner() {
 
   return (
     <section aria-label="Cookie preferences" className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4">
-      <div className="bg-[#0D0D0D] border border-white/10 text-white rounded-2xl shadow-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-[#0D0D0D] border border-white/10 text-white rounded-sm shadow-lg p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <p className="text-xs font-semibold tracking-widest uppercase text-blue-400 mb-1">
             Cookie Notice

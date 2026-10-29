@@ -39,6 +39,7 @@ coverage/
 *.tsbuildinfo
 
 # Editor and OS
+.agents
 .vscode/*
 !.vscode/extensions.json
 .idea
